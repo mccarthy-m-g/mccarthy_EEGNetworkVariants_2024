@@ -4,7 +4,7 @@
 #'
 #' @return Logical.
 eeg_recordings_unavailable <- function() {
-  fs::dir_exists(
+  !fs::dir_exists(
     here::here("data", "EEG-recordings", "raw")
   )
 }

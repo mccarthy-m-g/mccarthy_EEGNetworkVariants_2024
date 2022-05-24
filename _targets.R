@@ -248,8 +248,13 @@ descriptives_targets <- list(
       participant_descriptives_path,
       participants = participants_final
     )
+  ),
+  # Preprocessing descriptive statistics ----
+  tar_target(
+    bad_channels_descriptives_final,
+    summarize_bad_channels(file_handler_final)
   )
-  # TODO: Preprocessing descriptive statistics
+  # TODO: Add targets for bad segments and bad ICA indices
 )
 
 manuscripts_targets <- list(

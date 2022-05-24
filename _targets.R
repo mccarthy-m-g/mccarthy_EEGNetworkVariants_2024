@@ -208,6 +208,10 @@ connectivity_estimation_targets <- list(
       phase_similarity_plot,
       plot_similarity(phase_similarity, rv)
     )
+  ),
+  tar_target(
+    similarity_archetype_plot,
+    plot_similarity_archetype(phase_similarity_gamma)
   )
 )
 

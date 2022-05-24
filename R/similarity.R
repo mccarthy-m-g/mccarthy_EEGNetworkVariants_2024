@@ -267,72 +267,72 @@ plot_similarity_highlight <- function(similarity_results, participant) {
     ggplot2::theme(legend.position = "none")
 }
 
-# TODO: Write this function then add a target. Note: The target does not need to
-# be mapped, just need one copy of each.
-# Need to decide whether to return a list or make an argument for which effect to plot
+# TODO: Add a target. Note: The target does not need to be mapped, just need one copy of each.
+#' Title
+#'
+#' @param similarity_results
+#'
+#' @return List of ggplots.
 plot_similarity_archetype <- function(similarity_results) {
 
-  # Group effect (this would be calculated for each person)
-  # These ones are good!
-  similarity_results %>%
-    dplyr::mutate(rv = 1.0) %>%
+  group_effect <- similarity_results |>
+    dplyr::mutate(rv = 1.0) |>
     plot_similarity(estimate = rv)
 
-  # Session effect
-  # These ones are good!
-  similarity_results %>%
+  session_effect <- similarity_results |>
     dplyr::mutate(
       rv = dplyr::case_when(
         within_session == TRUE ~ 1.0,
         within_session == FALSE ~ 0.0
       )
-    ) %>%
+    ) |>
     plot_similarity(estimate = rv)
 
-  # State effect (this would be calculated for each person)
-  # These ones are good!
-  similarity_results %>%
+  state_effect <- similarity_results |>
     dplyr::mutate(
       rv = dplyr::case_when(
         within_state == TRUE ~ 1.0,
         within_state == FALSE ~ 0.0
       )
-    ) %>%
+    ) |>
     plot_similarity(estimate = rv)
 
-  # Individual effect (this would be calculated for each person)
-  # These ones are good!
-  similarity_results %>%
+  individual_effect <- similarity_results |>
     dplyr::mutate(
       rv = dplyr::case_when(
         within_participant == TRUE ~ 1.0,
         within_participant == FALSE ~ 0.0
       )
-    ) %>%
+    ) |>
     plot_similarity(estimate = rv)
 
-  # Individual and session
-  # These ones are good!
-  similarity_results %>%
+  individual_session_effect <- similarity_results |>
     dplyr::mutate(
       rv = dplyr::case_when(
         within_participant == TRUE & within_session == TRUE ~ 1.0,
         within_participant == TRUE & within_session == FALSE ~ 0.0,
         within_participant == FALSE ~ 0.0
       )
-    ) %>%
+    ) |>
     plot_similarity(estimate = rv)
 
-  # Individual and state
-  # These ones are good!
-  similarity_results %>%
+  individual_state_effect <- similarity_results |>
     dplyr::mutate(
       rv = dplyr::case_when(
         within_participant == TRUE & within_state == TRUE ~ 1.0,
         within_participant == TRUE & within_state == FALSE ~ 0.0,
         within_participant == FALSE ~ 0.0
       )
-    ) %>%
+    ) |>
     plot_similarity(estimate = rv)
+
+  list(
+    group_effect              = group_effect,
+    session_effect            = session_effect,
+    state_effect              = state_effect,
+    individual_effect         = individual_effect,
+    individual_session_effect = individual_session_effect,
+    individual_state_effect   = individual_state_effect
+  )
 
 }

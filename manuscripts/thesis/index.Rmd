@@ -1,0 +1,69 @@
+---
+params:
+  introduction_path: "path"
+  methods_path: "path"
+  references_path: "path"
+
+title             : "Studying network variants with electroencephalography"
+shorttitle        : "Network Variants"
+
+author: 
+  - name          : "Michael McCarthy"
+    affiliation   : "1"
+    corresponding : no    # Define only one corresponding author
+    address       :
+    email         : "michael.mccarthy@ucalgary.ca"
+
+
+affiliation:
+  - id            : "1"
+    institution   : "University of Calgary"
+
+note      : |
+  Author's Note: 
+
+abstract          : |
+  The study of network variants, individual-specific deviations in whole brain functional network organization, is an area of growing interest in human neuroscience due to its relevance for understanding *how much* and *in which ways* whole brain functional networks differ between and within individuals. Previous research has used highly sampled functional magnetic resonance imaging (fMRI) data to study network variants, creating a considerable practical barrier due to the cost of this work. The proposed research explores the feasability of using a relatively cheaper neuroimaging modality, electroencephalography (EEG), to study network variants. Paralleling the respective developments in the functional magnetic resonance imaging literature, we first test how much data is needed to observe stable effects within an individual using repeated measures resting state EEG. After establishing the amount of data needed to observe stable effects within an individual, we will examine how whole brain functional networks differ between and within individuals using EEG source space functional connectivity analysis and measures of network similarity. Given the similarities between EEG and fMRI functional connectivity, we expect to find patterns of network variants similar to those found in fMRI studies. The proposed research accomplishes two important goals: First, it addresses several calls in the literature to explore alternative metrics and paradigms that may move us closer to understanding the neural causes of differences in behaviour. Second it lays the empirical groundwork for future neuroscience research seeking to study how whole brain functional networks differ between and within individuals using EEG.
+
+keywords          : |
+  Electroencephalography, Functional Connectivity, Network Variants, Individual Differences
+wordcount         : 
+
+bibliography      : "`r params$references_path`"
+
+floatsintext      : no
+figurelist        : no
+tablelist         : no
+footnotelist      : no
+linenumbers       : yes
+mask              : no
+draft             : no
+
+documentclass     : "apa6"
+classoption       : "man"
+output            : papaja::apa6_word
+---
+
+```{r setup, include = FALSE}
+library(papaja)
+library(targets)
+```
+
+```{r introduction}
+#| child = params$introduction_path
+```
+
+```{r methods}
+#| child = params$methods_path
+```
+
+\newpage
+
+# References
+
+\begingroup
+\setlength{\parindent}{-0.5in}
+\setlength{\leftskip}{0.5in}
+
+<div id="refs" custom-style="Bibliography"></div>
+\endgroup

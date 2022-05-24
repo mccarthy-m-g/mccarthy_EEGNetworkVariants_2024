@@ -1,0 +1,138 @@
+# Methods
+
+## Data
+
+In this study, we used EEG data previously collected by our lab as part of a larger study. The larger study involved the collection of EEG recordings during resting state (eyes open and eyes closed) and during a lexical decision task [@meyerschvaneveldt_FacilitationRecognizingPairs_1971] across three repeated measures sessions. The data collected during the lexical decision task is described in detail by @cnuddeetal_IncreasedNeuralEfficiency_2021 and is available at <https://osf.io/da478/>. Here we only use the EEG recordings collected during resting state, which has not been previously described or made publicly available. All participants provided written informed consent before taking part in the study and were provided with monetary compensation for their participation. Ethics approval was received from the Conjoint Faculties Research Ethics Board of the University of Calgary.
+
+### Participants
+
+```{r demographic-descriptives}
+tar_load(participant_descriptives)
+tar_load(participant_descriptives_final)
+```
+
+Data from `r xfun::numbers_to_words(participant_descriptives$n)` healthy adults (`r participant_descriptives$male` males, `r participant_descriptives$female` females) whose ages ranged from `r participant_descriptives$years_age_min` to `r participant_descriptives$years_age_max` years (M = `r papaja::apa_num(participant_descriptives$years_age_mean)`, SD = `r papaja::apa_num(participant_descriptives$years_age_sd)`) and whose years of education ranged from `r participant_descriptives$years_education_min` to `r participant_descriptives$years_education_max` years (M = `r papaja::apa_num(participant_descriptives$years_education_mean)`, SD = `r papaja::apa_num(participant_descriptives$years_education_sd)`) was collected as part of the larger study mentioned above. All participants were right handed, spoke English as a first language, and had normal or corrected-to-normal vision. No participants had a history of neurological disease or disorder, mental illness, head trauma, alcoholism or drug abuse, or use of psychotropic medications within the last two years preceding data collection. Three participants were excluded from analyses because they did not participate in the final session; one participant was excluded because their data from the final session was lost; and three participants were excluded because they had one or more recordings that were of an unusable quality.
+
+The final sample used for analysis consisted of `r xfun::numbers_to_words(participant_descriptives_final$n)` participants (`r participant_descriptives_final$male` males, `r participant_descriptives_final$female` females) whose ages ranged from `r participant_descriptives_final$years_age_min` to `r participant_descriptives_final$years_age_max` years (M = `r papaja::apa_num(participant_descriptives_final$years_age_mean)`, SD = `r papaja::apa_num(participant_descriptives_final$years_age_sd)`) and whose years of education ranged from `r participant_descriptives_final$years_education_min` to `r participant_descriptives_final$years_education_max` years (M = `r papaja::apa_num(participant_descriptives_final$years_education_mean)`, SD = `r papaja::apa_num(participant_descriptives_final$years_education_sd)`). All data descriptions and results described below are based on this final sample. 
+
+### Electrophysiological Data Acquisition
+
+Electrophysiological data acquisition for each participant was done within a dimly lit, radio frequency shielded, and sound attenuated chamber on three separate occasions. The time between the first and second occasion ranged from `r participant_descriptives_final$days_pre_to_post_min` to `r participant_descriptives_final$days_pre_to_post_max` days (M = `r papaja::apa_num(participant_descriptives_final$days_pre_to_post_mean)`, SD = `r papaja::apa_num(participant_descriptives_final$days_pre_to_post_sd)`), and the time between the second and third occasion ranged from `r participant_descriptives_final$days_post_to_followup_min` to `r participant_descriptives_final$days_post_to_followup_max` days (M = `r papaja::apa_num(participant_descriptives_final$days_post_to_followup_mean)`, SD = `r papaja::apa_num(participant_descriptives_final$days_post_to_followup_sd)`). On each occasion, an EasyCap electrolyte-gel-filled cap with 64 active electrodes following 10-10 positioning was used to continuously record electrophysiological activity at the scalp (Brain Products GmbH, Gilching, Germany). Channel Cz was used as the reference electrode. A Brain Vision Solutions actiCHamp amplifier was used to amplify microvolt signals from the electrodes and transform them into digital format for storage and analysis (Brain Products GmbH, Gilching, Germany). All data were sampled at 500 Hz, and band limited with a built-in 0.05-100 Hz band-pass filter. All electrode impedances were below 17 kW at the start of recording.
+
+<!-- TODO: Consider actually getting the recording metadata such as lengths from MNE -->
+
+Each participant underwent 80 minutes of EEG recording. We first collected ten minutes of resting state data, in which participants had their eyes open for five minutes and their eyes closed for five minutes. The order of eyes open and eyes closed was counter-balanced across participants. This was followed by approximately 60 minutes of task state data collected during performance of a lexical decision task [for a detailed description, see @cnuddeetal_IncreasedNeuralEfficiency_2021]. Finally, ten more minutes of resting state data were collected, with the order of eyes open and eyes closed again being counter-balanced across participants. Across all three occasions, each participant was recorded for a total of 30 minutes during eyes open resting state (over 6 recordings), 30 minutes during eyes closed resting state (over 6 recordings), and 180 minutes during task state (over 3 recordings).
+
+### EEG preprocessing
+
+```{r preprocessing-descriptives}
+# TODO: read in targets
+```
+
+Raw EEG data was preprocessed to remove noise and non-neural artifacts from the data. All EEG preprocessing was done using the open source Python package MNE-Python [version 2.2.0, <https://doi.org/10.5281/zenodo.4338426>; @gramfortetal_MEGEEGData_2013]. The following steps were done to preprocess the raw EEG data from each recording.
+
+<!-- TODO: Update to reflect changes in targets pipeline -->
+
+First, following recommendations by @widmannetal_DigitalFilterDesign_2015, a two-pass forward and reverse, zero-phase, non-causal band-pass finite impulse response filter was used to remove slow drift potentials at infraslow frequencies less than 0.10 Hz, line noise at 60.00 Hz, and irrelevant noise fluctuations greater than 60.00 Hz [@decheveignenelken_FiltersWhenWhy_2019; @widmannetal_DigitalFilterDesign_2015]. The finite impulse response filter used a Hamming window with 0.0194 passband ripple and 53 dB stopband attenuation. The lower passband edge and transition bandwidth were set at 0.10 Hz (-12 dB cutoff frequency: 0.05 Hz), and the upper passband edge and transition bandwidth were set at 50.00 Hz (-12 dB cutoff frequency: 56.25 Hz). The filter length was 16501 samples (33.002 seconds). These filter parameters were selected after exploring the difference between raw and filtered signals and verifying that the selected filter parameters improved signal quality over alternative filter parameters or the raw signal [@widmannetal_DigitalFilterDesign_2015].[^2]
+
+Second, the data was downsampled from 500 to 200 Hz in order to reduce the size of the data and speed up computations operating on the data. <!-- TODO: talk about Nyquist frequency or whatever -->
+
+<!-- This would be first --> Third, data was rereferenced from Channel Cz, which served as the original reference electrode during recording, to a virtual common average reference electrode in order to reduce spatial biases in the signal amplitude of channels caused by their distance to the original reference electrode. Rereferencing was done by first adding Channel Cz to the data with its values set to zero, then averaging the signal over all channels and subtracting this average signal from each channel, which allowed each channel to contribute equally to the new reference.
+
+<!-- https://www.brainlatam.com/blog/choosing-your-reference-for-an-eeg-recording-and-the-advantage-of-use-analyzer-696?email=cesarnoronha@brainsupport.co -->
+
+<!-- TODO: add inline code --> 
+
+Fourth, bad channels and segments were manually marked and removed to prepare the data for ICA decomposition. Channels were marked as bad if they contained excessive noise or drift for a significant portion of the recording. Segments were marked as bad if they contained excessive noise or drift that (1) could interfere with fitting the ICA decomposition due to the amount of variance their component would capture, or (2) was unlikely to be repaired by ICA decomposition. These were subjective judgements and we did our best to make consistent decisions about what was bad across recordings.
+
+Figure \@ref(fig:preprocessing-plots)A shows the number of bad channels marked per recording across the entire sample. Bad channels were marked in 26.2% <!-- TODO: add inline code --> of recordings, ranging from 1 to 7 <!-- TODO: add inline code --> bad channels marked per recording with a mode of 1 <!-- TODO: add inline code -->. Figure \@ref(fig:preprocessing-plots)B shows the number of times a given channel was marked bad across the entire sample. The number of times channels were marked bad followed a power law distribution, with the 20% most marked channels (T8, TP9, TP10, T7, FT7 <!-- TODO: add inline code -->) accounting for 55.91% <!-- TODO: add inline code --> of times a channel was marked bad across the entire sample. 
+
+Figure \@ref(fig:preprocessing-plots)C shows the number of bad segments marked per recording across the entire sample. Bad segments were marked in 94.05% <!-- TODO: add inline code --> of the recordings, ranging from 1 to 11 <!-- TODO: add inline code --> bad segments marked per recording with a mode of 1 <!-- TODO: add inline code -->. Figure \@ref(fig:preprocessing-plots)D shows the duration of bad segments in seconds across the entire sample. ... <!-- TODO: add descriptive stats about this part -->.
+
+Fifth, ICA decomposition fitted using the Picard algorithm [@ablinetal_FasterICAOrthogonal_2017; @ablinetal_FasterIndependentComponent_2018] was performed to remove components carrying muscle artifacts or ocular artifacts (eye blinks, saccades, or horizontal eye movements) from the data. Components carrying artifacts were manually marked for removal.
+
+<!--
+
+TODO: Test sensitivity of results to different ICA configurations.
+
+Can try the following:
+- Limit the max number of bad components removed from a recording to the first ten or less.
+- Automated methods.
+-->
+
+Finally, the activity of bad channels removed in step four was interpolated using spherical splines [@perrinetal_SphericalSplinesScalp_1989] and the interpolated channels were put back into the data.
+
+<!--
+Note: https://neuroimage.usc.edu/forums/t/downsampling-data-before-ica-processing/3064/5
+Apparently downsampling doesn't affect ICA results, so we could actually identify components on the downsampled data, but then apply the ICAs to the data sampled at the original rate.
+-->
+
+
+
+```{r preprocessing-plots}
+
+```
+
+## Analyses
+
+### Functional Connectivity
+
+<!-- TODO: Break this section into two: One for source reconstruction and one for functional connectivity. Follow what this paper did: Fraschini, M., Demuru, M., Crobe, A., Marrosu, F., Stam, C. J., & Hillebrand, A. (2016). The effect of epoch length on estimated EEG functional connectivity and brain network organisation. Journal of Neural Engineering, 13(3), 036015. doi:10.1088/1741-2560/13/3/036015  -->
+
+Whole brain functional networks were derived within individuals using static functional connectivity. Static functional connectivity between EEG channels was estimated in each of the canonical frequency bands using the following pipeline recommended by @sadaghianiwirsich_IntrinsicConnectomeOrganization_2020. The exact decisions made at each step of the pipeline followed recommendations by @hassanwendling_ElectroencephalographySourceConnectivity_2018, @michelbrunet_EEGSourceImaging_2019, @oneilletal_DynamicsLargescaleElectrophysiological_2018, and  @schoffelengross_SourceConnectivityAnalysis_2009.
+
+First, epoching to remove bad segments...
+
+After preprocessing, EEG data was first filtered into five frequency bands thought to represent different neural processes [see @sadaghianiwirsich_IntrinsicConnectomeOrganization_2020]: delta ($\delta$, 1-4 Hz), theta ($\theta$, 4-8 Hz), alpha ($\alpha$, 8-13 Hz), beta ($\beta$, 13-30 Hz), and gamma ($\gamma$, 30-50 Hz). Filtering the data into these separate frequency bands allows us to investigate whether the organization of functional networks between and within individuals is dependent or invariant of temporal scale (frequency band), rather than assuming network organization is governed solely by broadband processes [@mostamesadaghiani_OscillationBasedConnectivityArchitecture_2021].
+
+
+<!-- TODO: Add notes about appendix/supplement for label connectivity -->
+
+For a third step, we originally planned for sensor space signal time courses to be source localized and reconstructed to regions of a common template whole-brain parcellation so that (1) functional connectivity could estimated between pairs of brain regions rather than pairs of EEG channels; and (2) we could avoid some of the ambiguities associated with sensor space functional connectivity analysis, such as field spread [@oneilletal_DynamicsLargescaleElectrophysiological_2018; @schoffelengross_SourceConnectivityAnalysis_2009]. However, after examining the source space functional connectivity estimates (the functional connectivity metrics we used are described in the next step below), we found that they were largely noise---showing consistently low connectivity between all brain regions, regardless of recording or frequency band. In contrast, sensor space functional connectivity estimates showed appreciable levels of connectivity and variation across recordings and frequency bands. Given this discrepancy, we did not feel confident in the quality of the transformations made to the data during source localization and reconstruction, so we decided to forgo this step.
+
+<!-- TODO: Add equations for connectivity measures, talk about the range of values they can take and their interpretation -->
+
+Finally, oscillation-based functional connectivity was estimated between each pair of EEG channels, once using amplitude coupling and once using phase coupling. Phase and amplitude coupling are thought to reflect different but related neurophysiological functions and it is common to use both measures so they can be compared [@engeletal_IntrinsicCouplingModes_2013; @sadaghianiwirsich_IntrinsicConnectomeOrganization_2020]. Specifically, amplitude coupling is thought to coordinate changes in (co)activation of brain areas on slow timescales, and phase coupling is thought to regulate the integration and flow of cognitive contents on fast timescales [@engeletal_IntrinsicCouplingModes_2013]. To reduce the influence of source signal leakage on the estimations of functional connectivity, amplitude coupling was calculated using the leakage controlled amplitude envelope correlation [@brookesetal_MeasuringFunctionalConnectivity_2012], and phase coupling was calculated using the phase lag index [@stametal_PhaseLagIndex_2007]. The resulting functional connectivity matrices (or functional connectomes) reflect electrophysiologically derived cortical functional networks for each frequency band using different oscillation-based measures.
+
+<!-- Should I mention something like this here? "The intracranial sources of scalp electric potential differences are thought to be cortical pyramidal neurons, which undergo post-synaptic potentials (PSP) that create an active, impressed current density. The dipolar nature (current density vector) of these sources is documented in (Mitzdorf 1985 and Martin 1992)." -->
+
+### Functional connectome similarity
+
+<!-- TODO: Describe how performance of RV coefficient was evaluated. Maybe add equation. Maybe consider using the adjusted version instead. -->
+
+The similarity of static functional connectomes across state (eyes open or eyes closed resting state), individual, and occasion within the delta, theta, alpha, beta, and gamma bands was next quantified by estimating the RV coefficient [@robertescoufier_UnifyingToolLinear_1976] between all pairs of functional connectomes from a given state, individual, and occasion. The RV coefficient is a multivariate measure of the linear relationship between two positive semi-definite matrices $\mathbf{X}$ and $\mathbf{Y}$ that takes values between 0 (no linear relationship) and 1 (perfect linear relationship) [@abdiherve_RVCoefficientCongruence_2007; @escoufier_TraitementVariablesVectorielles_1973; @josseholmes_MeasuringMultivariateAssociation_2016], given by
+
+$$
+\newcommand{\tr}{\mathop{\rm trace}}
+
+\mathrm{RV}(\mathbf{X}, \mathbf{Y}) = \frac{ 
+  \tr(\mathbf{ST})
+}{
+  \sqrt{\tr(\mathbf{SS}) \times \tr(\mathbf{TT})}
+},
+$$
+
+where $\mathbf{S} = \mathbf{XX}^\mathsf{T}$ and 
+
+
+can be interpreted similarly to the Pearson correlation [@josseholmes_MeasuringMultivariateAssociation_2016].
+
+
+
+
+The RV coefficient is a multivariate measure of association between two functional connectomes that can be interpreted similarly to the Pearson correlation [@josseholmes_MeasuringMultivariateAssociation_2016]. 
+
+
+These RV coefficients were then visualized with a heat map to examine the amount and pattern of similarity within states, individuals, occasions, and the entire sample.
+
+<!-- TODO: Fix this part to reflect whatever changes we make -->
+
+Following this, the relative magnitude of influence that states, individuals, occasions, and their interactions have on similarity was calculated. This was done by first calculating the average of the RV coefficients across (1) all states, individuals, and occasions (group effect); (2) the same state but different individuals (state effect); (3) the same individual but different states and sessions (individual effect); (4) the same individual and session but different states (individual and session effect); and (5) the same individual and state but different sessions (individual and state effect). These effects were then compared using paired two-tailed t-test with p-values corrected using the false discovery rate.[^3]
+
+<!-- Footnotes start ---------------------------------------------------------->
+
+[^2]: We may go back and refine the filter parameters further. After some peer review it was suggested that widening the highpass filter and increasing the cutoff might help with some artifacts that were difficult to clean.
+
+[^3]: We're basing this analysis off the @grattonetal_FunctionalBrainNetworks_2018 paper, but the description of the paired t-test comparisons in that paper doesn't make a lot of sense. My interpretation of their method leads me to think that each of the five effects has a different number of observations, but then a paired t-test would not be possible here. So we need data to play around with to figure out what's going on and to make sure this part of the analysis is statistically sound. 
+
+<!-- Footnotes end ---------------------------------------------------------->

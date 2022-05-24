@@ -267,7 +267,6 @@ plot_similarity_highlight <- function(similarity_results, participant) {
     ggplot2::theme(legend.position = "none")
 }
 
-# TODO: Add a target. Note: The target does not need to be mapped, just need one copy of each.
 #' Title
 #'
 #' @param similarity_results

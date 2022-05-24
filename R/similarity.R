@@ -4,6 +4,7 @@
 #'
 #' @return
 case_order <- function(participant_ids) {
+
   tidyr::expand_grid(
     participant = participant_ids,
     session_state = factor(
@@ -26,6 +27,7 @@ case_order <- function(participant_ids) {
     dplyr::arrange(participant) |>
     dplyr::mutate(label = paste0(participant, "_", session_state)) |>
     purrr::pluck("label")
+
 }
 
 #' Generate pairwise comparisons
@@ -80,6 +82,7 @@ pairwise_comparisons <- function(input) {
   )
 
   connectivity_matrix_pairs
+
 }
 
 #' Estimate similarity between list of connectivity matrices
@@ -154,6 +157,7 @@ make_symmetric <- function(similarity_results) {
     dplyr::mutate(dplyr::across(where(is.character), forcats::as_factor))
 
   similarity_results_symmetric
+
 }
 
 #' Plot similarity matrix
@@ -196,6 +200,7 @@ plot_similarity <- function(similarity_results, estimate) {
       axis.text = ggplot2::element_blank(),
       axis.ticks = ggplot2::element_blank()
     )
+
 }
 
 #' Title
@@ -225,7 +230,6 @@ plot_similarity_key <- function(similarity_results, participant) {
 
 }
 
-# TODO: Add target that maps over participants
 #' Title
 #'
 #' @param similarity_results
@@ -264,6 +268,7 @@ plot_similarity_highlight <- function(similarity_results, participant) {
     ggplot2::scale_fill_continuous(limits = c(0, 1), type = "viridis") +
     ggplot2::coord_cartesian(clip = "off") +
     ggplot2::theme(legend.position = "none")
+
 }
 
 #' Title

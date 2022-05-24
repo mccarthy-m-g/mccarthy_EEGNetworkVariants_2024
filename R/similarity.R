@@ -198,7 +198,6 @@ plot_similarity <- function(similarity_results, estimate) {
     )
 }
 
-# TODO: Add as target, consider mapping over participants
 #' Title
 #'
 #' @param similarity_results

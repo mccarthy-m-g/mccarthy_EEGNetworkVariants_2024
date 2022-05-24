@@ -200,6 +200,7 @@ connectivity_estimation_targets <- list(
       iteration = "list"
     ),
     ########## TODO: Plotting connectivity!
+    # Estimate similarity ----
     tar_target(
       phase_similarity,
       estimate_similarity(phase_connectivity_matrix)
@@ -207,6 +208,19 @@ connectivity_estimation_targets <- list(
     tar_target(
       phase_similarity_plot,
       plot_similarity(phase_similarity, rv)
+    ),
+    tar_map(
+      values = tibble(
+        participants = participants_final
+      ),
+      tar_target(
+        phase_similarity_key_plot,
+        plot_similarity_key(phase_similarity, participants)
+      ),
+      tar_target(
+        phase_similarity_highlight_plot,
+        plot_similarity_highlight(phase_similarity, participants)
+      )
     )
   ),
   tar_target(

@@ -37,19 +37,25 @@ case_order <- function(participant_ids) {
 #' @return A tibble.
 pairwise_comparisons <- function(input) {
 
-  # Generate all unique pairwise comparisons over branch names and label names
-  branch_names <- names(input)
+  # Get the branch and label names that go together so pair names are human
+  # readable
   label_names  <- input |>
     purrr::map(~ .x$metadata$case) |>
     unlist()
+  branch_names <- names(label_names)
 
-  # Make sure to allow repeats for self-comparison pairs
+  connectivity_matrix_names <- tibble::tibble(
+    label_names = label_names,
+    branch_names = branch_names
+  )
+
+  # Generate all unique pairwise comparisons over branch names. Make sure to
+  # allow repeats for self-comparison pairs.
   branch_combinations <- gtools::combinations(
     length(branch_names), 2, branch_names, repeats.allowed = TRUE
   )
-  label_combinations <- gtools::combinations(
-    length(label_names), 2, label_names, repeats.allowed = TRUE
-  )
+  colnames(branch_combinations) <- c("x_branch", "y_branch")
+  branch_combinations <- tibble::as_tibble(branch_combinations)
 
   # Get levels for labels
   label_levels <- input |>
@@ -58,33 +64,46 @@ pairwise_comparisons <- function(input) {
     unique() |>
     case_order()
 
-  # Add metadata to assist with analyses and filtering
-  connectivity_matrix_pairs <- tibble::tibble(
-    x_branch = branch_combinations[,1],
-    y_branch = branch_combinations[,2],
-    x_label = factor(label_combinations[,1], levels = label_levels),
-    y_label = factor(label_combinations[,2], levels = label_levels),
-    x_participant = stringr::str_extract(x_label, "^.*?(?=_)"),
-    x_session = stringr::str_extract(x_label, "(?<=_)(.*)(?=_)"),
-    x_state = stringr::str_extract(x_label, "([^_]*)$"),
-    y_participant = stringr::str_extract(y_label, "^.*?(?=_)"),
-    y_session = stringr::str_extract(y_label, "(?<=_)(.*)(?=_)"),
-    y_state = stringr::str_extract(y_label, "([^_]*)$"),
-    within_participant = ifelse(x_participant == y_participant, TRUE, FALSE),
-    within_session = ifelse(x_session == y_session, TRUE, FALSE),
-    within_state = ifelse(
-      stringr::str_detect(x_state, stringr::str_sub(y_state, 1, 2)),
-      TRUE,
-      FALSE
-    ),
-    diagonal = ifelse(x_label == y_label, TRUE, FALSE),
-    pair_label = paste(x_label, y_label, sep = "_x_")
-  )
+  connectivity_matrix_pairs <- branch_combinations |>
+    # Using a join ensures the branch and label names will line up
+    dplyr::full_join(
+      connectivity_matrix_names,
+      by = c("x_branch" = "branch_names")
+    ) |>
+    dplyr::rename(x_label = label_names) |>
+    dplyr::full_join(
+      connectivity_matrix_names,
+      by = c("y_branch" = "branch_names")
+    ) |>
+    dplyr::rename(y_label = label_names) |>
+    dplyr::mutate(
+      # Make labels a factor to assist with plotting order
+      x_label = factor(x_label, levels = label_levels),
+      y_label = factor(y_label, levels = label_levels),
+      # Add metadata to assist with analyses and filtering
+      x_participant = stringr::str_extract(x_label, "^.*?(?=_)"),
+      x_session = stringr::str_extract(x_label, "(?<=_)(.*)(?=_)"),
+      x_state = stringr::str_extract(x_label, "([^_]*)$"),
+      y_participant = stringr::str_extract(y_label, "^.*?(?=_)"),
+      y_session = stringr::str_extract(y_label, "(?<=_)(.*)(?=_)"),
+      y_state = stringr::str_extract(y_label, "([^_]*)$"),
+      within_participant = ifelse(x_participant == y_participant, TRUE, FALSE),
+      within_session = ifelse(x_session == y_session, TRUE, FALSE),
+      within_state = ifelse(
+        stringr::str_detect(x_state, stringr::str_sub(y_state, 1, 2)),
+        TRUE,
+        FALSE
+      ),
+      diagonal = ifelse(x_label == y_label, TRUE, FALSE),
+      pair_label = paste(x_label, y_label, sep = "_x_")
+    )
 
   connectivity_matrix_pairs
 
 }
 
+# TODO: Capture warnings. Different approaches shared here:
+# https://stackoverflow.com/questions/4948361/how-do-i-save-warnings-and-errors-as-output-from-a-function
 #' Estimate similarity between list of connectivity matrices
 #'
 #' @param input The list of connectivity matrices.
@@ -160,6 +179,7 @@ make_symmetric <- function(similarity_results) {
 
 }
 
+# FIXME: Facets aren't in order
 #' Plot similarity matrix
 #'
 #' @param similarity_results The tibble of similarity results.

@@ -51,9 +51,9 @@ estimate_phase_coupling <- function(input_file) {
   output_file <- input_file |>
     # Directory
     stringr::str_replace("recordings", "sensor-connectivity") |>
-    stringr::str_replace("ref_filt-ds_ica_epoch-filt", "phase") |>
+    stringr::str_replace("filt-ds_reref_ica-interp_epoch-filt", "phase") |>
     # File name
-    stringr::str_replace("ref_filt-ds_ica_epoch-filt", "phase") |>
+    stringr::str_replace("filt-ds_reref_ica-interp_epoch-filt", "phase") |>
     stringr::str_replace("-epo.fif.gz", ".csv")
 
   fs::dir_create(fs::path_dir(output_file))

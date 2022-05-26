@@ -9,70 +9,6 @@ eeg_recordings_unavailable <- function() {
   )
 }
 
-#' Get EEG channel dictionary for renaming
-#'
-#' @param file
-#'
-#' @return
-#' @export
-#'
-#' @examples
-get_channel_dictionary <- function(file) {
-  channel_dictionary <- readr::read_csv(file, col_types = readr::cols())
-  channel_dictionary_new <- channel_dictionary |>
-    dplyr::select(new_name) |>
-    dplyr::group_split(dplyr::row_number(), .keep = FALSE) |>
-    purrr::map(unlist)
-  names(channel_dictionary_new) <- channel_dictionary$channel
-  dict(channel_dictionary_new)
-}
-
-#' Reference raw EEG data
-#'
-#' Performs the following...
-#'
-#' @param input_file A path to a file.
-#' @param channel_dictionary_file A path to a file.
-#'
-#' @return A character vector of file paths for files written by the function.
-#'
-preprocess_reference <- function( # maybe rename to rereference
-  input_file,
-  channel_dictionary_file
-) {
-
-  # Read
-  raw_data <- mne$io$read_raw_brainvision(
-    input_file,
-    preload = TRUE,
-    verbose = FALSE
-  )
-
-  # Preprocess
-  channel_dictionary  <- get_channel_dictionary(channel_dictionary_file)
-  raw_data <- raw_data$rename_channels(channel_dictionary)
-
-  mne$add_reference_channels(
-    raw_data,
-    ref_channels = "Cz",
-    copy = FALSE
-  )
-  raw_data$set_eeg_reference(ref_channels = "average", projection = FALSE)
-
-  easycap_1010_montage <- mne$channels$make_standard_montage("easycap-M1")
-  raw_data <- raw_data$set_montage(easycap_1010_montage, verbose = FALSE)
-
-  # Write
-  output_file <- input_file |>
-    stringr::str_replace("raw", "ref") |>
-    stringr::str_replace(".vhdr", "_ref_raw.fif.gz")
-
-  fs::dir_create(fs::path_dir(output_file))
-  raw_data$save(output_file, overwrite = TRUE)
-
-  output_file
-}
-
 #' Title
 #'
 #' @param input_file
@@ -94,7 +30,11 @@ preprocess_filter_downsample <- function(
 ) {
 
   # Read
-  raw_data <- mne$io$read_raw_fif(input_file, preload = TRUE, verbose = FALSE)
+  raw_data <- mne$io$read_raw_brainvision(
+    input_file,
+    preload = TRUE,
+    verbose = FALSE
+  )
 
   # Preprocess
   raw_data$filter(
@@ -108,8 +48,69 @@ preprocess_filter_downsample <- function(
 
   # Write
   output_file <- input_file |>
-    stringr::str_replace("ref", "ref_filt-ds") |>
-    stringr::str_replace("ref_raw", "ref_filt-ds_raw")
+    stringr::str_replace("raw", "filt-ds") |>
+    stringr::str_replace(".vhdr", "_filt-ds_raw.fif.gz")
+
+  fs::dir_create(fs::path_dir(output_file))
+  raw_data$save(output_file, overwrite = TRUE)
+
+  output_file
+
+}
+
+#' Get EEG channel dictionary for renaming
+#'
+#' @param file
+#'
+#' @return
+#' @export
+#'
+#' @examples
+get_channel_dictionary <- function(file) {
+  channel_dictionary <- readr::read_csv(file, col_types = readr::cols())
+  channel_dictionary_new <- channel_dictionary |>
+    dplyr::select(new_name) |>
+    dplyr::group_split(dplyr::row_number(), .keep = FALSE) |>
+    purrr::map(unlist)
+  names(channel_dictionary_new) <- channel_dictionary$channel
+  dict(channel_dictionary_new)
+}
+
+#' Re-reference raw EEG data
+#'
+#' Performs the following...
+#'
+#' @param input_file A path to a file.
+#' @param channel_dictionary_file A path to a file.
+#'
+#' @return A character vector of file paths for files written by the function.
+#'
+preprocess_rereference <- function( # maybe rename to rereference
+  input_file,
+  channel_dictionary_file
+) {
+
+  # Read
+  raw_data <- mne$io$read_raw_fif(input_file, preload = TRUE, verbose = FALSE)
+
+  # Preprocess
+  channel_dictionary  <- get_channel_dictionary(channel_dictionary_file)
+  raw_data <- raw_data$rename_channels(channel_dictionary)
+
+  mne$add_reference_channels(
+    raw_data,
+    ref_channels = "Cz",
+    copy = FALSE
+  )
+  raw_data$set_eeg_reference(ref_channels = "average", projection = FALSE)
+
+  easycap_1010_montage <- mne$channels$make_standard_montage("easycap-M1")
+  raw_data <- raw_data$set_montage(easycap_1010_montage, verbose = FALSE)
+
+  # Write
+  output_file <- input_file |>
+    stringr::str_replace("filt-ds", "filt-ds_reref") |>
+    stringr::str_replace("filt-ds_raw", "filt-ds_reref_raw")
 
   fs::dir_create(fs::path_dir(output_file))
   raw_data$save(output_file, overwrite = TRUE)
@@ -209,8 +210,8 @@ preprocess_ica <- function(
 
   # Write
   output_file <- input_file |>
-    stringr::str_replace("ref_filt-ds", "ref_filt-ds_ica") |> # Directory
-    stringr::str_replace("ref_filt-ds_raw", "ref_filt-ds_ica_raw") # File name end
+    stringr::str_replace("filt-ds_reref", "filt-ds_reref_ica-interp") |> # Directory
+    stringr::str_replace("filt-ds_reref_raw", "filt-ds_reref_ica-interp_raw") # File name end
 
   fs::dir_create(fs::path_dir(output_file))
   raw_data$save(output_file, overwrite = TRUE)
@@ -287,13 +288,13 @@ preprocess_filter_epoch <- function(
   output_file <- input_file |>
     # Directory
     stringr::str_replace(
-      "ref_filt-ds_ica",
-      paste0("ref_filt-ds_ica_epoch-filt/", filter_freq_band)
+      "filt-ds_reref_ica-interp",
+      paste0("filt-ds_reref_ica-interp_epoch-filt/", filter_freq_band)
     ) |>
     # File name end
     stringr::str_replace(
-      "ref_filt-ds_ica_raw",
-      paste0("ref_filt-ds_ica_epoch-filt-", filter_freq_band, "-epo")
+      "filt-ds_reref_ica-interp_raw",
+      paste0("filt-ds_reref_ica-interp_epoch-filt-", filter_freq_band, "-epo")
     )
 
   fs::dir_create(fs::path_dir(output_file))

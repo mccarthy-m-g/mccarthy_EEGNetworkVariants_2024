@@ -37,7 +37,7 @@ participants_final <- c(
   # P01 Excluded for not having a follow-up session
   # P02 Excluded for not having a follow-up session
   "P03",
-  "P04",
+  "P04", # Consider excluding because fu rc1, fu ro1 have bad channels next to each other
   # P05 Excluded for not having a follow-up session
   "P06",
   "P07",
@@ -53,13 +53,10 @@ participants_final <- c(
   "P17",
   # P18 Excluded for having two unusable recordings
   "P19",
-  "P20",
+  "P20", # Consider excluding because fu ro2, post rc1, post ro1, post ro1, pre rc2, pre ro1, pre ro2 have bad channels next to each other
   "P21",
   "P22"
 )
-
-# FIXME: Some of the changes I made to preprocessing while testing the targets
-# pipeline changed the results. Should revert back to the original steps to fix.
 
 # Static branching
 preprocessing_targets <- list(
@@ -77,40 +74,39 @@ preprocessing_targets <- list(
     file_handler_final, # Exclusions applied
     filter(file_handler, participant %in% participants_final)
   ),
-  # Reference ----
-  tar_target(
-    channel_dictionary,
-    here("data", "EEG-recordings", "channel-dictionary.csv"),
-    format = "file"
-  ),
-  # FIXME This doesn't work with tar_files_input
   tar_files(
-    raw_ref_input,
+    raw_input,
     file_handler_final[["raw"]] # [slices]
-  ),
-  tar_target(
-    raw_ref,
-    preprocess_reference(
-      raw_ref_input,
-      channel_dictionary
-    ),
-    pattern = map(raw_ref_input),
-    format = "file"
   ),
   # Filter and downsample ----
   tar_target(
-    raw_ref_filt_ds,
+    raw_filt_ds,
     preprocess_filter_downsample(
-      raw_ref,
+      raw_input,
       l_freq = 0.1,
       h_freq = 50,
       phase = "zero-double",
       resample_rate = 200
     ),
-    pattern = map(raw_ref),
+    pattern = map(raw_input),
     format = "file"
   ),
-  # ICA ----
+  # Re-reference and rename channels ----
+  tar_target(
+    channel_dictionary,
+    here("data", "EEG-recordings", "channel-dictionary.csv"),
+    format = "file"
+  ),
+  tar_target(
+    raw_filt_ds_reref,
+    preprocess_rereference(
+      raw_filt_ds,
+      channel_dictionary
+    ),
+    pattern = map(raw_filt_ds),
+    format = "file"
+  ),
+  # ICA then interpolate bad channels ----
   tar_target(
     bad_channels,
     file_handler_final[["bad_channels"]] # [slices]
@@ -132,9 +128,9 @@ preprocessing_targets <- list(
     file_handler_final[["bad_indices"]] # [slices]
   ),
   tar_target(
-    raw_ref_filt_ds_ica,
+    raw_filt_ds_reref_ica_interp,
     preprocess_ica(
-      raw_ref_filt_ds,
+      raw_filt_ds_reref,
       bad_channels,
       annotation_onsets,
       annotation_durations,
@@ -145,7 +141,7 @@ preprocessing_targets <- list(
       bad_ica_indices
     ),
     pattern = map(
-      raw_ref_filt_ds,
+      raw_filt_ds_reref,
       bad_channels,
       annotation_onsets,
       annotation_durations,
@@ -167,30 +163,23 @@ connectivity_estimation_targets <- list(
       filter_h_freq    = c(4, 8, 13, 30, 50)
     ),
     names = filter_freq_band,
-    # Epoch and filter ----
+    # Epoch then filter into frequency bands ----
     tar_target(
-      raw_ref_filt_ds_ica_epoch_filt,
+      raw_filt_ds_reref_ica_interp_epoch_filt,
       preprocess_filter_epoch(
-        raw_ref_filt_ds_ica,
+        raw_filt_ds_reref_ica_interp,
         filter_freq_band,
         filter_l_freq,
         filter_h_freq
       ),
-      pattern = map(raw_ref_filt_ds_ica),
+      pattern = map(raw_filt_ds_reref_ica_interp),
       format = "file"
     ),
     # Estimate phase coupling ----
-    # FIXME: This is giving different values from my original estimates.
-    # Might be caused by:
-    # - changing the montage
-    # - changing the order of some steps
-    # - screwing up the code somewhere
-    # The recordings are 99.99% identical but there's maybe a slight difference
-    # in amplitude scaling of some channels, so it's probably the montage or referencing.
     tar_target(
       phase_coupling,
-      estimate_phase_coupling(raw_ref_filt_ds_ica_epoch_filt),
-      pattern = map(raw_ref_filt_ds_ica_epoch_filt),
+      estimate_phase_coupling(raw_filt_ds_reref_ica_interp_epoch_filt),
+      pattern = map(raw_filt_ds_reref_ica_interp_epoch_filt),
       format = "file"
     ),
     tar_target(

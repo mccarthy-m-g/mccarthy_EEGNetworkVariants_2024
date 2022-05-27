@@ -198,7 +198,6 @@ make_symmetric <- function(similarity_results) {
 
 }
 
-# FIXME: Facets aren't in order
 #' Plot similarity matrix
 #'
 #' @param similarity_results The tibble of similarity results.

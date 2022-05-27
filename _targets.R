@@ -188,7 +188,12 @@ connectivity_estimation_targets <- list(
       pattern = map(phase_coupling),
       iteration = "list"
     ),
-    ########## TODO: Plotting connectivity!
+    tar_target(
+      phase_connectivity_plot,
+      plot_connectivity(phase_connectivity_matrix, "PLI"),
+      pattern = map(phase_connectivity_matrix),
+      iteration = "list"
+    ),
     # Estimate similarity ----
     tar_target(
       phase_similarity,

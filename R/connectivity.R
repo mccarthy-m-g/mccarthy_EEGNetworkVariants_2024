@@ -1,11 +1,74 @@
+# TODO: Decide on the order I want.
+#' Title
+#'
+#' @param input
+#'
+#' @return Character vector.
+channel_order <- function(input) {
+
+  # Define helper functions for sorting
+  get_channel_lobe <- function(channel) {
+    stringr::str_extract(channel, "[A-Y|a-y]+")
+  }
+
+  get_channel_lobe("Fpz")
+
+  get_channel_number <- function(channel) {
+    channel_number <- channel |>
+      stringr::str_extract("[[:digit:]]+") |>
+      as.numeric()
+    channel_number <- ifelse(
+      is.na(channel_number),
+      0,
+      channel_number
+    )
+    channel_number
+  }
+
+  # Set the channel order
+  channels <- tibble::tibble(channel = colnames(input))
+
+  channel_order <- channels |>
+    dplyr::mutate(
+      channel_lobe = get_channel_lobe(channel),
+      # Order the channels from anterior to posterior
+      channel_lobe = factor(
+        channel_lobe,
+        levels = c(
+          "Fp", "AF", "F", "FT", "FC", "T", "C", "TP", "CP", "P", "PO", "O"
+        )
+      ),
+      channel_number = get_channel_number(channel),
+      # In the standard 10-10 system odd channels are on the left and even
+      # channels are on the right. "z" or 0 channels are in the centre.
+      channel_hemisphere = dplyr::case_when(
+        # A number is odd if division by 2 gives a remainder of 1.
+        channel_number %% 2 == 1 ~ "left",
+        channel_number == 0      ~ "centre",
+        # A number is even if division by 2 gives a remainder of 0.
+        channel_number %% 2 == 0 ~ "right"
+      ),
+      channel_hemisphere = factor(
+        channel_hemisphere,
+        levels = c("left", "centre", "right")
+      ),
+      channel_number = factor(
+        channel_number,
+        levels = c(9, 7, 5, 3, 1, 0, 2, 4, 6, 8, 10)
+      )
+    ) %>%
+    dplyr::group_by(channel_hemisphere) %>%
+    dplyr::arrange(channel_lobe, channel_number, .by_group = TRUE)
+
+  dplyr::pull(channel_order, channel)
+
+}
+
 #' Title
 #'
 #' @param input_file
 #'
 #' @return
-#' @export
-#'
-#' @examples
 estimate_phase_coupling <- function(input_file) {
 
   # Read
@@ -46,6 +109,9 @@ estimate_phase_coupling <- function(input_file) {
   connectivity_matrix <- as.matrix(
     Matrix::forceSymmetric(connectivity_matrix, uplo = "L")
   )
+  ### The rows and columns should be in an order that makes sense.
+  reorder_channels <- channel_order(connectivity_matrix)
+  connectivity_matrix <- connectivity_matrix[reorder_channels, reorder_channels]
 
   # Write
   output_file <- input_file |>
@@ -68,7 +134,7 @@ estimate_phase_coupling <- function(input_file) {
 #'
 #' @param input_file
 #'
-#' @return
+#' @return A List.
 get_connectivity_matrix <- function(input_file) {
 
   # Connectivity matrix
@@ -98,50 +164,27 @@ get_connectivity_matrix <- function(input_file) {
 }
 
 # TODO: Finish writing then add target
-plot_connectivity <- function(input_file) {
+plot_connectivity <- function(input, method) {
 
-  # Read
-  connectivity_matrix <- get_connectivity_matrix(input_file)
-
-  # Process
-  # TODO: Modify/write plotting code
-  con_lower_tri <- con_mat[lower.tri(con_mat)]
-
-  # Some descriptive stats
-  con_mean <- sprintf("%.2f", mean(con_lower_tri))
-  con_min  <- sprintf("%.2f", min(con_lower_tri))
-  con_max  <- sprintf("%.2f", max(con_lower_tri))
-
-  # Plot
-  con_mat %>%
-    as.data.frame.table() %>%
-    ggplot(aes(x=Var1, y=Var2, fill=Freq)) +
+  connectivity_matrix_plot <- input$connectivity_matrix |>
+    as.data.frame.table() |>
+    ggplot2::ggplot(ggplot2::aes(x=Var1, y=Var2, fill=Freq)) +
     ggplot2::geom_raster() +
-    scale_fill_continuous(limits = c(0,1), type = "viridis") +
-    scale_x_discrete(guide = guide_axis(angle = 90), limits = rev) +
-    labs(
-      title = case_name,
-      subtitle = paste0(
-        "Mean: ", con_mean, "\n",
-        "Min: ", con_min, "\n",
-        "Max: ", con_max
-      ),
-      x = "",
-      y = "",
-      fill = "Con Strength"
+    ggplot2::scale_fill_continuous(limits = c(0,1), type = "viridis") +
+    ggplot2::scale_x_discrete(guide = ggplot2::guide_axis(angle = 90)) +
+    # Reversing the y-axis is needed for the diagonal to go from the upper-left
+    # to the bottom-right.
+    ggplot2::scale_y_discrete(limits = rev) +
+    ggplot2::labs(
+      x = "EEG Channels",
+      y = "EEG Channels",
+      fill = method
     )
 
-  # Write
-  output_file <- input_file |>
-    # Directory
-    stringr::str_replace("data", "figures") |>
-    # File name
-    stringr::str_replace(".csv", ".png")
-
-  fs::dir_create(fs::path_dir(output_file))
-  # TODO: Add code for saving
-
-  output_file
+  list(
+    plot = connectivity_matrix_plot,
+    metadata = append(input$metadata, list(method = method))
+  )
 }
 
 # TODO: This is the patchwork plot of all the functional connectivity matrices for a subject

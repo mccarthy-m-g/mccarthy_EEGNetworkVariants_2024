@@ -57,12 +57,15 @@ pairwise_comparisons <- function(input) {
   colnames(branch_combinations) <- c("x_branch", "y_branch")
   branch_combinations <- tibble::as_tibble(branch_combinations)
 
-  # Get levels for labels
-  label_levels <- input |>
+  # Get levels for factors
+  participant_levels <- label_levels <- input |>
     purrr::map(~ .x$metadata$participant) |>
     unlist() |>
     unique() |>
-    case_order()
+    sort()
+  session_levels <- c("pre", "post", "fu")
+  state_levels <- c("rc1", "rc2", "ro1", "ro2")
+  label_levels <- case_order(participant_levels)
 
   connectivity_matrix_pairs <- branch_combinations |>
     # Using a join ensures the branch and label names will line up
@@ -81,12 +84,30 @@ pairwise_comparisons <- function(input) {
       x_label = factor(x_label, levels = label_levels),
       y_label = factor(y_label, levels = label_levels),
       # Add metadata to assist with analyses and filtering
-      x_participant = stringr::str_extract(x_label, "^.*?(?=_)"),
-      x_session = stringr::str_extract(x_label, "(?<=_)(.*)(?=_)"),
-      x_state = stringr::str_extract(x_label, "([^_]*)$"),
-      y_participant = stringr::str_extract(y_label, "^.*?(?=_)"),
-      y_session = stringr::str_extract(y_label, "(?<=_)(.*)(?=_)"),
-      y_state = stringr::str_extract(y_label, "([^_]*)$"),
+      x_participant = factor(
+        stringr::str_extract(x_label, "^.*?(?=_)"),
+        levels = participant_levels
+      ),
+      x_session = factor(
+        stringr::str_extract(x_label, "(?<=_)(.*)(?=_)"),
+        levels = session_levels
+      ),
+      x_state = factor(
+        stringr::str_extract(x_label, "([^_]*)$"),
+        levels = state_levels
+      ),
+      y_participant = factor(
+        stringr::str_extract(y_label, "^.*?(?=_)"),
+        levels = participant_levels
+      ),
+      y_session = factor(
+        stringr::str_extract(y_label, "(?<=_)(.*)(?=_)"),
+        levels = session_levels
+      ),
+      y_state = factor(
+        stringr::str_extract(y_label, "([^_]*)$"),
+        levels = state_levels
+      ),
       within_participant = ifelse(x_participant == y_participant, TRUE, FALSE),
       within_session = ifelse(x_session == y_session, TRUE, FALSE),
       within_state = ifelse(
@@ -171,9 +192,7 @@ make_symmetric <- function(similarity_results) {
     dplyr::mutate(pair_label = paste(x_label, y_label, sep = "_x_"))
 
   # Combine the upper, lower, and diagonals to prepare for plotting
-  similarity_results_symmetric <- rbind(similarity_results, similarity_results_upper) |>
-    # Ensure levels are in order for plotting
-    dplyr::mutate(dplyr::across(where(is.character), forcats::as_factor))
+  similarity_results_symmetric <- rbind(similarity_results, similarity_results_upper)
 
   similarity_results_symmetric
 

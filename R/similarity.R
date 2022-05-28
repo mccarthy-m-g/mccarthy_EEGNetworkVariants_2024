@@ -116,7 +116,78 @@ pairwise_comparisons <- function(input) {
         FALSE
       ),
       diagonal = ifelse(x_label == y_label, TRUE, FALSE),
-      pair_label = paste(x_label, y_label, sep = "_x_")
+      pair_label = paste(x_label, y_label, sep = "_x_"),
+      # There are no equivalent participant pairs to collapse here since we're
+      # only using the lower triangle of the matrix.
+      pair_participant = factor(
+        paste(x_participant, y_participant, sep = "_x_")
+      ),
+      # Relevel the participant pairs so the first 14 levels are within
+      # participant and the remaining levels are between participant.
+      pair_participant = forcats::fct_relevel(
+        pair_participant,
+        c(
+          "P03_x_P03",
+          "P04_x_P04",
+          "P06_x_P06",
+          "P07_x_P07",
+          "P08_x_P08",
+          "P09_x_P09",
+          "P11_x_P11",
+          "P14_x_P14",
+          "P16_x_P16",
+          "P17_x_P17",
+          "P19_x_P19",
+          "P20_x_P20",
+          "P21_x_P21",
+          "P22_x_P22"
+        ),
+        after = 0
+      ),
+      pair_session = paste(x_session, y_session, sep = "_x_"),
+      # Equivalent session pairs should be collapsed into a single factor so
+      # they aren't treated as different factors.
+      pair_session = forcats::fct_collapse(
+        pair_session,
+        pre_x_pre = c("pre_x_pre"),
+        post_x_post = c("post_x_post"),
+        fu_x_fu = c("fu_x_fu"),
+        pre_x_post = c("pre_x_post", "post_x_pre"),
+        pre_x_fu = c("pre_x_fu", "fu_x_pre"),
+        post_x_fu = c("post_x_fu", "fu_x_post")
+      ),
+      # Relevel the session pairs so the first 3 levels are within
+      # session and the remaining levels are between session
+      pair_session = forcats::fct_relevel(
+        pair_session,
+        c("pre_x_pre", "post_x_post", "fu_x_fu"),
+        after = 0
+      ),
+      pair_state = paste(x_state, y_state, sep = "_x_"),
+      # Equivalent state pairs should be collapsed into a single factor so they
+      # aren't treated as different factors. It doesn't matter whether the state
+      # came before or after the task, so base this on the state name without
+      # the number.
+      pair_state = forcats::fct_collapse(
+        pair_state,
+        rc_x_rc = c("rc1_x_rc1", "rc2_x_rc2", "rc1_x_rc2", "rc2_x_rc1"),
+        ro_x_ro = c("ro1_x_ro1", "ro2_x_ro2", "ro1_x_ro2", "ro2_x_ro1"),
+        rc_x_ro = c(
+          "rc1_x_ro1",
+          "ro1_x_rc1",
+          "rc1_x_ro2",
+          "ro2_x_rc1",
+          "rc2_x_ro1",
+          "ro1_x_rc2",
+          "rc2_x_ro2",
+          "ro2_x_rc2"
+        )
+      ),
+      # Relevel the state pairs so the first 3 levels are within
+      # state and the remaining levels are between session
+      pair_state = forcats::fct_relevel(
+        pair_state, c("rc_x_rc", "ro_x_ro"), after = 0
+      )
     )
 
   connectivity_matrix_pairs
@@ -375,5 +446,11 @@ plot_similarity_archetype <- function(similarity_results) {
     individual_session_effect = individual_session_effect,
     individual_state_effect   = individual_state_effect
   )
+
+}
+
+# TODO: Mixed modelling
+## Might need to add columns and set factor levels in estimate_similarity() for this
+model_similarity <- function() {
 
 }

@@ -247,8 +247,20 @@ descriptives_targets <- list(
   tar_target(
     bad_channels_descriptives_final,
     summarize_bad_channels(file_handler_final)
+  ),
+  tar_target(
+    bad_channels_plots_final,
+    plot_bad_channel_counts(bad_channels_descriptives_final)
+  ),
+  tar_target(
+    bad_segments_descriptives_final,
+    summarize_bad_segments(file_handler_final)
+  ),
+  tar_target(
+    bad_segments_plots_final,
+    plot_bad_segment_descriptives(bad_segments_descriptives_final)
   )
-  # TODO: Add targets for bad segments and bad ICA indices
+  # TODO: Add targets for bad ICA indices
 )
 
 manuscripts_targets <- list(

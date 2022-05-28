@@ -47,19 +47,6 @@ summarize_participant_descriptives <- function(input_file, participants = NULL) 
 
 }
 
-# TODO: Write these
-get_preprocessing_descriptives <- function(input_files) {
-
-  # TODO: Map over recordings and extract metadata, then save to a csv
-  # Or just use the file handler, in which case probably don't need this function
-  # and can just use the next one
-
-}
-
-summarize_preprocessing_descriptives <- function(input_file) {
-
-}
-
 #' Title
 #'
 #' @param x
@@ -93,7 +80,7 @@ summarize_bad_channels <- function(input_file) {
       bad_channels_n_mode = mode(bad_channels_n)
     )
 
-  count_per_participant <- file_handler |>
+  count_per_recording <- file_handler |>
     dplyr::count(bad_channels_n) |>
     # Reverse the arrange order so cumsum() goes from max to min.
     dplyr::arrange(dplyr::desc(bad_channels_n)) |>
@@ -119,12 +106,51 @@ summarize_bad_channels <- function(input_file) {
 
   list(
     descriptives = descriptives,
-    count_per_participant = count_per_participant,
+    count_per_recording = count_per_recording,
     count_per_channel = count_per_channel
   )
 
 }
 
+#' Title
+#'
+#' @param input
+#'
+#' @return
+plot_bad_channel_counts <- function(input) {
+
+  plot_count_per_recording <- input |>
+    purrr::pluck("count_per_recording") |>
+    ggplot2::ggplot(ggplot2::aes(x = n, y = factor(bad_channels_n))) +
+      ggplot2::geom_col() +
+      ggplot2::labs(
+        x = "Number of recordings with n bad channels",
+        y = "Number of bad channels"
+      )
+
+  plot_count_per_channel <- input |>
+    purrr::pluck("count_per_channel") |>
+    ggplot2::ggplot(
+      ggplot2::aes(x = n, y = forcats::fct_reorder(bad_channels, n))
+    ) +
+      ggplot2::geom_col() +
+      ggplot2::labs(
+        x = "Number of recordings marked bad in",
+        y = "Bad channel"
+      )
+
+  list(
+    plot_count_per_recording = plot_count_per_recording,
+    plot_count_per_channel   = plot_count_per_channel
+  )
+
+}
+
+#' Title
+#'
+#' @param input_file
+#'
+#' @return
 summarize_bad_segments <- function(input_file) {
 
   file_handler <- input_file |>
@@ -141,7 +167,7 @@ summarize_bad_segments <- function(input_file) {
       bad_segments_n_mode = mode(bad_segments_n)
     )
 
-  count_per_participant <- file_handler |>
+  count_per_recording <- file_handler |>
     dplyr::count(bad_segments_n) |>
     # Reverse the arrange order so cumsum() goes from max to min.
     dplyr::arrange(dplyr::desc(bad_segments_n)) |>
@@ -154,8 +180,8 @@ summarize_bad_segments <- function(input_file) {
   bad_segment_durations <- file_handler |>
     dplyr::select(participant:task, annotation_durations) |>
     tidyr::unnest(cols = annotation_durations) |>
-    dplyr::mutate(annotation_durations = as.numeric(annotation_durations))
-  na.omit()
+    dplyr::mutate(annotation_durations = as.numeric(annotation_durations)) |>
+    na.omit()
 
   bad_segment_durations_descriptives <- bad_segment_durations |>
     dplyr::summarise(
@@ -174,10 +200,50 @@ summarize_bad_segments <- function(input_file) {
 
   list(
     descriptives = descriptives,
-    count_per_participant = count_per_participant,
+    count_per_recording = count_per_recording,
+    bad_segment_durations = bad_segment_durations,
     bad_segment_durations_descriptives = bad_segment_durations_descriptives,
     bad_segment_duration_totals = bad_segment_duration_totals
   )
 
 }
 
+#' Title
+#'
+#' @param input
+#'
+#' @return List.
+plot_bad_segment_descriptives <- function(input) {
+
+  plot_count_per_recording <- input |>
+    purrr::pluck("count_per_recording") |>
+    ggplot2::ggplot(ggplot2::aes(x = n, y = factor(bad_segments_n))) +
+    ggplot2::geom_col() +
+    ggplot2::labs(
+      x = "Number of recordings with n bad segments",
+      y = "Number of bad segments"
+    )
+
+  plot_duration_totals <- input |>
+    purrr::pluck("bad_segment_duration_totals") |>
+    ggplot2::ggplot(ggplot2::aes(x = sum)) +
+      ggplot2::geom_histogram(bins = 60) +
+      ggplot2::coord_flip() +
+      ggplot2::xlab("Bad segment duration total per recording (seconds)")
+
+  plot_durations <- input |>
+    purrr::pluck("bad_segment_durations") |>
+    ggplot2::ggplot(ggplot2::aes(x = annotation_durations)) +
+      ggplot2::geom_histogram(bins = 60) +
+      ggplot2::coord_flip() +
+      ggplot2::xlab("Bad segment duration (seconds)")
+
+  list(
+    plot_count_per_recording = plot_count_per_recording,
+    plot_duration_totals = plot_duration_totals,
+    plot_durations = plot_durations
+  )
+
+}
+
+# TODO: Summarize ICA bad indices

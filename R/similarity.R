@@ -449,8 +449,91 @@ plot_similarity_archetype <- function(similarity_results) {
 
 }
 
-# TODO: Mixed modelling
-## Might need to add columns and set factor levels in estimate_similarity() for this
-model_similarity <- function() {
+# TODO: Descriptives
+summarize_similarity <- function() {
+
+}
+
+#' Title
+#'
+#' @param formula
+#' @param data
+#'
+#' @return glmmTMB
+glmmTMB_similarity <- function(formula, data) {
+
+  similarity_results <- data |>
+    # Diagonals shouldn't be included in modelling since they're comparing a
+    # recording with itself
+    dplyr::filter(diagonal == FALSE)
+
+  similarity_fit <- glmmTMB::glmmTMB(
+    formula,
+    data = similarity_results,
+    family = glmmTMB::beta_family(),
+    control = glmmTMB::glmmTMBControl(
+      # Parallel processing doesn't appear to be supported in a targets
+      # pipeline, so make sure to use serial processing to avoid a warning.
+      # At least that's what this should do; the warning still appears but
+      # it's ignorable so that's okay.
+      parallel = 1,
+      # The fit in the beta band has a false convergence using the default
+      # optimizer. Changing the optimizer resolves the convergence failure
+      # and the results are either the same or nearly identical, so this can
+      # be brushed off as a false positive failure.
+      optimizer = optim,
+      optArgs = list(method = "BFGS")
+    )
+  )
+
+  similarity_fit
+
+}
+
+#' Title
+#'
+#' @param object
+#'
+#' @return
+emmeans_similarity <- function(object) {
+
+  emmeans::emmeans(
+    object,
+    specs = list(
+      # Main effects
+      within_participant = ~ within_participant,
+      within_session = ~ within_session,
+      within_state = ~ within_state,
+      # Interaction effects
+      within_participant_session = ~ within_session | within_participant,
+      within_participant_state = ~ within_state | within_participant,
+      within_participant_session_state = ~ within_state | within_participant + within_session
+    ),
+    # Back-transform from the logit scale to the response scale to make
+    # interpretation easier. Back-transformation is done using the regrid argument
+    # so that the reference grid is reparameterized to the response scale. This
+    # ensures that subsequent EMMs and contrasts will be conducted on the response
+    # scale. See ?emmeans::regrid for details.
+    regrid = "response"
+  )
+
+}
+
+#' Title
+#'
+#' @param object
+#'
+#' @return
+contrast_similarity <- function(object) {
+
+  emmeans::contrast(
+    object,
+    method = "revpairwise", # Subtracts the between value from the within value
+    infer = TRUE
+  )
+
+}
+
+plot_similarity_contrasts <- function() {
 
 }

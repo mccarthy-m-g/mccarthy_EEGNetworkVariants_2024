@@ -215,7 +215,26 @@ connectivity_estimation_targets <- list(
         phase_similarity_highlight_plot,
         plot_similarity_highlight(phase_similarity, participants)
       )
+    ),
+    # Model similarity ----
+    tar_target(
+      phase_similarity_glmmTMB,
+      glmmTMB_similarity(
+        rv ~
+          within_participant * within_session * within_state + # Fixed effects
+          (1 | pair_participant) + (1 | x_label) + (1 | y_label), # Random effects
+        data = phase_similarity
+      )
+    ),
+    tar_target(
+      phase_similarity_emmeans,
+      emmeans_similarity(phase_similarity_glmmTMB)
+    ),
+    tar_target(
+      phase_similarity_contrasts,
+      contrast_similarity(phase_similarity_emmeans)
     )
+    # TODO: Tidying and plotting
   ),
   tar_target(
     similarity_archetype_plot,

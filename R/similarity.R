@@ -532,6 +532,84 @@ contrast_similarity <- function(object) {
 
 }
 
-plot_similarity_contrasts <- function() {
+#' Title
+#'
+#' @param object
+#'
+#' @return
+plot_similarity_contrasts <- function(object) {
+
+  # Tidy data to prepare for plotting
+  effect_labels <- c(
+    "Main effect",
+    "Between sessions",
+    "Within sessions",
+    "Between states",
+    "Within states",
+    "Between sessions and states",
+    "Between sessions and within states",
+    "Within sessions and between states",
+    "Within sessions and states"
+  )
+
+  contrasts <- object |>
+    purrr::map_dfr(broom::tidy, .id = "effect") |>
+      dplyr::mutate(
+        effect_label = factor(effect_labels, levels = effect_labels)
+      )
+
+  # Plotting
+  interval_pal <- RColorBrewer::brewer.pal(n = 3, "YlGn")[2:3]
+
+  ggplot2::ggplot(contrasts, ggplot2::aes(x = estimate, y = effect_label)) +
+    ggplot2::geom_segment(
+      ggplot2::aes(x = 0, xend = estimate, yend = effect_label),
+      alpha = 0.05
+    ) +
+    ggplot2::geom_vline(ggplot2::aes(xintercept = 0), linetype = 2) +
+    ggdist::stat_interval(
+      ggplot2::aes(
+        xdist = distributional::dist_student_t(
+          df = df.residual(similarity_fit), mu = estimate, sigma = std.error
+        )
+      ),
+      .width = c(0.66, 0.95)
+    ) +
+    ggplot2::scale_colour_manual(values = interval_pal) +
+    # This is a slightly hacky way to get a bar the same height as the interval
+    # for the point estimate since the standard ggplot2 geoms aren't well-suited
+    # for this.
+    ggdist::geom_interval(
+      ggplot2::aes(xmin = estimate - 0.001, xmax = estimate + 0.001)
+    ) +
+    ggplot2::scale_x_continuous(
+      breaks = c(-0.1, 0, 0.1),
+      sec.axis = ggplot2::sec_axis(
+        ~ .,
+        breaks = c(-0.075, 0.075),
+        labels = c(
+          "Less similar\nwithin participant",
+          "More similar\nwithin participant"
+        )
+      )
+    ) +
+    # Adding padding makes it hard to centre the secondary x-axis, so don't
+    # expand.
+    ggplot2::coord_cartesian(xlim = c(-0.15, 0.15), expand = FALSE) +
+    ggplot2::labs(
+      x = paste0(
+        "Difference in functional connectome similarity",
+        "\n",
+        "(Within participant - Between participant)"
+      ),
+      y = "Effect",
+      colour = "Compatibility\nInterval"
+    ) +
+    ggplot2::theme_classic() +
+    ggplot2::theme(
+      axis.ticks.x.top = ggplot2::element_blank(),
+      axis.line.x.top  = ggplot2::element_blank(),
+      axis.text.x.top  = ggplot2::element_text(size = 11, colour = "black")
+    )
 
 }

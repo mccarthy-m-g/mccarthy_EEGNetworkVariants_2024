@@ -233,8 +233,11 @@ connectivity_estimation_targets <- list(
     tar_target(
       phase_similarity_contrasts,
       contrast_similarity(phase_similarity_emmeans)
+    ),
+    tar_target(
+      phase_similarity_contrasts_plot,
+      plot_similarity_contrasts(phase_similarity_contrasts)
     )
-    # TODO: Tidying and plotting
   ),
   tar_target(
     similarity_archetype_plot,

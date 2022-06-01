@@ -459,6 +459,9 @@ summarize_similarity <- function() {
 #' @param formula
 #' @param data
 #'
+#' @note Since each of the predictors are categorical, it doesn't make sense to
+#  include random slopes in this model.
+#'
 #' @return glmmTMB
 glmmTMB_similarity <- function(formula, data) {
 
@@ -600,7 +603,7 @@ plot_similarity_contrasts <- function(object) {
       x = paste0(
         "Difference in functional connectome similarity",
         "\n",
-        "(Within participant - Between participant)"
+        "(Within participant \U2212 Between participant)"
       ),
       y = "Effect",
       colour = "Compatibility\nInterval"

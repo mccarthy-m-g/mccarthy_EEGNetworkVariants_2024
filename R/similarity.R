@@ -500,14 +500,12 @@ emmeans_similarity <- function(object) {
   emmeans::emmeans(
     object,
     specs = list(
-      # Main effects
-      within_participant = ~ within_participant,
-      within_session = ~ within_session,
-      within_state = ~ within_state,
-      # Interaction effects
-      within_participant_session = ~ within_session | within_participant,
-      within_participant_state = ~ within_state | within_participant,
-      within_participant_session_state = ~ within_state | within_participant + within_session
+      main_effect = ~ within_participant,
+      # Two-way interactions
+      participant_session = ~ within_participant | within_session,
+      participant_state = ~ within_participant | within_state,
+      # Three-way interactions
+      participant_session_state = ~ within_participant | within_state + within_session
     ),
     # Back-transform from the logit scale to the response scale to make
     # interpretation easier. Back-transformation is done using the regrid argument

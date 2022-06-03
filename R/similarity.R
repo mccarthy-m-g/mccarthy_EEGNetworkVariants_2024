@@ -565,10 +565,6 @@ plot_similarity_contrasts <- function(object) {
   interval_pal <- RColorBrewer::brewer.pal(n = 3, "YlGn")[2:3]
 
   ggplot2::ggplot(contrasts, ggplot2::aes(x = estimate, y = effect_label)) +
-    ggplot2::geom_segment(
-      ggplot2::aes(x = 0, xend = estimate, yend = effect_label),
-      alpha = 0.05
-    ) +
     ggplot2::geom_vline(ggplot2::aes(xintercept = 0), linetype = 2) +
     ggdist::stat_interval(
       ggplot2::aes(

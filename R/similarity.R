@@ -568,7 +568,7 @@ contrast_similarity <- function(object) {
 #' @param object
 #'
 #' @return
-plot_similarity_contrasts <- function(object) {
+plot_similarity_contrasts <- function(object, model) {
 
   # Tidy data to prepare for plotting
   effect_labels <- c(
@@ -597,7 +597,7 @@ plot_similarity_contrasts <- function(object) {
     ggdist::stat_interval(
       ggplot2::aes(
         xdist = distributional::dist_student_t(
-          df = df.residual(similarity_fit), mu = estimate, sigma = std.error
+          df = df.residual(model), mu = estimate, sigma = std.error
         )
       ),
       .width = c(0.66, 0.95)

@@ -237,7 +237,10 @@ connectivity_estimation_targets <- list(
     ),
     tar_target(
       phase_similarity_contrasts_plot,
-      plot_similarity_contrasts(phase_similarity_contrasts)
+      plot_similarity_contrasts(
+        phase_similarity_contrasts,
+        phase_similarity_glmmTMB
+      )
     ),
     # Model diagnostics ----
     tar_target(
@@ -252,6 +255,7 @@ connectivity_estimation_targets <- list(
       phase_similarity_glmmTMB_randnorm,
       check_model(phase_similarity_glmmTMB, check = c("reqq"), panel = FALSE)
     ),
+    # TODO: Upgrade `performance` to 9.1 so I get CIs for these
     tar_target(
       phase_similarity_glmmTMB_collinearity,
       check_collinearity(phase_similarity_glmmTMB)

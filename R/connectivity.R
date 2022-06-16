@@ -163,7 +163,12 @@ get_connectivity_matrix <- function(input_file) {
 
 }
 
-# TODO: Finish writing then add target
+#' Title
+#'
+#' @param input
+#' @param method
+#'
+#' @return A list.
 plot_connectivity <- function(input, method) {
 
   connectivity_matrix_plot <- input$connectivity_matrix |>

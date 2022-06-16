@@ -8,6 +8,7 @@ library(here)
 library(tibble)
 library(rbbt)
 library(dplyr)
+library(performance)
 
 # Load Python packages required to define the pipeline:
 library(reticulate)
@@ -237,6 +238,19 @@ connectivity_estimation_targets <- list(
     tar_target(
       phase_similarity_contrasts_plot,
       plot_similarity_contrasts(phase_similarity_contrasts)
+    ),
+    # Model diagnostics ----
+    tar_target(
+      phase_similarity_glmmTMB_ppreds,
+      check_predictions(phase_similarity_glmmTMB)
+    ),
+    tar_target(
+      phase_similarity_glmmTMB_uniformity,
+      check_uniformity(phase_similarity_glmmTMB)
+    ),
+    tar_target(
+      phase_similarity_glmmTMB_randnorm,
+      check_model(phase_similarity_glmmTMB, check = c("reqq"), panel = FALSE)
     )
   ),
   tar_target(

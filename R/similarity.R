@@ -495,6 +495,34 @@ glmmTMB_similarity <- function(formula, data) {
 
 #' Title
 #'
+#' @param object Fitted model.
+#'
+#' @return ggplot.
+check_uniformity <- function(object) {
+
+  # Simulated residuals; see vignette("DHARMa")
+  simulated_residuals <- DHARMa::simulateResiduals(object)
+
+  dp <- list(min = 0, max = 1, lower.tail = TRUE, log.p = FALSE)
+  ggplot2::ggplot(
+    tibble::tibble(scaled_residuals = residuals(simulated_residuals)),
+    ggplot2::aes(sample = scaled_residuals)
+  ) +
+    # The confidence band is working here; it's just really tight so it's hard to see.
+    qqplotr::stat_qq_band(distribution = "unif", dparams = list(min = 0, max = 1), alpha = .2, conf = .99) +
+    qqplotr::stat_qq_line(distribution = "unif", dparams = dp, size = .8, colour = "#3aaf85") +
+    qqplotr::stat_qq_point(distribution = "unif", dparams = dp, size = .5, alpha = .05, colour = "#1b6ca8") +
+    ggplot2::labs(
+      title = "Uniformity of Residuals",
+      subtitle = "Dots should fall along the line",
+      x = "Uniform Distribution Quantiles",
+      y = "Sample Quantiles"
+    ) +
+    see::theme_lucid()
+}
+
+#' Title
+#'
 #' @param object
 #'
 #' @return

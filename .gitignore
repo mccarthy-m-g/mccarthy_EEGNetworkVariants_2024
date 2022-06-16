@@ -4,3 +4,6 @@
 .Ruserdata
 
 data/EEG-recordings/
+
+R/scratch.R
+python/scratch.py

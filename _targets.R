@@ -251,6 +251,10 @@ connectivity_estimation_targets <- list(
     tar_target(
       phase_similarity_glmmTMB_randnorm,
       check_model(phase_similarity_glmmTMB, check = c("reqq"), panel = FALSE)
+    ),
+    tar_target(
+      phase_similarity_glmmTMB_collinearity,
+      check_collinearity(phase_similarity_glmmTMB)
     )
   ),
   tar_target(

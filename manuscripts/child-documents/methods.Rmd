@@ -86,37 +86,113 @@ Finally, the activity of bad channels removed in step four was interpolated usin
 
 After removing noise and non-neural artifacts, the continuous data was divided into epochs and filtered to prepare for functional connectivity analysis. This was a three step process. First, the continuous data was divided into equally spaced, overlapping epochs. Epochs with an 8 second duration were created at 5 second intervals such that an epoch occurred---with reference to the continuous data---from 0-8 seconds, 5-13 seconds, 10-18 seconds, and so forth, until the end of the recording. Epochs that contained a bad segment were removed from the data. Second, the epoched data was filtered into five frequency bands---delta ($\delta$, 1-4 Hz), theta ($\theta$, 4-8 Hz), alpha ($\alpha$, 8-13 Hz), beta ($\beta$, 13-30 Hz), and gamma ($\gamma$, 30-50 Hz)---using a two-pass forward and reverse, zero-phase, non-causal band-pass finite impulse response filter. Third, epochs were cropped to a 5 second duration starting 1 second into each epoch such that an epoch then occurred from 1-6 seconds, 6-11 seconds, 11-16 seconds, and so forth, until the end of the recording.
 
-The purpose of this three step process was as follows: Filtering the data into five frequency bands allowed us to investigate whether the organization of functional networks between and within individuals was dependent or invariant of temporal scale (frequency band), rather than assuming network organization was governed solely by broadband processes [@mostamesadaghiani_OscillationBasedConnectivityArchitecture_2021]; the five frequency bands we selected are thought to represent different neural processes [see @sadaghianiwirsich_IntrinsicConnectomeOrganization_2020]. However, filtering epoched data creates edge artifacts at the start and end of each epoch that distort the true signal. Creating longer epochs in the first step provided padding around the edges of each epoch that could be cropped in the third step to remove these edge artifacts; and overlapping epochs in the first step made it possible for the cropped epochs in the third step to be non-overlapping and contiguous with reference to the continuous data, preserving the true signal across the length of the recording. The 5 second duration was selected based on the minimum epoch length required to get reliable phase coupling estimates in the delta band.
+The purpose of this three step process was as follows: Filtering the data into five frequency bands allowed us to investigate whether the organization of functional networks between and within individuals was dependent or invariant of temporal scale (frequency band), rather than assuming network organization was governed solely by broadband processes [@mostamesadaghiani_OscillationBasedConnectivityArchitecture_2021]; the five frequency bands we selected are thought to represent different neural processes [see @sadaghianiwirsich_IntrinsicConnectomeOrganization_2020], and are more prominent in different brain regions following a medial-to-lateral and posterior-to-anterior gradient of increasing frequency [@capillaetal_NaturalFrequenciesResting_2022]. However, filtering epoched data creates edge artifacts at the start and end of each epoch that distort the true signal. Creating longer epochs in the first step provided padding around the edges of each epoch that could be cropped in the third step to remove these edge artifacts; and overlapping epochs in the first step made it possible for the cropped epochs in the third step to be non-overlapping and contiguous with reference to the continuous data, preserving the true signal across the length of the recording. The 5 second duration was selected based on the minimum epoch length required to get reliable phase coupling estimates in the delta band.
 
 <!-- TODO: Add notes about appendix/supplement for label connectivity -->
+
+<!-- Don't include this in the manuscript because someone is just going to ask why it went wrong according to Andrea...
 
 As a final preprocessing step, we originally planned for sensor space signal time courses to be source localized and reconstructed to regions of a common template whole-brain parcellation following the pipeline recommended by @sadaghianiwirsich_IntrinsicConnectomeOrganization_2020 so that functional connectivity could estimated between pairs of cortical regions rather than pairs of EEG channels. Our motivation to transform the data from sensor space to source space was twofold: First, the location of EEG channels on the scalp does not easily translate to the location of the underlying neural sources, preventing the interpretation of sensor space functional networks in terms of neuroanatomy [@laietal_ComparisonScalpSourcereconstructed_2018]. Second, the effects of field spread and volume conduction in the head can cause multiple electrodes to record activity from the same underlying neural source, resulting in spurious functional connectivity estimates between channels in sensor space [@nunezsrinivasan_ElectricFieldsBrain_2006; @schoffelengross_SourceConnectivityAnalysis_2009]; by estimating the location of the underlying neural sources through source localization, functional connectivity can instead be estimated at the level of the underlying neural sources, reducing (but not mitigating) the spurious effects of field spread and volume conduction [@oneilletal_DynamicsLargescaleElectrophysiological_2018; @schoffelengross_SourceConnectivityAnalysis_2009].
 
 However, after examining the source space functional connectivity estimates (the functional connectivity metrics we used are described in the next step below), we found that they were largely noise---showing consistently low connectivity between all brain regions, regardless of recording or frequency band. In contrast, sensor space functional connectivity estimates showed appreciable levels of connectivity and variation across recordings and frequency bands. Given this discrepancy, we did not feel confident in the quality of the transformations made to the data during source localization and reconstruction, so we decided to forgo this step.
+-->
 
 ## Analyses
 
 ### Functional Connectivity
 
-Whole brain functional networks were estimated within individuals using static functional connectivity. Static functional connectivity between EEG channels was estimated in each of the five frequency bands described in the previous section using the following pipeline recommended by @sadaghianiwirsich_IntrinsicConnectomeOrganization_2020. The exact decisions made at each step of the pipeline followed recommendations by @hassanwendling_ElectroencephalographySourceConnectivity_2018, @michelbrunet_EEGSourceImaging_2019, @oneilletal_DynamicsLargescaleElectrophysiological_2018, and  @schoffelengross_SourceConnectivityAnalysis_2009.
+Oscillation-based functional connectivity was estimated between all pairs of EEG channels within each recording for all five frequency bands using measures of phase and amplitude coupling. Phase and amplitude coupling are thought to reflect different but related neurophysiological functions and it is common to use both measures so they can be compared [@engeletal_IntrinsicCouplingModes_2013; @sadaghianiwirsich_IntrinsicConnectomeOrganization_2020]. Specifically, phase coupling is thought to regulate the integration and flow of cognitive contents on fast timescales, and amplitude coupling is thought to coordinate changes in (co)activation of brain areas on slow timescales [@engeletal_IntrinsicCouplingModes_2013]. We selected measures of phase and amplitude coupling that account for the effects of field spread and volume conduction in the head---which can cause multiple electrodes to record activity from the same underlying neural source [@nunezsrinivasan_ElectricFieldsBrain_2006; @schoffelengross_SourceConnectivityAnalysis_2009]---to reduce the possibility of spurious coupling between channels from influencing our functional connectivity estimates. The resulting functional connectivity estimates from each recording were collected into ten symmetrical $64 \times 64$ matrices called *functional connectomes* (one functional connectome for each frequency band and method), which reflected electrophysiological cortical functional networks derived from averaged oscillatory coupling between each pair of channels. These functional connectomes were the basic unit of observation for subsequent analyses.
 
 <!-- TODO: Add equations for connectivity measures, talk about the range of values they can take and their interpretation -->
-
-Finally, oscillation-based functional connectivity was estimated between each pair of EEG channels, once using amplitude coupling and once using phase coupling. Phase and amplitude coupling are thought to reflect different but related neurophysiological functions and it is common to use both measures so they can be compared [@engeletal_IntrinsicCouplingModes_2013; @sadaghianiwirsich_IntrinsicConnectomeOrganization_2020]. Specifically, amplitude coupling is thought to coordinate changes in (co)activation of brain areas on slow timescales, and phase coupling is thought to regulate the integration and flow of cognitive contents on fast timescales [@engeletal_IntrinsicCouplingModes_2013]. To reduce the influence of source signal leakage on the estimations of functional connectivity, amplitude coupling was calculated using the leakage controlled amplitude envelope correlation [@brookesetal_MeasuringFunctionalConnectivity_2012], and phase coupling was calculated using the phase lag index [@stametal_PhaseLagIndex_2007]. The resulting functional connectivity matrices (or functional connectomes) reflect electrophysiologically derived cortical functional networks for each frequency band using different oscillation-based measures.
-
-$$
-\mathit{PLI} = \vert \langle \mathrm{sign} [\Delta \phi(t_k)] \rangle \vert
-$$
 
 <!-- AEC formula https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5949275/ -->
 
 <!-- Should I mention something like this here? "The intracranial sources of scalp electric potential differences are thought to be cortical pyramidal neurons, which undergo post-synaptic potentials (PSP) that create an active, impressed current density. The dipolar nature (current density vector) of these sources is documented in (Mitzdorf 1985 and Martin 1992)." -->
 
+#### Phase coupling
+
+The average amount of phase coupling between pairs of sensors was estimated within each recording using the phase lag index [@stametal_PhaseLagIndex_2007]. The phase lag index estimates the ..., given by [@vincketal_ImprovedIndexPhasesynchronization_2011]:
+
+$$
+\mathit{PLI} = \vert E \langle \mathrm{sign}( \mathrm{Im}(S_{xy}) ) \rangle \vert,
+$$
+
+where $S_{xy}$ is the cross spectral density between two sensors, $\mathrm{sign}(\cdot)$ is the signum function, ... and $E$ is the expected value operator.
+
+The phase lag index takes values between 0 and 1. A value of zero indicates either no phase coupling or phase coupling with a phase angle difference centred around 0 mod $\pi$. A value of 1 indicates perfect phase locking with a nonzero phase angle difference. 
+
+We first estimated the the phase lag index between two channels at several frequency bins within each epoch, then we averaged the phase lag index at each frequency bin across epochs, and finally we averaged again across frequency bins to get the final phase lag index estimate. The details of this procedure are described below.
+
+```{r rfftfreq, eval=FALSE}
+n_times <- 1000
+n_freqs <- n_times + 1
+sampling_rate <- 200
+sample_spacing <- 1 / sampling_rate
+my_sequence <- 0:(n_times / 2)
+rfftfrreqs <- my_sequence / (sample_spacing * n_freqs)
+```
+
+First we determined the frequency bins at which the phase lag index between two channels would be estimated by calculating the Discrete Fourier Transform sample frequencies for a 1000 sample window (corresponding to a 5 second epoch) and a sample space of 0.005 (the inverse of the sampling rate). This resulted in 501 frequency bins spaced at roughly 0.2 Hz intervals between zero and 100 Hz. Then for each frequency band we simply selected the frequency bins that were greater than or equal to the minimum frequency and less than or equal to the maximum frequency of each frequency band. 
+
+The tapered spectra were combined, then we estimated the power spectral density at each frequency bin using the combined spectra
+
+Then the cross spectral density between each pair of channels was estimated at each at each frequency bin
+
+Then the *signed* phase lag index was estimated using the cross spectral density at each frequency bin
+
+Then the absolute average of the signed phase lag index was calculated across epochs at each frequency bin
+
+Then the value for each frequency bin was averaged to get the final score
+
+<!-- I think the issue here is that this is technically calculating the phase lag index over trials like Cohen talks about, except instead of doing it at each sample across the epochs, it's treating each epoch as a sample -->
+
+
+<!-- TODO I could also modify the envelope_correlation function to compute PLI, since the Hilbert transform gives phase too -->
+
+TODO: I believe this method actually is okay, the limitation is that each epoch is treated as "stationary"
+
+Say that we picked PLI because it's commonly used in the literature (maybe look in the cohen book, if he says it's common then you can cite the book)
+
+
+
+The power spectral densities were estimated using the multitaper spectral estimation [@babadibrown_ReviewMultitaperSpectral_2014; @thomson_SpectrumEstimationHarmonic_1982] with digital prolate spheroidal sequence (DPSS) [@slepianpollak_ProlateSpheroidalWave_1961] windows.
+
+"These measures are not to be interpreted over time. Each Epoch passed into the dataset is interpreted as an independent sample of the same connectivity structure. Within each Epoch, it is assumed that the spectral measure is stationary."
+
+
+
+
+Cross spectral density is estimated within each epoch at each frequency using multitapers. Right now we’re using a default of 7 tapers.
+
+PLI is estimated within each epoch at each frequency using the cross spectral density
+
+PLI is averaged across epochs at each frequency
+
+The averaged PLI_average is averaged across frequencies to get the final value
+
+
+#### Amplitude coupling
+
+TODO
+
+amplitude coupling between pairs of sensors was estimated using the leakage controlled amplitude envelope correlation [@brookesetal_MeasuringFunctionalConnectivity_2011; @brookesetal_MeasuringFunctionalConnectivity_2012]
+
+pairwise correlations are calculated in each epoch, and then averaged across epochs to get the final estimate
+
+Orthogonalization is done both ways, then the average is taken to get the corr value. As seen in Hipp et al [@hippetal_LargescaleCorticalCorrelation_2012]
+
+
+
+
+
+
+
+
 ### Functional connectome similarity
 
 <!-- TODO: Describe how performance of RV coefficient was evaluated. Maybe add equation. -->
 
-The similarity of static functional connectomes across state (eyes open or eyes closed resting state), individual, and session within the delta, theta, alpha, beta, and gamma bands was next quantified by estimating the RV coefficient [@robertescoufier_UnifyingToolLinear_1976] between all pairs of functional connectomes from a given state, individual, and session. The RV coefficient is a multivariate measure of the linear relationship between two positive semi-definite matrices $\mathbf{X}$ and $\mathbf{Y}$ that takes values between 0 (no linear relationship) and 1 (perfect linear relationship) [@abdiherve_RVCoefficientCongruence_2007; @escoufier_TraitementVariablesVectorielles_1973; @josseholmes_MeasuringMultivariateAssociation_2016], given by
+The similarity of phase- and amplitude-based functional connectomes was next quantified by estimating the RV coefficient [@robertescoufier_UnifyingToolLinear_1976] between all pairs of functional connectomes from a given individual, session, and state within each frequency band. The RV coefficient is a multivariate measure of the linear relationship between two positive semi-definite matrices $\mathbf{X}$ and $\mathbf{Y}$ that takes values between 0 (no linear relationship) and 1 (perfect linear relationship) [@abdiherve_RVCoefficientCongruence_2007; @escoufier_TraitementVariablesVectorielles_1973; @josseholmes_MeasuringMultivariateAssociation_2016; @robertescoufier_UnifyingToolLinear_1976], given by
 
 $$
 \newcommand{\tr}{\mathop{\rm trace}}
@@ -128,18 +204,43 @@ $$
 },
 $$
 
-where $\mathbf{S} = \mathbf{XX}^\mathsf{T}$ and 
+where $\mathbf{S} = \mathbf{XX}^\mathsf{T}$ and $\mathbf{T} = \mathbf{YY}^\mathsf{T}$. The RV coefficient can thought of as a generalization of the squared Pearson correlation coefficient between two variables to the case of two sets of variables, where two sets of variables are correlated if the relative position (in Hilbert space) of the observations in one set is similar to the relative position of the observations in the other set [@josseholmes_MeasuringMultivariateAssociation_2016; @mayeretal_ExploratoryAnalysisMultiple_2011]. However, as can be seen in Equation \@ref(eq:rv) above, unlike the Pearson correlation coefficient, the mean of the observations in a set is not subtracted from its observations when estimating the RV coefficient [@abdiherve_RVCoefficientCongruence_2007].
 
+After estimating the RV coefficient between all pairs of functional connectomes within each frequency band, we assessed how functional connectome similarity varied between and within individuals, sessions, and states using data visualization and statistical modelling.
 
-can be interpreted similarly to the squared Pearson correlation [@josseholmes_MeasuringMultivariateAssociation_2016].
+#### Visualizing functional connectome similarity
 
-
-
-
-The RV coefficient is a multivariate measure of association between two functional connectomes that can be interpreted similarly to the Pearson correlation [@josseholmes_MeasuringMultivariateAssociation_2016]. 
-
+we collected the RV coefficient estimates into a similarity matrix
 
 These RV coefficients were then visualized with a heat map to examine the amount and pattern of similarity within states, individuals, sessions, and the entire sample.
+
+#### Modelling functional connectome similarity
+
+We used a mixed beta regression to model how functional connectome similarity varied between and within individuals, sessions, and states for each frequency band [for an accessible overview of mixed beta regression, see @doumaweedon_AnalysingContinuousProportions_2019]. The unit of observation was the pair of functional connectomes used for a given similarity estimate. The response variable was the RV coefficient estimated for each pair, which was modelled with a beta distribution and related to the predictors with the logit link function following the parameterization of @cribari-netozeileis_BetaRegression_2010 and @ferraricribari-neto_BetaRegressionModelling_2004. The predictors were binary indicators (where $0 = \textrm{No}$ and  $1 = \textrm{Yes}$) for whether a pair was within participant, within session, or within state, and their interactions. Because the RV coefficient estimates are based on the similarity of pairs of functional connectomes, we included a random intercept for both the $\mathbf{X}$ and $\mathbf{Y}$ connectome that each observation came from to account for statistical dependencies between observations that had a connectome in common. We also included a random intercept for the participant pair to account for the repeated observation of the same participant pairs. All random effects were assumed to be normally distributed [@brooksetal_GlmmTMBBalancesSpeed_2017].
+
+The fit of the model was assessed using posterior predictive checks [@gelmanetal_BayesianDataAnalysis_2013; @gelmanetal_RegressionOtherStories_2020; @gelmanhill_DataAnalysisUsing_2006], and inspection of (standardized or simulated residuals)
+
+
+
+After fitting the model we constructed a reference grid using estimated marginal means [], then used this to estimate the difference in functional connectome similarity within and between participants using pairwise contrasts.
+
+The estimated marginal means and pairwise contrasts were back-transformed to the response scale (0-1) for interpretability.
+
+These contrasts were the estimands of our model and will be the focus of discussion.
+
+
+
+The precision parameter was assumed to be constant across observations.
+
+Mixed-effects beta regression
+
+constant phi
+
+binary indicators
+
+Our estimand from the model was between and within contrasts
+
+
 
 <!-- TODO: Fix this part to reflect whatever changes we make -->
 

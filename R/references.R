@@ -1,4 +1,4 @@
-#' Title
+#' Check if the Zotero library with citation keys is available
 #'
 #' @param public_library_id
 #'
@@ -25,7 +25,7 @@ bbt_zotero_library_unavailable <- function(public_library_id) {
 
 }
 
-#' Title
+#' Write `references.json` file using Zotero library
 #'
 #' @param path
 #' @param keys

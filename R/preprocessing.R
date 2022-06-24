@@ -9,7 +9,9 @@ eeg_recordings_unavailable <- function() {
   )
 }
 
-#' Title
+#' Filter and downsample Raw EEG data
+#'
+#' This function is a wrapper for the
 #'
 #' @param input_file
 #' @param l_freq
@@ -17,10 +19,14 @@ eeg_recordings_unavailable <- function() {
 #' @param phase
 #' @param resample_rate
 #'
-#' @return
-#' @export
+#' @references
 #'
-#' @examples
+#' - <https://mne.tools/0.22/generated/mne.io.read_raw_brainvision.html#mne.io.read_raw_brainvision>
+#' - <https://mne.tools/0.22/generated/mne.io.Raw.html#mne.io.Raw.filter>
+#' - <https://mne.tools/0.22/generated/mne.io.Raw.html#mne.io.Raw.resample>
+#' - <https://mne.tools/0.22/generated/mne.io.Raw.html#mne.io.Raw.save>
+#'
+#' @return
 preprocess_filter_downsample <- function(
   input_file,
   l_freq,
@@ -76,15 +82,23 @@ get_channel_dictionary <- function(file) {
   dict(channel_dictionary_new)
 }
 
-#' Re-reference raw EEG data
+#' Re-reference Raw EEG data to average and set montage
 #'
 #' Performs the following...
 #'
 #' @param input_file A path to a file.
 #' @param channel_dictionary_file A path to a file.
 #'
-#' @return A character vector of file paths for files written by the function.
+#' @references
 #'
+#' - <https://mne.tools/0.22/generated/mne.io.read_raw_fif.html#mne.io.read_raw_fif>
+#' - <https://mne.tools/0.22/generated/mne.io.Raw.html#mne.io.Raw.rename_channels>
+#' - <https://mne.tools/0.22/generated/mne.add_reference_channels.html#mne.add_reference_channels>
+#' - <https://mne.tools/0.22/generated/mne.io.Raw.html#mne.io.Raw.set_eeg_reference>
+#' - <https://mne.tools/0.22/generated/mne.channels.make_standard_montage.html#mne.channels.make_standard_montage>
+#' - <https://mne.tools/0.22/generated/mne.io.Raw.html#mne.io.Raw.set_montage>
+#'
+#' @return A character vector of file paths for files written by the function.
 preprocess_rereference <- function( # maybe rename to rereference
   input_file,
   channel_dictionary_file
@@ -118,7 +132,8 @@ preprocess_rereference <- function( # maybe rename to rereference
   output_file
 }
 
-#' Title
+#' Fit ICA to Raw EEG data then interpolate bad channels
+#'
 #'
 #' @param input_file
 #' @param bad_channels
@@ -126,10 +141,14 @@ preprocess_rereference <- function( # maybe rename to rereference
 #' @param annotation_durations
 #' @param annotation_labels
 #'
-#' @return
-#' @export
+#' @references
 #'
-#' @examples
+#' - <https://mne.tools/0.22/generated/mne.Annotations.html#mne.Annotations>
+#' - <https://mne.tools/0.22/generated/mne.io.Raw.html#mne.io.Raw.set_annotations>
+#' - <https://mne.tools/0.22/generated/mne.preprocessing.ICA.html#mne.preprocessing.ICA>
+#' - <https://mne.tools/0.22/generated/mne.io.Raw.html#mne.io.Raw.interpolate_bads>
+#'
+#' @return
 preprocess_ica <- function(
   input_file,
   bad_channels,
@@ -219,6 +238,22 @@ preprocess_ica <- function(
   output_file
 }
 
+
+#' Epoch Raw EEG data then filter into five frequency bands
+#'
+#' @param input_file
+#' @param filter_freq_band
+#' @param filter_l_freq
+#' @param filter_h_freq
+#'
+#' @references
+#'
+#' - <https://mne.tools/0.22/generated/mne.make_fixed_length_events.html#mne.make_fixed_length_events>
+#' - <https://mne.tools/0.22/generated/mne.Epochs.html#mne.Epochs>
+#' - <https://mne.tools/0.22/generated/mne.Epochs.html#mne.Epochs.filter>
+#' - <https://mne.tools/0.22/generated/mne.Epochs.html#mne.Epochs.crop>
+#'
+#' @return
 preprocess_filter_epoch <- function(
   input_file,
   filter_freq_band,
@@ -255,7 +290,7 @@ preprocess_filter_epoch <- function(
     tmin = 0.0,
     tmax = 8.0,
     baseline = NULL,
-    detrend = NULL,
+    detrend = NULL, # TODO: See if detrending improves results: 1L # Linear detrend
     reject_by_annotation = TRUE, # Epochs with BAD segments should be dropped
     preload = TRUE,
     verbose = FALSE

@@ -1,4 +1,4 @@
-#' Helper
+#' Create an ordered vector of participant IDs
 #'
 #' @param participant_ids
 #'
@@ -30,7 +30,7 @@ case_order <- function(participant_ids) {
 
 }
 
-#' Generate pairwise comparisons
+#' Generate possible pairwise comparisons of functional connectomes
 #'
 #' @param input List of connectivity matrices and their metadata.
 #'
@@ -220,6 +220,11 @@ estimate_similarity <- function(input) {
 
       # Note: The FactoMineR::coeffRV() function centres the matrices in the
       # background.
+      # Note 2: This function can give a warning "NaNs produced" for some
+      # estimates. When this happens the skewness value will be "0.000000e+00"
+      # and the p-value will be "NaN". This is likely from the permutation test
+      # failing. This isn't an issue for our study since  we are only concerned
+      # with the RV coefficient, not it's p-value
       rv_coeff <- FactoMineR::coeffRV(x_matrix, y_matrix)
 
       rv_coeff
@@ -246,7 +251,7 @@ estimate_similarity <- function(input) {
 
 }
 
-#' Helper
+#' Make the similarity results symmetric for plotting
 #'
 #' @param similarity_results
 #'
@@ -269,7 +274,7 @@ make_symmetric <- function(similarity_results) {
 
 }
 
-#' Plot similarity matrix
+#' Plot a similarity matrix
 #'
 #' @param similarity_results The tibble of similarity results.
 #' @param estimate The similarity estimate to plot. Options are `rv`.
@@ -312,7 +317,7 @@ plot_similarity <- function(similarity_results, estimate) {
 
 }
 
-#' Title
+#' Plot the within-participant similarity block of a participant
 #'
 #' @param similarity_results
 #' @param participant
@@ -339,7 +344,7 @@ plot_similarity_key <- function(similarity_results, participant) {
 
 }
 
-#' Title
+#' Highlight a within-participant block in the similarity matrix
 #'
 #' @param similarity_results
 #' @param participant
@@ -380,7 +385,7 @@ plot_similarity_highlight <- function(similarity_results, participant) {
 
 }
 
-#' Title
+#' Plot hypothetical similarity matrices
 #'
 #' @param similarity_results
 #'
@@ -454,7 +459,7 @@ summarize_similarity <- function() {
 
 }
 
-#' Title
+#' Fit a mixed beta regression to similarity results
 #'
 #' @param formula
 #' @param data
@@ -493,9 +498,23 @@ glmmTMB_similarity <- function(formula, data) {
 
 }
 
-#' Title
+#' Check uniformity of GL(M)M's residuals
+#'
+#' `check_uniformity()` checks generalized linear (mixed) models for uniformity
+#' of randomized quantile residuals, which can be used to identify typical model
+#' misspecification problems, such as over/underdispersion, zero-inflation, and
+#' residual spatial and temporal autocorrelation.
 #'
 #' @param object Fitted model.
+#'
+#' @details
+#'
+#' See `vignette("DHARMa")`.
+#'
+#' @references
+#'
+#' - Hartig, F., & Lohse, L. (2022). DHARMa: Residual Diagnostics for Hierarchical (Multi-Level / Mixed) Regression Models (Version 0.4.5). Retrieved from https://CRAN.R-project.org/package=DHARMa
+#' - Dunn, P. K., & Smyth, G. K. (1996). Randomized Quantile Residuals. Journal of Computational and Graphical Statistics, 5(3), 236. https://doi.org/10.2307/1390802
 #'
 #' @return ggplot.
 check_uniformity <- function(object) {
@@ -521,7 +540,7 @@ check_uniformity <- function(object) {
     see::theme_lucid()
 }
 
-#' Title
+#' Construct a reference grid from the mixed beta regression
 #'
 #' @param object
 #'
@@ -548,7 +567,7 @@ emmeans_similarity <- function(object) {
 
 }
 
-#' Title
+#' Estimate pairwise contrasts using the reference grid
 #'
 #' @param object
 #'
@@ -563,7 +582,7 @@ contrast_similarity <- function(object) {
 
 }
 
-#' Title
+#' Plot similarity contrast intervals
 #'
 #' @param object
 #'

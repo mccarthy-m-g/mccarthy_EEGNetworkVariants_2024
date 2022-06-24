@@ -47,7 +47,7 @@ summarize_participant_descriptives <- function(input_file, participants = NULL) 
 
 }
 
-#' Title
+#' Calculate the mode of a vector
 #'
 #' @param x
 #'
@@ -57,7 +57,7 @@ mode <- function(x) {
   ux[which.max(tabulate(match(x, ux)))]
 }
 
-#' Title
+#' Get summary statistics about bad EEG channels
 #'
 #' @param input_file
 #'
@@ -112,7 +112,7 @@ summarize_bad_channels <- function(input_file) {
 
 }
 
-#' Title
+#' Plot summary statistics about bad EEG channels
 #'
 #' @param input
 #'
@@ -146,7 +146,7 @@ plot_bad_channel_counts <- function(input) {
 
 }
 
-#' Title
+#' Get summary statistics about bad segments flagged in EEG data
 #'
 #' @param input_file
 #'
@@ -208,7 +208,7 @@ summarize_bad_segments <- function(input_file) {
 
 }
 
-#' Title
+#' Plot summary statistics about bad segments
 #'
 #' @param input
 #'

@@ -290,7 +290,7 @@ preprocess_filter_epoch <- function(
     tmin = 0.0,
     tmax = 8.0,
     baseline = NULL,
-    detrend = NULL, # TODO: See if detrending improves results: 1L # Linear detrend
+    detrend = NULL, # Aside: Linear detrend `1L` does not influence results
     reject_by_annotation = TRUE, # Epochs with BAD segments should be dropped
     preload = TRUE,
     verbose = FALSE

@@ -1,5 +1,4 @@
-# TODO: Decide on the order I want.
-#' Title
+#' Create a vector of channels names ordered from left to centre to right, front to back
 #'
 #' @param input
 #'
@@ -64,9 +63,18 @@ channel_order <- function(input) {
 
 }
 
-#' Title
+#' Estimate phase coupling between pairs of channels using PLI
 #'
 #' @param input_file
+#'
+#' @details
+#' This function is a wrapper for the `mne.connectivity.spectral_connectivity()`
+#' function.
+#'
+#' @references
+#'
+#' - <https://mne.tools/0.22/generated/mne.read_epochs.html#mne.read_epochs>
+#' - <https://mne.tools/0.22/generated/mne.connectivity.spectral_connectivity.html#mne.connectivity.spectral_connectivity>
 #'
 #' @return
 estimate_phase_coupling <- function(input_file) {
@@ -130,7 +138,154 @@ estimate_phase_coupling <- function(input_file) {
   output_file
 }
 
+
 #' Title
+#'
+#' @param input_file
+#' @param absolute_last Whether to take the absolute value after averaging
+#' across epochs (TRUE; this is what MNE does), or to take the absolute value
+#' at each epoch before averaging across epochs (FALSE).
+#'
+#' @details
+#' This function calculates the Phase Lag Index following Stam's original
+#' definition using the instantaneous phase angle differences obtained using
+#' the Hilbert Transform.
+#'
+#' @references
+#'
+#' @return
+estimate_phase_coupling_2 <- function(input_file, absolute_last) {
+
+  # Read
+  epochs_data <-  mne$read_epochs(input_file, preload = TRUE, verbose = FALSE)
+
+  # Process
+
+  ## The absolute value of the signed PLI can either be returned for the
+  ## connectivity matrix of each epoch, or for the averaged across epochs
+  ## connectivity matrix. In general, taking the absolute value of each
+  ## epoch will result in higher mean connectivity. Both methods make
+  ## different assumptions about the nature of the phase coupling.
+  absolute_by_epoch <- ifelse(absolute_last, FALSE, TRUE)
+
+  ## Estimate phase coupling using the PLI
+  phase_coupling <- pli$phase_lag_index(
+    epochs_data, average = TRUE, absolute = absolute_by_epoch
+  )
+  ### Take the absolute value after getting the mean over epochs
+  if (absolute_last) phase_coupling <- abs(phase_coupling)
+
+  ## Tidy the connectivity matrix
+  connectivity_matrix <- matrix(
+    phase_coupling,
+    nrow = 64,
+    ncol = 64,
+    dimnames = list(
+      epochs_data$info$ch_names, # rownames
+      epochs_data$info$ch_names  # colnames
+    )
+  )
+  ### The diagonal should be 1.0 to reflect perfect similarity of a label with
+  # itself. MNE zeroes out the diagonals so it needs to be fixed here.
+  diag(connectivity_matrix) <- 1.0
+  ### The rows and columns should be in an order that makes sense.
+  reorder_channels <- channel_order(connectivity_matrix)
+  connectivity_matrix <- connectivity_matrix[reorder_channels, reorder_channels]
+
+  # Write
+  output_file <- input_file |>
+    # Directory
+    stringr::str_replace("recordings", "sensor-connectivity") |>
+    stringr::str_replace("filt-ds_reref_ica-interp_epoch-filt", "phase") |>
+    # File name
+    stringr::str_replace("filt-ds_reref_ica-interp_epoch-filt", "phase") |>
+    stringr::str_replace("-epo.fif.gz", ".csv")
+
+  fs::dir_create(fs::path_dir(output_file))
+  connectivity_matrix |>
+    tibble::as_tibble() |>
+    readr::write_csv(output_file)
+
+  output_file
+}
+
+#' Estimate amplitude coupling between pairs of channels using AEC
+#'
+#' @param input_file
+#' @param absolute_last Whether to take the absolute value after averaging
+#' across epochs (TRUE; this is what the `mne.connectivity.spectral_connectivity()`
+#' function does), or to take the absolute value at each epoch before averaging
+#' across epochs (FALSE).
+#'
+#' @references
+#'
+#' - <https://mne.tools/0.22/generated/mne.read_epochs.html#mne.read_epochs>
+#' - <https://mne.tools/0.22/generated/mne.connectivity.envelope_correlation.html#mne.connectivity.envelope_correlation>
+#'
+#' @return Character string of the file path for the `.csv` file
+estimate_amplitude_coupling <- function(input_file, absolute_last) {
+
+  # Read
+  epochs_data <- mne$read_epochs(input_file, preload = TRUE, verbose = FALSE)
+
+  # Process
+
+  ## The absolute value of the signed corr can either be returned for the
+  ## connectivity matrix of each epoch, or for the averaged across epochs
+  ## connectivity matrix. In general, taking the absolute value of each
+  ## epoch will result in higher mean connectivity. Both methods make
+  ## different assumptions about the nature of the phase coupling.
+  absolute_by_epoch <- ifelse(absolute_last, FALSE, TRUE)
+
+  ## Estimate amplitude coupling using the AEC
+  amplitude_coupling <- mne$connectivity$envelope_correlation(
+    epochs_data,
+    combine = 'mean',
+    orthogonalize = 'pairwise',
+    log = FALSE,
+    absolute = absolute_by_epoch
+  )
+  ### Take the absolute value after getting the mean over epochs
+  if (absolute_last) amplitude_coupling <- abs(amplitude_coupling)
+
+  ## Tidy the connectivity matrix
+  connectivity_matrix <- matrix(
+    amplitude_coupling,
+    nrow = 64,
+    ncol = 64,
+    dimnames = list(
+      epochs_data$info$ch_names, # rownames
+      epochs_data$info$ch_names  # colnames
+    )
+  )
+  ### The diagonal should be 1.0 to reflect perfect similarity of a label with
+  # itself. MNE zeroes out the diagonals so it needs to be fixed here.
+  diag(connectivity_matrix) <- 1.0
+  ### The rows and columns should be in an order that makes sense.
+  reorder_channels <- channel_order(connectivity_matrix)
+  connectivity_matrix <- connectivity_matrix[reorder_channels, reorder_channels]
+
+  # Write
+  output_file <- input_file |>
+    # Directory
+    stringr::str_replace("recordings", "sensor-connectivity") |>
+    stringr::str_replace("filt-ds_reref_ica-interp_epoch-filt", "amplitude") |>
+    # File name
+    stringr::str_replace("filt-ds_reref_ica-interp_epoch-filt", "amplitude") |>
+    stringr::str_replace("-epo.fif.gz", ".csv")
+
+  fs::dir_create(fs::path_dir(output_file))
+  connectivity_matrix |>
+    tibble::as_tibble() |>
+    readr::write_csv(output_file)
+
+  output_file
+}
+
+#' Collect all connectivity matrices into a list
+#'
+#' Collects all the connectivity matrices into a named list, including
+#' metadata for each matrix.
 #'
 #' @param input_file
 #'
@@ -163,7 +318,7 @@ get_connectivity_matrix <- function(input_file) {
 
 }
 
-#' Title
+#' Plot a connectivity matrix
 #'
 #' @param input
 #' @param method

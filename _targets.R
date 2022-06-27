@@ -14,6 +14,7 @@ library(performance)
 library(reticulate)
 use_miniconda("r-reticulate-mne")
 mne <- import("mne")
+pli <- import_from_path("pli", "python")
 
 # Set target options:
 tar_option_set(
@@ -195,7 +196,9 @@ connectivity_estimation_targets <- list(
       pattern = map(phase_connectivity_matrix),
       iteration = "list"
     ),
-    # Estimate similarity ----
+    # TODO: Try also using the equivalent measure that doesn't control for
+    # volume conduction
+    # Estimate phase connectivity similarity ----
     tar_target(
       phase_similarity,
       estimate_similarity(phase_connectivity_matrix)
@@ -217,7 +220,7 @@ connectivity_estimation_targets <- list(
         plot_similarity_highlight(phase_similarity, participants)
       )
     ),
-    # Model similarity ----
+    # Model phase connectivity similarity ----
     tar_target(
       phase_similarity_glmmTMB,
       glmmTMB_similarity(
@@ -242,7 +245,7 @@ connectivity_estimation_targets <- list(
         phase_similarity_glmmTMB
       )
     ),
-    # Model diagnostics ----
+    ## Model diagnostics
     tar_target(
       phase_similarity_glmmTMB_ppreds,
       check_predictions(phase_similarity_glmmTMB)
@@ -259,6 +262,53 @@ connectivity_estimation_targets <- list(
     tar_target(
       phase_similarity_glmmTMB_collinearity,
       check_collinearity(phase_similarity_glmmTMB)
+    ),
+    # Estimate amplitude coupling ----
+    tar_target(
+      amplitude_coupling,
+      estimate_amplitude_coupling(
+        raw_filt_ds_reref_ica_interp_epoch_filt,
+        absolute_last = TRUE
+      ),
+      pattern = map(raw_filt_ds_reref_ica_interp_epoch_filt),
+      format = "file"
+    ),
+    tar_target(
+      amplitude_connectivity_matrix,
+      get_connectivity_matrix(amplitude_coupling),
+      pattern = map(amplitude_coupling),
+      iteration = "list"
+    ),
+    tar_target(
+      amplitude_connectivity_plot,
+      plot_connectivity(amplitude_connectivity_matrix, "AEC"),
+      pattern = map(amplitude_connectivity_matrix),
+      iteration = "list"
+    ),
+    # TODO: Try also using the equivalent measure that doesn't control for
+    # volume conduction
+    #
+    # Estimate amplitude coupling similarity ----
+    tar_target(
+      amplitude_similarity,
+      estimate_similarity(amplitude_connectivity_matrix)
+    ),
+    tar_target(
+      amplitude_similarity_plot,
+      plot_similarity(amplitude_similarity, rv)
+    ),
+    tar_map(
+      values = tibble(
+        participants = participants_final
+      ),
+      tar_target(
+        amplitude_similarity_key_plot,
+        plot_similarity_key(amplitude_similarity, participants)
+      ),
+      tar_target(
+        amplitude_similarity_highlight_plot,
+        plot_similarity_highlight(amplitude_similarity, participants)
+      )
     )
   ),
   tar_target(
@@ -319,6 +369,11 @@ manuscripts_targets <- list(
     here("manuscripts", "child-documents", "methods.Rmd"),
     format = "file"
   ),
+  tar_target(
+    results,
+    here("manuscripts", "child-documents", "results.Rmd"),
+    format = "file"
+  ),
   # Bibliography file ----
   tar_target(
     references,
@@ -345,6 +400,7 @@ manuscripts_targets <- list(
     params = list(
       introduction_path = introduction,
       methods_path      = methods,
+      results_path      = results,
       references_path   = references
     )
   )

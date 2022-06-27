@@ -2,6 +2,7 @@
 params:
   introduction_path: "path"
   methods_path: "path"
+  results_path: "path"
   references_path: "path"
 
 title             : "Studying network variants with electroencephalography"
@@ -47,6 +48,11 @@ output            : papaja::apa6_word
 ```{r setup, include = FALSE}
 library(papaja)
 library(targets)
+# FIXME: I'm using patchwork right now just to place figures while drafting.
+# However, for the final product I should assemble the figures together and save
+# them as pngs in the targets pipeline, then simply call the pngs in the
+# in the code chunks instead of plotting the ggplots.
+library(patchwork)
 ```
 
 ```{r introduction}
@@ -55,6 +61,10 @@ library(targets)
 
 ```{r methods}
 #| child = params$methods_path
+```
+
+```{r results}
+#| child = params$results_path
 ```
 
 \newpage

@@ -297,7 +297,7 @@ plot_similarity <- function(similarity_results, estimate) {
     ggplot2::labs(
       x = NULL,
       y = NULL,
-      fill = "RV Coefficient"
+      fill = "RV"
     ) +
     ggh4x::facet_grid2(
       cols = ggplot2::vars(x_participant),

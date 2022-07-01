@@ -336,6 +336,7 @@ plot_connectivity <- function(input, method) {
     # to the bottom-right.
     ggplot2::scale_y_discrete(limits = rev) +
     ggplot2::labs(
+      title = input$metadata$case,
       x = "EEG Channels",
       y = "EEG Channels",
       fill = method

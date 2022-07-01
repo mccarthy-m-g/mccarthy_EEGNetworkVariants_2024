@@ -664,3 +664,33 @@ plot_similarity_contrasts <- function(object, model) {
     )
 
 }
+
+# TODO: Add documentation
+subset_similarity_results <- function(similarity_results, participant) {
+
+  # The similarity results are technically shaped like the lower diagonal of a
+  # matrix, which we don't want when subsetting by participant, since it leads
+  # factor levels we don't want.
+  similarity_results_ltri <- similarity_results
+  # As a solution we can make the "matrix" symmetric
+  similarity_results_utri <- similarity_results |>
+    dplyr::filter(diagonal == FALSE, within_participant == FALSE) |>
+    dplyr::rename_with(~ stringr::str_replace(.x, "x", "z"), tidyselect::starts_with("x")) |>
+    dplyr::rename_with(~ stringr::str_replace(.x, "y", "x"), tidyselect::starts_with("y")) |>
+    dplyr::rename_with(~ stringr::str_replace(.x, "z", "y"), tidyselect::starts_with("z")) |>
+    dplyr::mutate(pair_label = paste(x_label, y_label, sep = "_x_"))
+
+  similarity_results_sym <- rbind(
+    similarity_results_ltri,
+    similarity_results_utri
+  )
+
+  # This corresponds to the rows belonging to a given participant in the
+  # similarity matrix, including both within and between participant
+  # similarities.
+  P00_similarities <- similarity_results_sym |>
+    dplyr::filter(x_participant == participant)
+
+  P00_similarities
+
+}

@@ -196,8 +196,6 @@ connectivity_estimation_targets <- list(
       pattern = map(phase_connectivity_matrix),
       iteration = "list"
     ),
-    # TODO: Try also using the equivalent measure that doesn't control for
-    # volume conduction
     # Estimate phase connectivity similarity ----
     tar_target(
       phase_similarity,
@@ -226,7 +224,7 @@ connectivity_estimation_targets <- list(
       glmmTMB_similarity(
         rv ~
           within_participant * within_session * within_state + # Fixed effects
-          (1 | pair_participant) + (1 | x_label) + (1 | y_label), # Random effects
+          (1 | x_label) + (1 | y_label), # Random effects
         data = phase_similarity
       )
     ),
@@ -263,6 +261,25 @@ connectivity_estimation_targets <- list(
       phase_similarity_glmmTMB_collinearity,
       check_collinearity(phase_similarity_glmmTMB)
     ),
+    # Fit phase connectivity similarity submodels ----
+    tar_map(
+      values = tibble(
+        participants = participants_final
+      ),
+      tar_target(
+        phase_similarity_subset,
+        subset_similarity_results(phase_similarity, participants)
+      ),
+      tar_target(
+        phase_similarity_subset_glmmTMB,
+        glmmTMB_similarity(
+          rv ~
+            within_participant * within_session * within_state + # Fixed effects
+            (1 | x_label) + (1 | y_label), # Random effects
+          data = phase_similarity_subset
+        )
+      )
+    ),
     # Estimate amplitude coupling ----
     tar_target(
       amplitude_coupling,
@@ -285,9 +302,6 @@ connectivity_estimation_targets <- list(
       pattern = map(amplitude_connectivity_matrix),
       iteration = "list"
     ),
-    # TODO: Try also using the equivalent measure that doesn't control for
-    # volume conduction
-    #
     # Estimate amplitude coupling similarity ----
     tar_target(
       amplitude_similarity,
@@ -310,6 +324,8 @@ connectivity_estimation_targets <- list(
         plot_similarity_highlight(amplitude_similarity, participants)
       )
     )
+    # Model amplitude connectivity similarity ----
+    ## Model diagnostics
   ),
   tar_target(
     similarity_archetype_plot,

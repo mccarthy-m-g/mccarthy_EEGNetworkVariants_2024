@@ -36,7 +36,7 @@ Raw EEG data was preprocessed to remove noise and non-neural artifacts from the 
 
 First, following recommendations by @widmannetal_DigitalFilterDesign_2015, a two-pass forward and reverse, zero-phase, non-causal band-pass finite impulse response filter was used to remove slow drift potentials at infraslow frequencies less than 0.10 Hz, line noise at 60.00 Hz, and irrelevant noise fluctuations greater than 60.00 Hz [@decheveignenelken_FiltersWhenWhy_2019; @widmannetal_DigitalFilterDesign_2015]. The finite impulse response filter used a Hamming window with 0.0194 passband ripple and 53 dB stopband attenuation. The lower passband edge and transition bandwidth were set at 0.10 Hz (-12 dB cutoff frequency: 0.05 Hz), and the upper passband edge and transition bandwidth were set at 50.00 Hz (-12 dB cutoff frequency: 56.25 Hz). The filter length was 16501 samples (33.002 seconds). These filter parameters were selected after exploring the difference between raw and filtered signals and verifying that the selected filter parameters improved signal quality over alternative filter parameters or the raw signal [@widmannetal_DigitalFilterDesign_2015].
 
-Second, the data was downsampled from 500 to 200 Hz in order to reduce the size of the data and speed up computations operating on the data. <!-- TODO: talk about Nyquist frequency or whatever, and how we don't need to worry about downsampling since we aren't interest in precise timings --> <!-- TODO: Decide if we'll drop downsampling for final results -->
+Second, the data was downsampled from 500 to 200 Hz in order to reduce the size of the data and speed up computations operating on the data.
 
 Third, data was rereferenced from Channel Cz, which served as the original reference electrode during recording, to a virtual common average reference electrode in order to reduce spatial biases in the signal amplitude of channels caused by their distance to the original reference electrode. Rereferencing was done by first adding Channel Cz to the data with its values set to zero, then calculating the average of the signal across all channels. This average signal was subtracted from each channel's signal, which allowed each channel to contribute equally to the new reference [@nunezsrinivasan_ElectricFieldsBrain_2006].
 
@@ -138,9 +138,9 @@ However, after examining the source space functional connectivity estimates (the
 
 ### Functional Connectivity
 
-Oscillation-based functional connectivity was estimated between all pairs of EEG channels within each recording for all five frequency bands using measures of phase and amplitude coupling. Phase and amplitude coupling are thought to reflect different but related neurophysiological functions and it is common to use both measures so they can be compared [@engeletal_IntrinsicCouplingModes_2013; @sadaghianiwirsich_IntrinsicConnectomeOrganization_2020]. Specifically, phase coupling is thought to regulate the integration and flow of cognitive contents on fast timescales, and amplitude coupling is thought to coordinate changes in (co)activation of brain areas on slow timescales [@engeletal_IntrinsicCouplingModes_2013].
+Oscillation-based functional connectivity was estimated between all pairs of EEG channels within each recording for all five frequency bands using the phase lag index [PLI; @stametal_PhaseLagIndex_2007] and the orthogonalized amplitude envelope correlation [AEC; @brookesetal_MeasuringFunctionalConnectivity_2011; @brookesetal_MeasuringFunctionalConnectivity_2012], which are measures of phase and amplitude coupling, respectively. Phase and amplitude coupling are thought to reflect different but related neurophysiological functions and it is common to use both measures so they can be compared [@engeletal_IntrinsicCouplingModes_2013; @sadaghianiwirsich_IntrinsicConnectomeOrganization_2020]. Specifically, phase coupling is thought to regulate the integration and flow of cognitive contents on fast timescales, and amplitude coupling is thought to coordinate changes in (co)activation of brain areas on slow timescales [@engeletal_IntrinsicCouplingModes_2013].
 
-We selected measures of phase and amplitude coupling (described below) that account for the effects of field spread and volume conduction in the head---which can cause multiple electrodes to record activity from the same underlying neural source [@nunezsrinivasan_ElectricFieldsBrain_2006; @schoffelengross_SourceConnectivityAnalysis_2009]---to reduce the possibility of spurious coupling between channels from influencing our functional connectivity estimates. The resulting functional connectivity estimates from each recording were collected into ten symmetrical $64 \times 64$ matrices called *functional connectomes* (one functional connectome for each frequency band and method), which reflected electrophysiological cortical functional networks derived from averaged oscillatory coupling between each pair of channels. These functional connectomes were the basic unit of observation for subsequent analyses.
+Both the phase lag index and the orthogonalized amplitude envelope correlation account for the effects of field spread and volume conduction in the head---which can cause multiple electrodes to record activity from the same underlying neural source [@nunezsrinivasan_ElectricFieldsBrain_2006; @schoffelengross_SourceConnectivityAnalysis_2009]--reducing the possibility of spurious coupling between channels from influencing our functional connectivity estimates [@bastosschoffelen_TutorialReviewFunctional_2016]. The resulting functional connectivity estimates from each recording were collected into ten symmetrical $64 \times 64$ matrices called *functional connectomes* (one functional connectome for each frequency band and measure), which reflected electrophysiological cortical functional networks derived from averaged oscillatory coupling between each pair of channels. These functional connectomes were the basic unit of observation for subsequent analyses.
 
 #### Phase coupling
 
@@ -218,7 +218,7 @@ $$
 X_{\bot Y}(a, b) = \operatorname{Im} \left(X(a, b) \frac{Y(a, b)^*}{\vert Y(a, b) \vert} \right),
 $$
 
-where $Y(a, b)^*$ is the complex conjugate of $X(a, b)$. Similarly to the phase lag index, the orthogonalization procedure used here allowed us to ignore parts of the signal that be explained by volume conduction from a single common source, making the subsequent amplitude envelope correlations a sound measure of the interactions between different underlying neural sources [@hippetal_LargescaleCorticalCorrelation_2012]. After orthogonalization, the amplitude envelopes of the two analytic signals were computed by taking the absolute value of each signal, then the amplitude envelope correlation between them was estimated. We computed amplitude envelope correlations for both directions of the orthogonalization ($X$ to $Y$, and $Y$ to $X$), then averaged the values to get the final amplitude envelope correlation estimate for each pair.
+where $Y(a, b)^*$ is the complex conjugate of $X(a, b)$. Similarly to the phase lag index, the orthogonalization procedure used here allowed us to ignore parts of the signal that can be explained by volume conduction from a single common source, making the subsequent amplitude envelope correlations a sound measure of the interactions between different underlying neural sources [@hippetal_LargescaleCorticalCorrelation_2012]. After orthogonalization, the amplitude envelopes of the two analytic signals were computed by taking the absolute value of each signal, then the amplitude envelope correlation between them was estimated. We computed amplitude envelope correlations for both directions of the orthogonalization ($X$ to $Y$, and $Y$ to $X$), then averaged the values to get the final amplitude envelope correlation estimate for each pair.
 
 The amplitude envelope correlation takes values between 0 and 1. A value of 0 indicates no amplitude coupling between the orthogonalized signals, and a value of 1 indicates perfect amplitude coupling with a consistent amplitude envelope correlation between the orthogonalized signals.
 
@@ -236,7 +236,112 @@ $$
 
 where $\mathbf{S} = \mathbf{XX}^\mathsf{T}$ and $\mathbf{T} = \mathbf{YY}^\mathsf{T}$. The RV coefficient can thought of as a generalization of the squared Pearson correlation coefficient between two variables to the case of two sets of variables, where two sets of variables are correlated if the relative position (in Hilbert space) of the observations in one set is similar to the relative position of the observations in the other set [@josseholmes_MeasuringMultivariateAssociation_2016; @mayeretal_ExploratoryAnalysisMultiple_2011]. However, as can be seen in the equation above, unlike the Pearson correlation coefficient, the mean of the observations in a set is not subtracted from its observations when estimating the RV coefficient [@abdiherve_RVCoefficientCongruence_2007].
 
-<!-- TODO: Describe how performance of RV coefficient was evaluated -->
+```{r}
+which_participant <- "P19"
+```
+
+Figure \@ref(fig:similarity-key) provides a visual depiction of how the similarities between functional connectomes are captured by the RV coefficient. On the left, Figure \@ref(fig:similarity-key)A shows the alpha band phase coupling functional connectomes for participant `r which_participant`; on the right, Figure \@ref(fig:similarity-key)B shows the similarity matrix containing the RV coefficient estimates for all pairs of functional connectomes shown in Figure \@ref(fig:similarity-key)A.
+
+As can be seen from this example, in the eyes open state (ro1, ro2), participant `r which_participant`'s functional connectomes are quite similar regardless of session (pre, post, fu), showing generally low phase coupling with no large deviations in overall patterns of the connectomes. This is reflected in the similarity matrix, which shows a quite high RV coefficient between the functional connectomes in the eyes open state. Conversely, in the eyes closed state (rc1, rc2), participant `r which_participant`'s functional connectomes are quite variable across recordings within and between sessions, showing varying levels of phase coupling with noticeable deviations in overall patterns of the connectomes. Again, this is reflected in the similarity matrix, which shows much lower RV coefficients between the functional connectomes in the eyes closed state. Finally, between states, participant `r which_participant`'s functional connectomes are quite different in the overall degree of phase coupling, but have some less visually obvious similarities in their overall pattern. This too is reflected in the similarity matrix, which shows moderate RV coefficients between the functional connectomes that share a similar pattern, despite their differences in the overall degree of phase coupling.
+
+This example demonstrates that the RV coefficient (1) acts as a good summary measure of the degree of similarity between functional connectomes, and (2) is sensitive to both the overall extent and the pattern of coupling, making it a viable measure for studying network variants.
+
+```{r similarity-key}
+#| fig.cap: |
+#|   TODO: Write caption.
+case_order <- function(participant_ids) {
+
+  tidyr::expand_grid(
+    participant = participant_ids,
+    session_state = factor(
+      c(
+        "pre_rc1",
+        "pre_rc2",
+        "post_rc1",
+        "post_rc2",
+        "fu_rc1",
+        "fu_rc2",
+        "pre_ro1",
+        "pre_ro2",
+        "post_ro1",
+        "post_ro2",
+        "fu_ro1",
+        "fu_ro2"
+      )
+    )
+  ) |>
+    dplyr::arrange(participant) |>
+    dplyr::mutate(label = paste0(participant, "_", session_state)) |>
+    purrr::pluck("label")
+
+}
+
+tar_load(phase_similarity_key_plot_P19_alpha)
+
+phase_connectivity_plots_P19_alpha <- tibble::tibble(
+  branches = names(tar_read(phase_connectivity_plot_alpha)),
+  plots = tar_read(phase_connectivity_plot_alpha)
+) |>
+  tidyr::hoist(
+    plots,
+    participant = list("metadata", "participant"),
+    case = list("metadata", "case")
+  ) |>
+  dplyr::filter(participant == which_participant) |>
+  dplyr::arrange(factor(case, levels = case_order(which_participant))) |>
+  dplyr::select(plots) |>
+  as.list() |>
+  purrr::pluck(1) |>
+  purrr::map(purrr::pluck, 1)
+
+connectivity_patch <- patchwork::wrap_plots(
+    phase_connectivity_plots_P19_alpha,
+    ncol = 3, widths = 1,
+    guides = "auto"
+  ) &
+  ggplot2::theme(
+    axis.text = ggplot2::element_blank(),
+    axis.ticks = ggplot2::element_blank(),
+    axis.title = ggplot2::element_blank(),
+    plot.margin = grid::unit(c(0.05, 0.05, 0.1, 0.05), "cm"),
+    legend.position = "right"
+  )
+
+# The facet from the similarity matrix pushes the titles in the top row of
+# the connectivity matrix patchwork up, so we have to manually readjust them
+# to get the alignment we want. Doing this also duplicates the legends so we
+# need to remove those too.
+connectivity_patch[[1]] <- connectivity_patch[[1]] +
+  ggplot2::theme(
+    plot.title = ggplot2::element_text(
+      margin = ggplot2::margin(b = -18, unit = "pt")
+    ),
+    legend.position = "none"
+  )
+connectivity_patch[[2]] <- connectivity_patch[[2]] +
+  ggplot2::theme(
+    plot.title = ggplot2::element_text(
+      margin = ggplot2::margin(b = -18, unit = "pt")
+    ),
+    legend.position = "none"
+  )
+connectivity_patch[[3]] <- connectivity_patch[[3]] +
+  ggplot2::theme(
+    plot.title = ggplot2::element_text(
+      margin = ggplot2::margin(b = -18, unit = "pt")
+    ),
+    legend.position = "none"
+  )
+
+connectivity_patch -
+  patchwork::plot_spacer() +
+  phase_similarity_key_plot_P19_alpha +
+  ggplot2::theme(legend.position = "right") +
+  patchwork::plot_layout(widths = c(1, 0.1, 1), guides = "collect") +
+  patchwork::plot_annotation(
+    tag_levels = list(c("A", rep("", 11), "B"))
+  )
+```
 
 After estimating the RV coefficient between all pairs of phase- and amplitude-based functional connectomes within each frequency band, we assessed how functional connectome similarity varied between and within individuals, sessions, and states using data visualization and statistical modelling.
 

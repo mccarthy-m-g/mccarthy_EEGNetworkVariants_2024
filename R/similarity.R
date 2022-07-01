@@ -37,11 +37,24 @@ case_order <- function(participant_ids) {
 #' @return A tibble.
 pairwise_comparisons <- function(input) {
 
+  # Get levels for factors
+  participant_levels <- input |>
+    purrr::map(~ .x$metadata$participant) |>
+    unlist() |>
+    unique() |>
+    sort()
+  session_levels <- c("pre", "post", "fu")
+  state_levels <- c("rc1", "rc2", "ro1", "ro2")
+  label_levels <- case_order(participant_levels)
+
   # Get the branch and label names that go together so pair names are human
   # readable
   label_names  <- input |>
     purrr::map(~ .x$metadata$case) |>
     unlist()
+  label_names <- label_names |>
+    factor(levels = label_levels) |>
+    sort()
   branch_names <- names(label_names)
 
   connectivity_matrix_names <- tibble::tibble(
@@ -50,22 +63,17 @@ pairwise_comparisons <- function(input) {
   )
 
   # Generate all unique pairwise comparisons over branch names. Make sure to
-  # allow repeats for self-comparison pairs.
-  branch_combinations <- gtools::combinations(
-    length(branch_names), 2, branch_names, repeats.allowed = TRUE
+  # allow repeats for self-comparison pairs. This returns the lower triangle and
+  # diagonal pairs.
+  branch_combinations <- outer(branch_names, branch_names, "paste", sep = "_x_")
+  branch_combinations <- stringr::str_split(
+    branch_combinations[lower.tri(branch_combinations, diag = TRUE)],
+    "_x_"
   )
-  colnames(branch_combinations) <- c("x_branch", "y_branch")
-  branch_combinations <- tibble::as_tibble(branch_combinations)
-
-  # Get levels for factors
-  participant_levels <- label_levels <- input |>
-    purrr::map(~ .x$metadata$participant) |>
-    unlist() |>
-    unique() |>
-    sort()
-  session_levels <- c("pre", "post", "fu")
-  state_levels <- c("rc1", "rc2", "ro1", "ro2")
-  label_levels <- case_order(participant_levels)
+  branch_combinations <- tibble::tibble(
+    x_branch = purrr::map_chr(branch_combinations, 1),
+    y_branch = purrr::map_chr(branch_combinations, 2)
+  )
 
   connectivity_matrix_pairs <- branch_combinations |>
     # Using a join ensures the branch and label names will line up
@@ -80,9 +88,6 @@ pairwise_comparisons <- function(input) {
     ) |>
     dplyr::rename(y_label = label_names) |>
     dplyr::mutate(
-      # Make labels a factor to assist with plotting order
-      x_label = factor(x_label, levels = label_levels),
-      y_label = factor(y_label, levels = label_levels),
       # Add metadata to assist with analyses and filtering
       x_participant = factor(
         stringr::str_extract(x_label, "^.*?(?=_)"),

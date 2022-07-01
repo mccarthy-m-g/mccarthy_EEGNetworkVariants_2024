@@ -666,7 +666,7 @@ plot_similarity_contrasts <- function(object, model) {
 }
 
 # TODO: Add documentation
-subset_similarity_results <- function(similarity_results, participant) {
+subset_similarity_results <- function(similarity_results, participants) {
 
   # The similarity results are technically shaped like the lower diagonal of a
   # matrix, which we don't want when subsetting by participant, since it leads
@@ -688,9 +688,76 @@ subset_similarity_results <- function(similarity_results, participant) {
   # This corresponds to the rows belonging to a given participant in the
   # similarity matrix, including both within and between participant
   # similarities.
-  P00_similarities <- similarity_results_sym |>
-    dplyr::filter(x_participant == participant)
+  P00_similarities <- purrr::map(
+    purrr::set_names(participants),
+    ~{
+      similarity_results_sym |>
+        dplyr::filter(x_participant == .x)
+    }
+  )
 
   P00_similarities
+
+}
+
+subset_glmmTMB_similarity <- function(formula, data) {
+
+  purrr::map(
+    data,
+    ~{
+      glmmTMB_similarity(formula, data = .x)
+    }
+  )
+
+}
+
+subset_emmeans_similarity <- function(objects) {
+
+  purrr::map(
+    objects,
+    ~{
+      emmeans_similarity(.x)
+    }
+  )
+
+}
+
+subset_contrast_similarity <- function(objects) {
+
+  purrr::map(
+    objects,
+    ~{
+      contrast_similarity(.x)
+    }
+  )
+
+}
+
+tidy_subset_contrast_similarity <- function(objects) {
+
+  effect_labels <- c(
+    "Main effect",
+    "Between sessions",
+    "Within sessions",
+    "Between states",
+    "Within states",
+    "Between sessions and states",
+    "Between sessions and within states",
+    "Within sessions and between states",
+    "Within sessions and states"
+  )
+
+  purrr::map_dfr(
+    objects,
+    ~{
+      contrasts <- .x |>
+      purrr::map_dfr(broom::tidy, .id = "effect") |>
+      dplyr::mutate(
+        effect_label = factor(effect_labels, levels = effect_labels)
+      )
+      contrasts
+    },
+    .id = "participant"
+  )
 
 }

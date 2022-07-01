@@ -262,23 +262,30 @@ connectivity_estimation_targets <- list(
       check_collinearity(phase_similarity_glmmTMB)
     ),
     # Fit phase connectivity similarity submodels ----
-    tar_map(
-      values = tibble(
-        participants = participants_final
-      ),
-      tar_target(
-        phase_similarity_subset,
-        subset_similarity_results(phase_similarity, participants)
-      ),
-      tar_target(
-        phase_similarity_subset_glmmTMB,
-        glmmTMB_similarity(
-          rv ~
-            within_participant * within_session * within_state + # Fixed effects
-            (1 | x_label) + (1 | y_label), # Random effects
-          data = phase_similarity_subset
-        )
+    tar_target(
+      phase_similarity_subset,
+      subset_similarity_results(phase_similarity, participants_final)
+    ),
+    tar_target(
+      phase_similarity_subset_glmmTMB,
+      subset_glmmTMB_similarity(
+        rv ~
+          within_participant * within_session * within_state + # Fixed effects
+          (1 | x_label) + (1 | y_label), # Random effects
+        data = phase_similarity_subset
       )
+    ),
+    tar_target(
+      phase_similarity_subset_emmeans,
+      subset_emmeans_similarity(phase_similarity_subset_glmmTMB)
+    ),
+    tar_target(
+      phase_similarity_subset_contrasts,
+      subset_contrast_similarity(phase_similarity_subset_emmeans)
+    ),
+    tar_target(
+      phase_similarity_subset_contrasts_tidy,
+      tidy_subset_contrast_similarity(phase_similarity_subset_contrasts)
     ),
     # Estimate amplitude coupling ----
     tar_target(

@@ -238,10 +238,7 @@ connectivity_estimation_targets <- list(
     ),
     tar_target(
       phase_similarity_contrasts_plot,
-      plot_similarity_contrasts(
-        phase_similarity_contrasts,
-        phase_similarity_glmmTMB
-      )
+      plot_similarity_contrasts(phase_similarity_contrasts)
     ),
     ## Model diagnostics
     tar_target(
@@ -284,8 +281,11 @@ connectivity_estimation_targets <- list(
       subset_contrast_similarity(phase_similarity_subset_emmeans)
     ),
     tar_target(
-      phase_similarity_subset_contrasts_tidy,
-      tidy_subset_contrast_similarity(phase_similarity_subset_contrasts)
+      phase_similarity_subset_contrasts_plot,
+      plot_subset_similarity_contrasts(
+        phase_similarity_contrasts,
+        phase_similarity_subset_contrasts
+      )
     ),
     # Estimate amplitude coupling ----
     tar_target(

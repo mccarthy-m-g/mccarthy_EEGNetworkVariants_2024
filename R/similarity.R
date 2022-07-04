@@ -587,14 +587,13 @@ contrast_similarity <- function(object) {
 
 }
 
-#' Plot similarity contrast intervals
+#' Title
 #'
 #' @param object
 #'
-#' @return
-plot_similarity_contrasts <- function(object, model) {
+#' @return A tibble.
+tidy_contrast_similarity <- function(object) {
 
-  # Tidy data to prepare for plotting
   effect_labels <- c(
     "Main effect",
     "Between sessions",
@@ -609,9 +608,28 @@ plot_similarity_contrasts <- function(object, model) {
 
   contrasts <- object |>
     purrr::map_dfr(broom::tidy, .id = "effect") |>
-      dplyr::mutate(
-        effect_label = factor(effect_labels, levels = effect_labels)
+    dplyr::mutate(
+      effect_label = factor(effect_labels, levels = effect_labels),
+      dist = distributional::dist_student_t(
+        df = df, mu = estimate, sigma = std.error
       )
+    ) |>
+    ggdist::point_interval(dist, .width = c(.66, .95)) |>
+    tidyr::pivot_wider(names_from = .width, values_from = c(.lower, .upper))
+
+  contrasts
+
+}
+
+#' Plot similarity contrast intervals
+#'
+#' @param object
+#'
+#' @return
+plot_similarity_contrasts <- function(object) {
+
+  # Tidy data to prepare for plotting
+  contrasts <- tidy_contrast_similarity(object)
 
   # Plotting
   interval_pal <- RColorBrewer::brewer.pal(n = 3, "YlGn")[2:3]
@@ -621,7 +639,7 @@ plot_similarity_contrasts <- function(object, model) {
     ggdist::stat_interval(
       ggplot2::aes(
         xdist = distributional::dist_student_t(
-          df = df.residual(model), mu = estimate, sigma = std.error
+          df = df, mu = estimate, sigma = std.error
         )
       ),
       .width = c(0.66, 0.95)
@@ -759,5 +777,160 @@ tidy_subset_contrast_similarity <- function(objects) {
     },
     .id = "participant"
   )
+
+}
+
+#' Title
+#'
+#' @param group_object
+#' @param subset_objects
+#'
+#' @return A ggplot
+plot_subset_similarity_contrasts <- function(group_object, subset_objects) {
+
+  # Tidy data to prepare for plotting
+  contrasts <- tidy_contrast_similarity(group_object)
+  subset_contrasts <- tidy_subset_contrast_similarity(subset_objects)
+
+  subset_contrasts <- contrasts |>
+    dplyr::select(effect_label, group_estimate = estimate) |>
+    dplyr::left_join(subset_contrasts) |>
+    # Since we have 9 contrasts, there's an odd number which makes lining up
+    # facets awkward. We'll create a blank factor level, whose facet we will
+    # later remove, to work around this.
+    dplyr::mutate(
+      effect_label = forcats::fct_expand(effect_label, " "),
+      effect_label = forcats::fct_relevel(effect_label, "Main effect", " ")
+    )
+
+  # Plotting
+  ramp_colours <- viridis::plasma(9)
+  far_colour_index <- 2
+  close_colour_index <- length(ramp_colours) - 1
+
+  p <- ggplot2::ggplot(subset_contrasts) +
+    ggplot2::geom_vline(ggplot2::aes(xintercept = 0), linetype = 5, alpha = 0.2) +
+    # Point estimate and 95% interval for the group-level effect
+    ggplot2::geom_rect(
+      ggplot2::aes(
+        xmin = .lower_0.95,
+        xmax = .upper_0.95,
+        ymin = -Inf,
+        ymax = Inf
+      ),
+      alpha = 0.2,
+      data = contrasts
+    ) +
+    ggplot2::geom_rect(
+      ggplot2::aes(
+        xmin = .lower_0.66,
+        xmax = .upper_0.66,
+        ymin = -Inf,
+        ymax = Inf
+      ),
+      alpha = 0.2,
+      data = contrasts
+    ) +
+    # This is a slightly hacky way to get a consistent width for the point
+    # estimate since geom_vline() varies with graphics device size.
+    ggplot2::geom_rect(
+      ggplot2::aes(
+        xmin = estimate - 0.001,
+        xmax = estimate + 0.001,
+        ymin = -Inf,
+        ymax = Inf
+      ),
+      alpha = 0.2,
+      data = contrasts
+    ) +
+    # Confidence distributions for participant sub-models
+    ggdist::stat_slab(
+      ggplot2::aes(
+        x = estimate,
+        y = participant,
+        # This throws a warning that the aesthetic is being ignored, but it's
+        # needed for the code in `fill_ramp` to work.
+        group_estimate = group_estimate,
+        xdist = distributional::dist_student_t(df = df, mu = estimate, sigma = std.error),
+        fill_ramp = stat(abs(group_estimate - x))
+      ),
+      color = "black",
+      size = 0.25,
+      height = 2,
+      expand = TRUE, # I can't disable this for whatever reason
+      trim = FALSE, # I can't disable this for whatever reason
+      fill = ramp_colours[far_colour_index],
+      fill_type = "gradient"
+    ) +
+    ggdist::scale_fill_ramp_continuous(
+      from = ramp_colours[close_colour_index],
+      name = "Distance from\ngroup-level\npoint estimate",
+      trans = "identity",
+      # This adjusts how quickly the fill ramps. It should be set to a meaningful
+      # value such as the maximum distance we consider compatible with the
+      # group-level estimate.
+      limits = c(0, 0.05),
+      # Fills outside the distance limit should be given the max colour
+      oob = scales::oob_squish,
+      guide = ggdist::guide_rampbar(
+        to = ramp_colours[far_colour_index],
+        title.vjust = 1.5
+      )
+    ) +
+    # Finally, some subtle lines that can be seen when the ridges overlap the
+    # interval.
+    ggplot2::geom_vline(
+      ggplot2::aes(xintercept = .lower_0.95),
+      linetype = 5,
+      alpha = 0.2,
+      data = contrasts
+    ) +
+    ggplot2::geom_vline(
+      ggplot2::aes(xintercept = .upper_0.95),
+      linetype = 5,
+      alpha = 0.2,
+      data = contrasts
+    ) +
+    ggplot2::geom_vline(
+      ggplot2::aes(xintercept = estimate),
+      linetype = 2,
+      alpha = 0.2,
+      data = contrasts
+    ) +
+    # General plot settings
+    ggplot2::scale_x_continuous(
+      breaks = c(-0.3, -0.2, -0.1, 0, 0.1, 0.2, 0.3)
+    ) +
+    # Keep the empty " " facet to enforce facet alignment. It will be removed
+    # manually after building the plot. Make the direction vertical so that
+    # the "Main effect" facet is above the " " facet.
+    ggplot2::facet_wrap(~ effect_label, ncol = 5, drop = FALSE, dir = "v") +
+    ggplot2::labs(
+      x = paste0(
+        "Difference in functional connectome similarity",
+        "\n",
+        "(Within participant y \U2212 Between participant)"
+      ),
+      y = "Participant"
+    ) +
+    ggplot2::theme_classic()
+  p
+
+  # Remove the blank facet. Solution for removing facet modified from:
+  # https://stackoverflow.com/a/30372692/16844576
+  g <- ggplot2::ggplotGrob(p)
+
+  # Get the grobs that must be removed
+  rm_grobs <- g$layout$name %in% c("strip-t-1-2")
+  # Remove grobs
+  g$grobs[rm_grobs] <- NULL
+  g$layout <- g$layout[!rm_grobs, ]
+  # Move x-axis from " " facet to "Main effect" facet
+  g$layout[g$layout$name == "axis-b-1-2", c("t", "b")] <- c(9, 9)
+  # Move y-axis from " " facet to "Within sessions" facet
+  g$layout[g$layout$name == "axis-l-2-1", c("l", "r")] <- c(8, 8)
+
+  # Transform back to class ggplot and print
+  ggpubr::as_ggplot(g)
 
 }

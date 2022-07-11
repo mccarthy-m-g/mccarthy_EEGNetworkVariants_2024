@@ -1,1 +1,23 @@
 # Discussion
+
+Overall, we found that in our sample, contingent on the correctness of all background assumptions used to compute our estimates, EEG is generally poor at detecting network variants in both phase- and amplitude-based functional connectomes, regardless of frequency band. Where we did find evidence supportive of network variants (phase-coupling in the alpha band), effects were small and inconsistent across participants.
+
+That said, one thing we do see is that the group-level similarity estimates follow the general pattern we would expect based on common sense (the more "within" we get, the more similarity there is)
+
+## Things to talk about
+
+Higher density EEG caps
+
+Testing concurrent EEG and fMRI to rule out sample issues
+
+Trying different connectivity measures
+
+Recording length
+
+Statistical limitations
+
+Generalizability
+
+Contrast results with those from @mostamesadaghiani_OscillationBasedConnectivityArchitecture_2021
+
+we find little evidence of network variants in both phase and amplitude functional connectomes across frequency bands, given the correctness of all assumptions in our model.

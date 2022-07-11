@@ -46,6 +46,7 @@ output            : papaja::apa6_word
 ---
 
 ```{r setup, include = FALSE}
+library(here)
 library(papaja)
 library(targets)
 # FIXME: I'm using patchwork right now just to place figures while drafting.
@@ -69,15 +70,15 @@ knitr::opts_chunk$set(
 ```
 
 ```{r introduction}
-#| child = params$introduction_path
+#| child = here::here("manuscripts/child-documents/introduction.Rmd")
 ```
 
 ```{r methods}
-#| child = params$methods_path
+#| child = here::here("manuscripts/child-documents/methods.Rmd")
 ```
 
 ```{r results}
-#| child = params$results_path
+#| child = here::here("manuscripts/child-documents/results.Rmd")
 ```
 
 \newpage

@@ -572,6 +572,38 @@ emmeans_similarity <- function(object) {
 
 }
 
+#' Title
+#'
+#' @param object
+#'
+#' @return
+tidy_emmeans_similarity <- function(object) {
+
+  effect_labels <- c(
+    "main_effect",
+    "between_sessions",
+    "within_sessions",
+    "between_states",
+    "within_states",
+    "between_sessions_states",
+    "between_sessions_within_states",
+    "within_sessions_between_states",
+    "within_sessions_states"
+  )
+
+  object |>
+    purrr::map_dfr(broom::tidy, .id = "effect") |>
+    dplyr::mutate(
+      effect_label = rep(effect_labels, each = 2),
+      within_participant = dplyr::case_when(
+        within_participant == TRUE  ~ "within_participants",
+        within_participant == FALSE ~ "between_participants"
+      ),
+      effect_label = paste0(within_participant, "_", effect_label)
+    )
+
+}
+
 #' Estimate pairwise contrasts using the reference grid
 #'
 #' @param object
@@ -607,7 +639,7 @@ tidy_contrast_similarity <- function(object) {
   )
 
   contrasts <- object |>
-    purrr::map_dfr(broom::tidy, .id = "effect") |>
+    purrr::map_dfr(broom::tidy, .id = "effect", conf.int = TRUE) |>
     dplyr::mutate(
       effect_label = factor(effect_labels, levels = effect_labels),
       dist = distributional::dist_student_t(
@@ -932,5 +964,42 @@ plot_subset_similarity_contrasts <- function(group_object, subset_objects) {
 
   # Transform back to class ggplot and print
   ggpubr::as_ggplot(g)
+
+}
+
+#' Title
+#'
+#' @param filename
+#' @param similarity_matrix
+#' @param group_contrasts
+#' @param subset_contrasts
+#'
+#' @return A character vector
+save_results_figure <- function(
+  filename,
+  similarity_matrix,
+  group_contrasts,
+  subset_contrasts
+  ) {
+
+  design <- "AB
+             CC"
+
+  p1 <- patchwork::wrap_elements(similarity_matrix)
+  p2 <- patchwork::wrap_elements(group_contrasts)
+  p3 <- patchwork::wrap_elements(subset_contrasts)
+
+  patch <- patchwork::wrap_plots(A = p1, B = p2, C = p3, design = design) +
+    patchwork::plot_annotation(tag_levels = "A")
+
+  ggplot2::ggsave(
+    filename = filename,
+    plot = patch,
+    device = ragg::agg_png,
+    width = 14,
+    height = 10
+  )
+
+  filename
 
 }

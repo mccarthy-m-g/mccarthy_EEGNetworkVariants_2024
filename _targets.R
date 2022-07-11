@@ -233,8 +233,16 @@ connectivity_estimation_targets <- list(
       emmeans_similarity(phase_similarity_glmmTMB)
     ),
     tar_target(
+      phase_similarity_emmeans_tidy,
+      tidy_emmeans_similarity(phase_similarity_emmeans)
+    ),
+    tar_target(
       phase_similarity_contrasts,
       contrast_similarity(phase_similarity_emmeans)
+    ),
+    tar_target(
+      phase_similarity_contrasts_tidy,
+      tidy_contrast_similarity(phase_similarity_contrasts)
     ),
     tar_target(
       phase_similarity_contrasts_plot,
@@ -330,9 +338,89 @@ connectivity_estimation_targets <- list(
         amplitude_similarity_highlight_plot,
         plot_similarity_highlight(amplitude_similarity, participants)
       )
-    )
+    ),
     # Model amplitude connectivity similarity ----
+    tar_target(
+      amplitude_similarity_glmmTMB,
+      glmmTMB_similarity(
+        rv ~
+          within_participant * within_session * within_state + # Fixed effects
+          (1 | x_label) + (1 | y_label), # Random effects
+        data = amplitude_similarity
+      )
+    ),
+    tar_target(
+      amplitude_similarity_emmeans,
+      emmeans_similarity(amplitude_similarity_glmmTMB)
+    ),
+    tar_target(
+      amplitude_similarity_emmeans_tidy,
+      tidy_emmeans_similarity(amplitude_similarity_emmeans)
+    ),
+    tar_target(
+      amplitude_similarity_contrasts,
+      contrast_similarity(amplitude_similarity_emmeans)
+    ),
+    tar_target(
+      amplitude_similarity_contrasts_tidy,
+      tidy_contrast_similarity(amplitude_similarity_contrasts)
+    ),
+    tar_target(
+      amplitude_similarity_contrasts_plot,
+      plot_similarity_contrasts(amplitude_similarity_contrasts)
+    ),
     ## Model diagnostics
+
+    # Fit amplitude connectivity similarity submodels ----
+    tar_target(
+      amplitude_similarity_subset,
+      subset_similarity_results(amplitude_similarity, participants_final)
+    ),
+    tar_target(
+      amplitude_similarity_subset_glmmTMB,
+      subset_glmmTMB_similarity(
+        rv ~
+          within_participant * within_session * within_state + # Fixed effects
+          (1 | x_label) + (1 | y_label), # Random effects
+        data = amplitude_similarity_subset
+      )
+    ),
+    tar_target(
+      amplitude_similarity_subset_emmeans,
+      subset_emmeans_similarity(amplitude_similarity_subset_glmmTMB)
+    ),
+    tar_target(
+      amplitude_similarity_subset_contrasts,
+      subset_contrast_similarity(amplitude_similarity_subset_emmeans)
+    ),
+    tar_target(
+      amplitude_similarity_subset_contrasts_plot,
+      plot_subset_similarity_contrasts(
+        amplitude_similarity_contrasts,
+        amplitude_similarity_subset_contrasts
+      )
+    ),
+    # Save manuscript figures ----
+    tar_target(
+      phase_similarity_results_figure,
+      save_results_figure(
+        paste0("figures/", filter_freq_band, "/phase_similarity_results.png"),
+        phase_similarity_plot,
+        phase_similarity_contrasts_plot,
+        phase_similarity_subset_contrasts_plot
+      ),
+      format = "file"
+    ),
+    tar_target(
+      amplitude_similarity_results_figure,
+      save_results_figure(
+        paste0("figures/", filter_freq_band, "/amplitude_similarity_results.png"),
+        amplitude_similarity_plot,
+        amplitude_similarity_contrasts_plot,
+        amplitude_similarity_subset_contrasts_plot
+      ),
+      format = "file"
+    )
   ),
   tar_target(
     similarity_archetype_plot,
@@ -404,7 +492,8 @@ manuscripts_targets <- list(
       here("manuscripts", "references.json"),
       keys = c(
         introduction,
-        methods
+        methods,
+        results
       ),
       public_library_id = "mccarthymg"
     ),

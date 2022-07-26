@@ -64,6 +64,12 @@ knitr::opts_chunk$set(
   fig.show = "hold",
   cache.extra = knitr::rand_seed
 )
+
+# Load paths to child documents to enforce their dependencies in the pipeline
+tar_load(introduction)
+tar_load(methods)
+tar_load(results)
+tar_load(discussion)
 ```
 
 ```{r introduction}

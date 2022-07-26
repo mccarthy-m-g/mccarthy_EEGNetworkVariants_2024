@@ -313,9 +313,10 @@ plot_similarity <- function(similarity_results, estimate) {
     ) +
     ggplot2::theme(
       panel.spacing = grid::unit(0, "lines"),
-      strip.placement = "outside",
       strip.text = ggplot2::element_text(face = "bold", size = 9),
       strip.text.y.left = ggplot2::element_text(angle = 0),
+      strip.placement = "inside",
+      strip.switch.pad.grid = grid::unit(0, "lines"),
       axis.text = ggplot2::element_blank(),
       axis.ticks = ggplot2::element_blank()
     )
@@ -964,6 +965,89 @@ plot_subset_similarity_contrasts <- function(group_object, subset_objects) {
 
   # Transform back to class ggplot and print
   ggpubr::as_ggplot(g)
+
+}
+
+#' Title
+#'
+#' @param filename
+#' @param plots
+#'
+#' @return
+save_similarity_archetypes_figure <- function(filename, plots) {
+
+  # Hide the legends so we can only show one for the entire patchwork
+  group_effect <- plots$group_effect +
+    ggplot2::ggtitle("Group effect") +
+    ggplot2::theme(legend.position = "none")
+  session_effect <- plots$session_effect +
+    ggplot2::ggtitle("Session effect") +
+    ggplot2::theme(legend.position = "none")
+  state_effect <- plots$state_effect +
+    ggplot2::ggtitle("State effect") +
+    ggplot2::theme(legend.position = "none")
+  individual_session_effect <- plots$individual_session_effect +
+    ggplot2::ggtitle("Individual-session effect") +
+    ggplot2::theme(legend.position = "none")
+  individual_state_effect <- plots$individual_state_effect +
+    ggplot2::ggtitle("Individual-state effect") +
+    ggplot2::theme(legend.position = "none")
+
+  # Modify the legend so that it's discrete instead of continuous. This legend
+  # will be extracted to represent the entire patchwork, since collecting
+  # legends does not work with these plots.
+  individual_effect <- plots$individual_effect +
+    ggplot2::scale_fill_continuous(
+      breaks = c(0, 1),
+      labels = c("No similarity", "Perfect similarity"),
+      type = "viridis",
+      guide = ggplot2::guide_legend(
+        title = "Functional\nConnectome\nSimilarity", reverse = TRUE
+      )
+    )
+
+  plots_legend <- individual_effect |>
+    ggpubr::get_legend() |>
+    ggpubr::as_ggplot()
+
+  individual_effect <- individual_effect +
+    ggplot2::ggtitle("Individual effect") +
+    ggplot2::theme(legend.position = "none")
+
+  # design <- "ABCGHI
+  #            DEFGHI"
+
+  design <- "ADG#I
+             BEGHI
+             CFG#I"
+
+  p1 <- patchwork::wrap_elements(group_effect)
+  p2 <- patchwork::wrap_elements(session_effect)
+  p3 <- patchwork::wrap_elements(state_effect)
+  p4 <- patchwork::wrap_elements(individual_effect)
+  p5 <- patchwork::wrap_elements(individual_session_effect)
+  p6 <- patchwork::wrap_elements(individual_state_effect)
+  p7 <- plots_legend
+
+  patch <- patchwork::wrap_plots(
+    A = p1, B = p2, C = p3, D = p4, E = p5, F = p6, G = patchwork::plot_spacer(), H = p7, I = patchwork::plot_spacer(),
+    design = design,
+    guides = "collect",
+    widths = c(1, 1, 0.025, 0.2, 0.025)
+  )
+
+  ggplot2::ggsave(
+    filename = filename,
+    plot = patch,
+    device = ragg::agg_png,
+    width = 21.59,
+    height = 26,
+    units = "cm",
+    dpi = "retina",
+    scaling = 0.65
+  )
+
+  filename
 
 }
 

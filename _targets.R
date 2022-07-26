@@ -435,6 +435,14 @@ connectivity_estimation_targets <- list(
   tar_target(
     similarity_archetype_plot,
     plot_similarity_archetype(phase_similarity_gamma)
+  ),
+  tar_target(
+    similarity_archetypes_figure,
+    save_similarity_archetypes_figure(
+      "figures/similarity_archetypes.png",
+      similarity_archetype_plot
+    ),
+    format = "file"
   )
 )
 

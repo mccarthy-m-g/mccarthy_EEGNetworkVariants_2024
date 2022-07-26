@@ -19,36 +19,19 @@ Given these advantages, EEG has the potential to provide new and complementary i
 
 Here, we use EEG data previously collected by our lab as part of a larger study---containing a total of 30 minutes eyes open resting state data (over 6 recordings) and 30 minutes eyes closed resting state data (over 6 recordings) from each participant---to answer this question. First we create a functional connectome from each recording by estimating the phase and amplitude coupling between all pairs of EEG channels. Phase and amplitude coupling are thought to reflect different but related neurophysiological functions and it is common to use both measures so they can be compared [@engeletal_IntrinsicCouplingModes_2013; @sadaghianiwirsich_IntrinsicConnectomeOrganization_2020; @wirsichetal_RelationshipEEGFMRI_2021]. Specifically, phase coupling is thought to regulate the integration and flow of cognitive contents on fast timescales, and amplitude coupling is thought to coordinate changes in (co)activation of brain areas on slow timescales [@engeletal_IntrinsicCouplingModes_2013]. Then we test for the presence of network variants by estimating how functional connectomes differ between and within individuals using measures of network similarity.
 
-Figure \@ref(fig:similarity-archetype-plots) depicts six archetypal outcomes we could find. The first row shows outcomes that would occur in cases where functional connectomes *do not* differ between individuals. In particular, we might expect to see (1) high similarity among all measurements regardless of individual, session, or state, which might occur if the brain activity we measured is largely intrinsic and common across individuals [cf. @raichle_TwoViewsBrain_2010]; (2) high similarity among all measurements regardless of individual or state, but not session, which might occur if the brain activity we measured is largely intrinsic, common across individuals, and varies over time in the same way across individuals; or (3) high similarity among all measurements regardless of individual or session, but not state, which might occur if the brain activity we measured is largely reactive in a way that is common across individuals [cf. @raichle_TwoViewsBrain_2010]. The second row shows outcomes that would occur in cases where functional connectomes *do* differ between individuals. In particular, we might expect to see (4) high similarity among all measurements regardless of session or state, but not individual, which might occur if the brain activity we measured is largely intrinsic and unique within individuals; (5) high similarity among all measurements regardless of state, but not individual or session, which might occur if the brain activity we measured is largely intrinsic, unique within individuals, and varies over time within individuals; or (6) high similarity among all measurements regardless of session, but not individual or state, which might occur if the brain activity we measured is largely reactive in a way that is unique within individuals.
+Figure \@ref(fig:similarity-archetype-plots) depicts six archetypal outcomes we could find. The first column shows outcomes that would occur in cases where functional connectomes *do not* differ between individuals. In particular, we might expect to see (1) a *group effect* with high similarity among all measurements regardless of individual, session, or state, which might occur if the brain activity we measured is largely intrinsic and common across individuals [cf. @raichle_TwoViewsBrain_2010]; (2) a *session effect* with high similarity among all measurements regardless of individual or state, but not session, which might occur if the brain activity we measured is largely intrinsic, common across individuals, and varies over time in the same way across individuals; or (3) a *state effect* with high similarity among all measurements regardless of individual or session, but not state, which might occur if the brain activity we measured is largely reactive in a way that is common across individuals [cf. @raichle_TwoViewsBrain_2010]. The second column shows outcomes that would occur in cases where functional connectomes *do* differ between individuals. In particular, we might expect to see (4) an *individual effect* with high similarity among all measurements regardless of session or state, but not individual, which might occur if the brain activity we measured is largely intrinsic and unique within individuals; (5) an *individual-session effect* with high similarity among all measurements regardless of state, but not individual or session, which might occur if the brain activity we measured is largely intrinsic, unique within individuals, and varies over time within individuals; or (6) an *individual-state effect* with high similarity among all measurements regardless of session, but not individual or state, which might occur if the brain activity we measured is largely reactive in a way that is unique within individuals.
 
 ```{r similarity-archetype-plots}
 #| fig.cap: |
 #|   TODO: Write caption.
-tar_load(similarity_archetype_plot)
-
-# TODO: Improve the legend: Title should be "Connectome Similarity", and instead
-# of a continuous scale it should be two factors: "Perfect similarity", "No
-# similarity"
-cap <- agg_capture(width = 33.02, height = 16.51, res = 300, units = "cm")
-
-wrap_elements(similarity_archetype_plot$group_effect) +
-  wrap_elements(similarity_archetype_plot$session_effect) +
-  wrap_elements(similarity_archetype_plot$state_effect) +
-  wrap_elements(similarity_archetype_plot$individual_effect) +
-  wrap_elements(similarity_archetype_plot$individual_session_effect) +
-  wrap_elements(similarity_archetype_plot$individual_state_effect) +
-  plot_layout(ncol = 3)
-
-patch_plots <- cap(native = TRUE)
-dev.off()
-
-grid::grid.raster(patch_plots)
+targets::tar_load(similarity_archetypes_figure)
+knitr::include_graphics(here::here(similarity_archetypes_figure))
 ```
 
 It is likely that the real data will be representative of more than one of these archetypes. Based on the prior work discussed above, we expect to find effects consistent with functional connectomes that are more similar within than between individuals, with smaller variations in similarity related to session or state---consistent with the idea that functional networks are stable and trait-like with equal amounts of common and unique variance between individuals. To examine our hypotheses we contrast the magnitude of each of these effects and examine how they are distributed across different timescales using EEG functional connectivity analysis and measures of network similarity.
 
-<!-- Footnotes start ---------------------------------------------------------->
+<!-- Footnotes start --------------------------------------------------------->
 
 [^1]: The power and relevance of individual-level approaches in human neuroscience research has been recognized since the start of human neuroimaging using electroencephalography [e.g., @adrianmathews_BergerRhythmPotential_1934; @berger_UberElektrenkephalogrammMenschen_1929; @henry_ElectroencephalographicIndividualDifferences_1941], positron emission tomography [e.g., @schlaugetal_IntersubjectVariabilityCerebral_1994], and functional magnetic resonance imaging [e.g., @rolandzilles_StructuralDivisionsFunctional_1998]. Despite this, human neuroscience research has historically dedicated itself to group-level approaches due to methodological limitations [e.g., @brettetal_ProblemFunctionalLocalization_2002], faulty assumptions about universality and generalizability [e.g., @caramazza_DrawingInferencesStructure_1986; @henson_WhatCanFunctional_2005; cf. @viola_PlatonicBrainFacing_2020], oversimplified conceptions of the role human neuroscience has in the study of behaviour and cognition [for discussions, see @pessoa_UnderstandingBrainNetworks_2014; @ruz_LetBrainExplain_2006; @mcfarland_HowNeuroscienceCan_2017], and sociological factors related to the origins of human neuroscience research [e.g., @posnerdigirolamo_CognitiveNeuroscienceOrigins_2000; @posneretal_CognitiveNeuroscienceDevelopmentsScience_1982].
 
-<!-- Footnotes end ---------------------------------------------------------->
+<!-- Footnotes end ----------------------------------------------------------->

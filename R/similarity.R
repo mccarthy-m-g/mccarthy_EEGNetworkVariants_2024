@@ -977,27 +977,33 @@ plot_subset_similarity_contrasts <- function(group_object, subset_objects) {
 #' @return A character vector
 save_results_figure <- function(
   filename,
+  connectivity_profile,
   similarity_matrix,
   group_contrasts,
   subset_contrasts
   ) {
 
-  design <- "AB
-             CC"
+  design <- "AA
+             BC
+             DD"
 
-  p1 <- patchwork::wrap_elements(similarity_matrix)
-  p2 <- patchwork::wrap_elements(group_contrasts)
-  p3 <- patchwork::wrap_elements(subset_contrasts)
+  p1 <- patchwork::wrap_elements(connectivity_profile)
+  p2 <- patchwork::wrap_elements(similarity_matrix)
+  p3 <- patchwork::wrap_elements(group_contrasts)
+  p4 <- patchwork::wrap_elements(subset_contrasts)
 
-  patch <- patchwork::wrap_plots(A = p1, B = p2, C = p3, design = design) +
+  patch <- patchwork::wrap_plots(A = p1, B = p2, C = p3, D = p4, design = design) +
     patchwork::plot_annotation(tag_levels = "A")
 
   ggplot2::ggsave(
     filename = filename,
     plot = patch,
     device = ragg::agg_png,
-    width = 14,
-    height = 10
+    width = 21.59,
+    height = 25,
+    units = "cm",
+    dpi = "retina",
+    scaling = 0.65
   )
 
   filename

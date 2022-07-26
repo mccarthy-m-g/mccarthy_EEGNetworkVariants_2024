@@ -348,6 +348,92 @@ plot_connectivity <- function(input, method) {
   )
 }
 
+# TODO: Add legend for case levels
+plot_connectivity_profiles <- function(input, method) {
+
+  # Get levels for factors
+  participant_levels <- input |>
+    purrr::map(~ .x$metadata$participant) |>
+    unlist() |>
+    unique() |>
+    sort()
+  session_levels <- c("pre", "post", "fu")
+  state_levels <- c("rc1", "rc2", "ro1", "ro2")
+  label_levels <- case_order(participant_levels)
+
+  # Get lower triangle of connectivity matrices and store in a tibble to prepare
+  # for plotting
+  connectivity_profiles <- input |>
+    purrr::map_dfr(
+      ~{
+
+        # Get the lower triangle of the connectivity matrix as a named vector, which
+        # can be used as a connectivity profile
+        connectivity_matrix <- .x$connectivity_matrix
+        connectivity_matrix_cellnames <- outer(
+          colnames(connectivity_matrix),
+          rownames(connectivity_matrix),
+          "paste",
+          sep = "_x_"
+        )
+
+        connectivity_profile <- connectivity_matrix[lower.tri(connectivity_matrix)]
+        names(connectivity_profile) <- connectivity_matrix_cellnames[
+          lower.tri(connectivity_matrix_cellnames)
+        ]
+
+        tibble::tibble(
+          participant = .x$metadata$participant,
+          case = .x$metadata$case,
+          pair = names(connectivity_profile),
+          value = connectivity_profile
+        )
+      },
+      .id = "branch"
+    ) |>
+    dplyr::mutate(case = factor(case, levels = label_levels))
+
+  # Plot
+  axis_tick_colours <- colorspace::diverging_hcl(
+    12, h = c(135, 50), c = 60, l = c(25, 95), power = c(0.7, 1.3)
+  )
+
+  case_colours <- rep(
+    c(rev(axis_tick_colours[7:12]), axis_tick_colours[1:6]),
+    times = length(participant_levels)
+  )
+
+  ggplot2::ggplot(connectivity_profiles, ggplot2::aes(x = pair, y = case, fill = value)) +
+    ggplot2::geom_raster() +
+    ggplot2::scale_fill_viridis_c(limits = c(0, 1), option = "cividis") +
+    ggh4x::facet_nested(
+      rows = ggplot2::vars(participant),
+      independent = TRUE,
+      scales = "free",
+      switch = "y"
+    ) +
+    # Expand reduces the spacing between facets
+    ggplot2::scale_x_discrete(expand = c(0, 0)) +
+    ggplot2::scale_y_discrete(expand = c(0, 0), limits = rev) +
+    ggplot2::labs(
+      x = "Sensor pairs",
+      y = NULL,
+      fill = method
+    ) +
+    ggplot2::theme(
+      panel.spacing = grid::unit(0, "lines"),
+      strip.text = ggplot2::element_text(face = "bold", size = 9),
+      strip.text.y.left = ggplot2::element_text(angle = 0),
+      strip.placement = "outside",
+      strip.switch.pad.grid = grid::unit(0, "lines"),
+      axis.text = ggplot2::element_blank(),
+      axis.ticks.x = ggplot2::element_blank(),
+      axis.ticks.y = ggplot2::element_line(colour = case_colours, size = 1),
+      axis.ticks.length.y = grid::unit(0.5, "lines")
+    )
+
+}
+
 # TODO: This is the patchwork plot of all the functional connectivity matrices for a subject
 plot_connectivity_patchwork <- function() {
 

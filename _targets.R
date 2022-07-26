@@ -196,6 +196,10 @@ connectivity_estimation_targets <- list(
       pattern = map(phase_connectivity_matrix),
       iteration = "list"
     ),
+    tar_target(
+      phase_connectivity_profile_plot,
+      plot_connectivity_profiles(phase_connectivity_matrix, "PLI")
+    ),
     # Estimate phase connectivity similarity ----
     tar_target(
       phase_similarity,
@@ -317,6 +321,10 @@ connectivity_estimation_targets <- list(
       pattern = map(amplitude_connectivity_matrix),
       iteration = "list"
     ),
+    tar_target(
+      amplitude_connectivity_profile_plot,
+      plot_connectivity_profiles(amplitude_connectivity_matrix, "AEC")
+    ),
     # Estimate amplitude coupling similarity ----
     tar_target(
       amplitude_similarity,
@@ -405,6 +413,7 @@ connectivity_estimation_targets <- list(
       phase_similarity_results_figure,
       save_results_figure(
         paste0("figures/", filter_freq_band, "/phase_similarity_results.png"),
+        phase_connectivity_profile_plot,
         phase_similarity_plot,
         phase_similarity_contrasts_plot,
         phase_similarity_subset_contrasts_plot
@@ -415,6 +424,7 @@ connectivity_estimation_targets <- list(
       amplitude_similarity_results_figure,
       save_results_figure(
         paste0("figures/", filter_freq_band, "/amplitude_similarity_results.png"),
+        amplitude_connectivity_profile_plot,
         amplitude_similarity_plot,
         amplitude_similarity_contrasts_plot,
         amplitude_similarity_subset_contrasts_plot
@@ -485,6 +495,11 @@ manuscripts_targets <- list(
     here("manuscripts", "child-documents", "results.Rmd"),
     format = "file"
   ),
+  tar_target(
+    discussion,
+    here("manuscripts", "child-documents", "discussion.Rmd"),
+    format = "file"
+  ),
   # Bibliography file ----
   tar_target(
     references,
@@ -493,7 +508,8 @@ manuscripts_targets <- list(
       keys = c(
         introduction,
         methods,
-        results
+        results,
+        discussion
       ),
       public_library_id = "mccarthymg"
     ),
@@ -510,10 +526,7 @@ manuscripts_targets <- list(
     thesis,
     here("manuscripts", "thesis", "index.Rmd"),
     params = list(
-      introduction_path = introduction,
-      methods_path      = methods,
-      results_path      = results,
-      references_path   = references
+      references_path = references
     )
   )
 )

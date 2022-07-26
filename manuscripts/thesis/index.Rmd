@@ -1,8 +1,5 @@
 ---
 params:
-  introduction_path: "path"
-  methods_path: "path"
-  results_path: "path"
   references_path: "path"
 
 title             : "Studying network variants with electroencephalography"
@@ -79,6 +76,10 @@ knitr::opts_chunk$set(
 
 ```{r results}
 #| child = here::here("manuscripts/child-documents/results.Rmd")
+```
+
+```{r discussion}
+#| child = here::here("manuscripts/child-documents/discussion.Rmd")
 ```
 
 \newpage

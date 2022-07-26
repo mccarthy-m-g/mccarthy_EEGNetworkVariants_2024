@@ -52,6 +52,8 @@ We use ridge plots to report the individual-level contrasts estimating the diffe
 
 ### Phase coupling similarities
 
+Figure \@ref(fig:phase-similarity-plots-delta) shows the connectivity profile matrix, similarity matrix, interval, and ridge plots for phase coupling functional connectome similarities in the delta band. There was a visually obvious group effect, with high similarity between functional connectomes regardless of participant, session, or state (Figure \@ref(fig:phase-similarity-plots-delta)A). This was supported by the group-level contrasts, which showed that although functional connectomes were more similar within participants than between participants at all levels of the session and state predictors, the effect sizes most compatible with our data, given the background model, were at most very small and not practically relevant (Figure \@ref(fig:phase-similarity-plots-delta)B). Moreover, the individual-level contrasts also made it clear that the slightly higher within participant similarity at the group-level should not be overinterpreted, given that the data did not resolve whether the most compatible effect sizes were positive or negative for nearly all participants at most levels of the session and state predictors (Figure \@ref(fig:phase-similarity-plots-delta)C).
+
 ```{r phase-similarity-plots-delta}
 #| fig.cap: |
 #|   TODO: Write caption.
@@ -59,9 +61,9 @@ targets::tar_load(phase_similarity_results_figure_delta)
 knitr::include_graphics(here::here(phase_similarity_results_figure_delta))
 ```
 
-Figure \@ref(fig:phase-similarity-plots-delta) shows the connectivity profile matrix, similarity matrix, interval, and ridge plots for phase coupling functional connectome similarities in the delta band. There was a visually obvious group effect, with high similarity between functional connectomes regardless of participant, session, or state (Figure \@ref(fig:phase-similarity-plots-delta)A). This was supported by the group-level contrasts, which showed that although functional connectomes were more similar within participants than between participants at all levels of the session and state predictors, the effect sizes most compatible with our data, given the background model, were at most very small and not practically relevant (Figure \@ref(fig:phase-similarity-plots-delta)B). Moreover, the individual-level contrasts also made it clear that the slightly higher within participant similarity at the group-level should not be overinterpreted, given that the data did not resolve whether the most compatible effect sizes were positive or negative for nearly all participants at most levels of the session and state predictors (Figure \@ref(fig:phase-similarity-plots-delta)C).
-
 ### Amplitude-coupling similarities
+
+Figure \@ref(fig:amplitude-similarity-plots-delta) shows the connectivity profile matrix, similarity matrix, interval, and ridge plots for amplitude coupling functional connectome similarities in the delta band. There was a visually obvious group effect, with near-perfect similarity between functional connectomes regardless of participant, session, or state (Figure \@ref(fig:amplitude-similarity-plots-delta)A). This was also apparent from the group- and individual-level contrasts, which showed that the differences in functional connectome similarity similarity between and within individuals most compatible with our data, given the background model, were practically nil at all levels of the session and state predictors (Figures \@ref(fig:amplitude-similarity-plots-delta)B, \@ref(fig:amplitude-similarity-plots-delta)C).
 
 ```{r amplitude-similarity-plots-delta}
 #| fig.cap: |
@@ -70,11 +72,11 @@ targets::tar_load(amplitude_similarity_results_figure_delta)
 knitr::include_graphics(here::here(amplitude_similarity_results_figure_delta))
 ```
 
-Figure \@ref(fig:amplitude-similarity-plots-delta) shows the connectivity profile matrix, similarity matrix, interval, and ridge plots for amplitude coupling functional connectome similarities in the delta band. There was a visually obvious group effect, with near-perfect similarity between functional connectomes regardless of participant, session, or state (Figure \@ref(fig:amplitude-similarity-plots-delta)A). This was also apparent from the group- and individual-level contrasts, which showed that the differences in functional connectome similarity similarity between and within individuals most compatible with our data, given the background model, were practically nil at all levels of the session and state predictors (Figures \@ref(fig:amplitude-similarity-plots-delta)B, \@ref(fig:amplitude-similarity-plots-delta)C).
-
 ## Theta band
 
 ### Phase-coupling similarities
+
+Figure \@ref(fig:phase-similarity-plots-theta) shows the connectivity profile matrix, similarity matrix, interval, and ridge plots for phase coupling functional connectome similarities in the theta band. There was a visually obvious group effect, with high similarity between functional connectomes regardless of participant, session, or state (Figure \@ref(fig:phase-similarity-plots-theta)A)---but with slightly more variability within and between participants than we found with phase coupling functional connectomes in the delta band. This was reflected in the group-level contrasts, which showed that functional connectomes were somewhat more similar within participants than between participants at all levels of the session and state predictors, relative to the delta band; however, the effect sizes most compatible with our data, given the background model, were still at most small and not practically relevant (Figure \@ref(fig:phase-similarity-plots-theta)B). Again the individual-level contrasts made it clear that the higher within participant similarity at the group-level should not be overinterpreted, given that the data did not resolve whether the most compatible effect sizes were positive or negative for roughly half the participants at most levels of the session and state predictors; however, roughly one-third of the participants did have effect sizes that were consistently positive and reasonably compatible with values that were small and practically relevant (\@ref(fig:phase-similarity-plots-theta)C).
 
 ```{r phase-similarity-plots-theta}
 #| fig.cap: |
@@ -83,9 +85,9 @@ targets::tar_load(phase_similarity_results_figure_theta)
 knitr::include_graphics(here::here(phase_similarity_results_figure_theta))
 ```
 
-Figure \@ref(fig:phase-similarity-plots-theta) shows the connectivity profile matrix, similarity matrix, interval, and ridge plots for phase coupling functional connectome similarities in the theta band. There was a visually obvious group effect, with high similarity between functional connectomes regardless of participant, session, or state (Figure \@ref(fig:phase-similarity-plots-theta)A)---but with slightly more variability within and between participants than we found with phase coupling functional connectomes in the delta band. This was reflected in the group-level contrasts, which showed that functional connectomes were somewhat more similar within participants than between participants at all levels of the session and state predictors, relative to the delta band; however, the effect sizes most compatible with our data, given the background model, were still at most small and not practically relevant (Figure \@ref(fig:phase-similarity-plots-theta)B). Again the individual-level contrasts made it clear that the higher within participant similarity at the group-level should not be overinterpreted, given that the data did not resolve whether the most compatible effect sizes were positive or negative for roughly half the participants at most levels of the session and state predictors; however, roughly one-third of the participants did have effect sizes that were consistently positive and reasonably compatible with values that were small and practically relevant (\@ref(fig:phase-similarity-plots-theta)C). 
-
 ### Amplitude-coupling similarities
+
+Figure \@ref(fig:amplitude-similarity-plots-theta) shows the connectivity profile matrix, similarity matrix, interval, and ridge plots for amplitude coupling functional connectome similarities in the theta band. Here too there was slightly more variability within and between participants than we found in the delta band, but there was still a visually obvious group effect, with near-perfect similarity between functional connectomes regardless of participant, session, or state (Figure \@ref(fig:amplitude-similarity-plots-theta)A). This was also apparent from the group- and individual-level contrasts, which showed that the differences in functional connectome similarity similarity between and within individuals most compatible with our data, given the background model, were practically nil at all levels of the session and state predictors (Figures \@ref(fig:amplitude-similarity-plots-theta)B, \@ref(fig:amplitude-similarity-plots-theta)C).
 
 ```{r amplitude-similarity-plots-theta}
 #| fig.cap: |
@@ -93,8 +95,6 @@ Figure \@ref(fig:phase-similarity-plots-theta) shows the connectivity profile ma
 targets::tar_load(amplitude_similarity_results_figure_theta)
 knitr::include_graphics(here::here(amplitude_similarity_results_figure_theta))
 ```
-
-Figure \@ref(fig:amplitude-similarity-plots-theta) shows the connectivity profile matrix, similarity matrix, interval, and ridge plots for amplitude coupling functional connectome similarities in the theta band. Here too there was slightly more variability within and between participants than we found in the delta band, but there was still a visually obvious group effect, with near-perfect similarity between functional connectomes regardless of participant, session, or state (Figure \@ref(fig:amplitude-similarity-plots-theta)A). This was also apparent from the group- and individual-level contrasts, which showed that the differences in functional connectome similarity similarity between and within individuals most compatible with our data, given the background model, were practically nil at all levels of the session and state predictors (Figures \@ref(fig:amplitude-similarity-plots-theta)B, \@ref(fig:amplitude-similarity-plots-theta)C).
 
 ## Alpha band
 
@@ -222,13 +222,6 @@ zzz <- purrr::map(
 #   )
 ```
 
-```{r phase-similarity-plots-alpha}
-#| fig.cap: |
-#|   TODO: Write caption.
-targets::tar_load(phase_similarity_results_figure_alpha)
-knitr::include_graphics(here::here(phase_similarity_results_figure_alpha))
-```
-
 <!-- TODO: Finish! -->
 
 Figure \@ref(fig:phase-similarity-plots-alpha) shows the connectivity profile matrix, similarity matrix, interval, and ridge plots for phase coupling functional connectome similarities in the alpha band. There were no visually obvious patterns of similarity consistent across participants, but there were some individual differences worth highlighting: Participant P03 showed high similarity across sessions and states, corresponding to an individual effect; Participants P14, P17, and P19 showed moderate to high similarity in the eyes open state across sessions, and moderate similarity between participants, corresponding to a partial state effect; and participants P07, P08, P11, and P20 showed moderate similarity across sessions and states with themselves and each other, corresponding to a partial group effect. The remaining participants showed no distinctive patterns. Additionally, unlike the delta and theta bands, the amount of similarity between participants was generally moderate and considerably more variable; not consistently high (Figure \@ref(fig:phase-similarity-plots-alpha)A). <!-- TODO: Finish! -->
@@ -237,9 +230,16 @@ Figure \@ref(fig:phase-similarity-plots-alpha) shows the connectivity profile ma
 
 
 
- Although the group-level estimates were representative of the within-between similarities of some participants, we emphasize that they were not representative of a roughly equal amount of participants, who either had estimates compatible with both less and more similarity within than between individuals, or who had estimates moderately or strongly higher than the group-level estimates.
 
-<!-- Importantly, although the group-level contrasts are consistent with functional connectomes that are more similar within than between individuals, they are not consistent with the 50-100% increase in overall similarity within- versus between-individuals reported in the fMRI literature [cf. @grattonetal_FunctionalBrainNetworks_2018]. Moreover, as can be seen in Figure \@ref(fig:phase-similarity-plots-alpha)C, the group-level result of more similarity within than between individuals does not necessarily hold true for all participants in our sample. Several participants have estimates whose lower bounds are compatible with more similarity between than within individuals, and whose upper bounds are compatible with more similarity within than between individuals, leaving us with insufficient information to determine the directionality of the effects for these participants (if any). Thus, these results are also not compatible with the stable and trait-like characterization of functional networks reported in the fMRI literature [cf. @grattonetal_FunctionalBrainNetworks_2018]. -->
+
+Although the group-level estimates were representative of the within-between similarities of some participants, we emphasize that they were not representative of a roughly equal amount of participants, who either had estimates compatible with both less and more similarity within than between individuals, or who had estimates moderately or strongly higher than the group-level estimates.
+
+```{r phase-similarity-plots-alpha}
+#| fig.cap: |
+#|   TODO: Write caption.
+targets::tar_load(phase_similarity_results_figure_alpha)
+knitr::include_graphics(here::here(phase_similarity_results_figure_alpha))
+```
 
 ### Amplitude-coupling similarities
 
@@ -305,6 +305,10 @@ zzz <- purrr::map(
 )
 ```
 
+Figure \@ref(fig:amplitude-similarity-plots-alpha) shows the connectivity profile matrix, similarity matrix, interval, and ridge plots for amplitude coupling functional connectome similarities in the alpha band. Although there was high similarity between functional connectomes regardless of participant, session, or state---consistent with a group effect---there was noticeably more variability within and between participants than we found in the delta and theta bands, and nearly the same individual differences seen in Figure \@ref(fig:phase-similarity-plots-alpha)A with phase coupling functional connectome similarities were seen here (Figure \@ref(fig:amplitude-similarity-plots-alpha)A). This was reflected in the group-level contrasts, which showed that functional connectomes were more similar within participants than between participants at all levels of the session and state predictors, with effect sizes most compatible with our data, given the background model, that were at most small and not practically relevant (Figure \@ref(fig:amplitude-similarity-plots-alpha)B); and in the individual-level contrasts, which showed similar individual differences as seen with phase coupling functional connectome similarities in Figure \@ref(fig:phase-similarity-plots-alpha)C, but with smaller magnitudes and variation (Figure \@ref(fig:amplitude-similarity-plots-alpha)C). However, the individual-level contrasts also made it clear that that the higher within participant similarity at the group-level should not be overinterpreted, given that the data did not resolve whether the most compatible effect sizes were positive or negative for roughly half the participants at most levels of the session and state predictors, and the roughly one-third of participants whose most compatible effect sizes were consistently positive were still at most small and not practically relevant.
+
+<!-- This is perhaps unsurprising, given that phase values estimated with the cross spectral density are weighted by amplitude [@cohen_AnalyzingNeuralTime_2014] -->
+
 ```{r amplitude-similarity-plots-alpha}
 #| fig.cap: |
 #|   TODO: Write caption.
@@ -312,13 +316,11 @@ targets::tar_load(amplitude_similarity_results_figure_alpha)
 knitr::include_graphics(here::here(amplitude_similarity_results_figure_alpha))
 ```
 
-Figure \@ref(fig:amplitude-similarity-plots-alpha) shows the connectivity profile matrix, similarity matrix, interval, and ridge plots for amplitude coupling functional connectome similarities in the alpha band. Although there was high similarity between functional connectomes regardless of participant, session, or state---consistent with a group effect---there was noticeably more variability within and between participants than we found in the delta and theta bands, and nearly the same individual differences seen in Figure \@ref(fig:phase-similarity-plots-alpha)A with phase coupling functional connectome similarities were seen here (Figure \@ref(fig:amplitude-similarity-plots-alpha)A). This was reflected in the group-level contrasts, which showed that functional connectomes were more similar within participants than between participants at all levels of the session and state predictors, with effect sizes most compatible with our data, given the background model, that were at most small and not practically relevant (Figure \@ref(fig:amplitude-similarity-plots-alpha)B); and in the individual-level contrasts, which showed similar individual differences as seen with phase coupling functional connectome similarities in Figure \@ref(fig:phase-similarity-plots-alpha)C, but with smaller magnitudes and variation (Figure \@ref(fig:amplitude-similarity-plots-alpha)C). However, the individual-level contrasts also made it clear that that the higher within participant similarity at the group-level should not be overinterpreted, given that the data did not resolve whether the most compatible effect sizes were positive or negative for roughly half the participants at most levels of the session and state predictors, and the roughly one-third of participants whose most compatible effect sizes were consistently positive were still at most small and not practically relevant.
-
-<!-- This is perhaps unsurprising, given that phase values estimated with the cross spectral density are weighted by amplitude [@cohen_AnalyzingNeuralTime_2014] -->
-
 ## Beta band
 
 ### Phase-coupling similarities
+
+Figure \@ref(fig:phase-similarity-plots-beta) shows the connectivity profile matrix, similarity matrix, interval, and ridge plots for phase coupling functional connectome similarities in the beta band. There was a visually obvious group effect, with high similarity between functional connectomes regardless of participant, session, or state (Figure \@ref(fig:phase-similarity-plots-beta)A)---but with slightly more variability within and between participants than we found with phase coupling functional connectomes in the delta and theta bands. This was reflected in the group-level contrasts, which showed that functional connectomes were somewhat more similar within participants than between participants at all levels of the session and state predictors, relative to the delta and theta bands; however, the effect sizes most compatible with our data, given the background model, were still at most small and not practically relevant (Figure \@ref(fig:phase-similarity-plots-beta)B). Again the individual-level contrasts made it clear that the higher within participant similarity at the group-level should not be overinterpreted, given that the data did not resolve whether the most compatible effect sizes were positive or negative for roughly one-third of the participants at most levels of the session and state predictors; however, roughly two-thirds of the participants did have effect sizes that were consistently positive and reasonably compatible with values that were small and practically relevant (\@ref(fig:phase-similarity-plots-beta)C).
 
 ```{r phase-similarity-plots-beta}
 #| fig.cap: |
@@ -327,9 +329,9 @@ targets::tar_load(phase_similarity_results_figure_beta)
 knitr::include_graphics(here::here(phase_similarity_results_figure_beta))
 ```
 
-Figure \@ref(fig:phase-similarity-plots-beta) shows the connectivity profile matrix, similarity matrix, interval, and ridge plots for phase coupling functional connectome similarities in the beta band. There was a visually obvious group effect, with high similarity between functional connectomes regardless of participant, session, or state (Figure \@ref(fig:phase-similarity-plots-beta)A)---but with slightly more variability within and between participants than we found with phase coupling functional connectomes in the delta and theta bands. This was reflected in the group-level contrasts, which showed that functional connectomes were somewhat more similar within participants than between participants at all levels of the session and state predictors, relative to the delta and theta bands; however, the effect sizes most compatible with our data, given the background model, were still at most small and not practically relevant (Figure \@ref(fig:phase-similarity-plots-beta)B). Again the individual-level contrasts made it clear that the higher within participant similarity at the group-level should not be overinterpreted, given that the data did not resolve whether the most compatible effect sizes were positive or negative for roughly one-third of the participants at most levels of the session and state predictors; however, roughly two-thirds of the participants did have effect sizes that were consistently positive and reasonably compatible with values that were small and practically relevant (\@ref(fig:phase-similarity-plots-beta)C).
-
 ### Amplitude-coupling similarities
+
+Figure \@ref(fig:amplitude-similarity-plots-beta) shows the connectivity profile matrix, similarity matrix, interval, and ridge plots for amplitude coupling functional connectome similarities in the beta band. There was a visually obvious group effect, with near-perfect similarity between functional connectomes regardless of participant, session, or state, like we saw in the delta and theta bands (Figure \@ref(fig:amplitude-similarity-plots-beta)A). This was also apparent from the group- and individual-level contrasts, which showed that the differences in functional connectome similarity similarity between and within individuals most compatible with our data, given the background model, were practically nil at all levels of the session and state predictors (Figures \@ref(fig:amplitude-similarity-plots-beta)B, \@ref(fig:amplitude-similarity-plots-beta)C).
 
 ```{r amplitude-similarity-plots-beta}
 #| fig.cap: |
@@ -338,11 +340,11 @@ targets::tar_load(amplitude_similarity_results_figure_beta)
 knitr::include_graphics(here::here(amplitude_similarity_results_figure_beta))
 ```
 
-Figure \@ref(fig:amplitude-similarity-plots-beta) shows the connectivity profile matrix, similarity matrix, interval, and ridge plots for amplitude coupling functional connectome similarities in the beta band. There was a visually obvious group effect, with near-perfect similarity between functional connectomes regardless of participant, session, or state, like we saw in the delta and theta bands (Figure \@ref(fig:amplitude-similarity-plots-beta)A). This was also apparent from the group- and individual-level contrasts, which showed that the differences in functional connectome similarity similarity between and within individuals most compatible with our data, given the background model, were practically nil at all levels of the session and state predictors (Figures \@ref(fig:amplitude-similarity-plots-beta)B, \@ref(fig:amplitude-similarity-plots-beta)C).
-
 ## Gamma band
 
 ### Phase-coupling similarities
+
+Figure \@ref(fig:phase-similarity-plots-gamma) shows the connectivity profile matrix, similarity matrix, interval, and ridge plots for phase coupling functional connectome similarities in the gamma band. There was a visually obvious group effect, with high similarity between functional connectomes regardless of participant, session, or state for all participants but P21 (Figure \@ref(fig:phase-similarity-plots-gamma)A), with a similar degree of variability within and between participants as we found with phase coupling functional connectomes in the delta and theta band. This was supported by the group-level contrasts, which showed that although functional connectomes were more similar within participants than between participants at all levels of the session and state predictors, the effect sizes most compatible with our data, given the background model, were at most very small and not practically relevant (Figure \@ref(fig:phase-similarity-plots-gamma)B). Moreover, the individual-level contrasts also made it clear that the slightly higher within participant similarity at the group-level should not be overinterpreted, given that the data did not resolve whether the most compatible effect sizes were positive or negative for nearly all participants at most levels of the session and state predictors (Figure \@ref(fig:phase-similarity-plots-gamma)C).
 
 ```{r phase-similarity-plots-gamma}
 #| fig.cap: |
@@ -351,9 +353,9 @@ targets::tar_load(phase_similarity_results_figure_gamma)
 knitr::include_graphics(here::here(phase_similarity_results_figure_gamma))
 ```
 
-Figure \@ref(fig:phase-similarity-plots-gamma) shows the connectivity profile matrix, similarity matrix, interval, and ridge plots for phase coupling functional connectome similarities in the gamma band. There was a visually obvious group effect, with high similarity between functional connectomes regardless of participant, session, or state for all participants but P21 (Figure \@ref(fig:phase-similarity-plots-gamma)A), with a similar degree of variability within and between participants as we found with phase coupling functional connectomes in the delta and theta band. This was supported by the group-level contrasts, which showed that although functional connectomes were more similar within participants than between participants at all levels of the session and state predictors, the effect sizes most compatible with our data, given the background model, were at most very small and not practically relevant (Figure \@ref(fig:phase-similarity-plots-gamma)B). Moreover, the individual-level contrasts also made it clear that the slightly higher within participant similarity at the group-level should not be overinterpreted, given that the data did not resolve whether the most compatible effect sizes were positive or negative for nearly all participants at most levels of the session and state predictors (Figure \@ref(fig:phase-similarity-plots-gamma)C).
-
 ### Amplitude-coupling similarities
+
+Figure \@ref(fig:amplitude-similarity-plots-gamma) shows the connectivity profile matrix, similarity matrix, interval, and ridge plots for amplitude coupling functional connectome similarities in the gamma band. There was a visually obvious group effect, with near-perfect similarity between functional connectomes regardless of participant, session, or state, like we saw in the delta, theta, and beta bands (Figure \@ref(fig:amplitude-similarity-plots-beta)A). This was also apparent from the group- and individual-level contrasts, which showed that the differences in functional connectome similarity similarity between and within individuals most compatible with our data, given the background model, were practically nil at all levels of the session and state predictors (Figures \@ref(fig:amplitude-similarity-plots-gamma)B, \@ref(fig:amplitude-similarity-plots-gamma)C).
 
 ```{r amplitude-similarity-plots-gamma}
 #| fig.cap: |
@@ -361,8 +363,6 @@ Figure \@ref(fig:phase-similarity-plots-gamma) shows the connectivity profile ma
 targets::tar_load(amplitude_similarity_results_figure_gamma)
 knitr::include_graphics(here::here(amplitude_similarity_results_figure_gamma))
 ```
-
-Figure \@ref(fig:amplitude-similarity-plots-gamma) shows the connectivity profile matrix, similarity matrix, interval, and ridge plots for amplitude coupling functional connectome similarities in the gamma band. There was a visually obvious group effect, with near-perfect similarity between functional connectomes regardless of participant, session, or state, like we saw in the delta, theta, and beta bands (Figure \@ref(fig:amplitude-similarity-plots-beta)A). This was also apparent from the group- and individual-level contrasts, which showed that the differences in functional connectome similarity similarity between and within individuals most compatible with our data, given the background model, were practically nil at all levels of the session and state predictors (Figures \@ref(fig:amplitude-similarity-plots-gamma)B, \@ref(fig:amplitude-similarity-plots-gamma)C).
 
 <!-- Footnotes start --------------------------------------------------------->
 

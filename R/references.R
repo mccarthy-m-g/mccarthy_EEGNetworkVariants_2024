@@ -29,10 +29,11 @@ bbt_zotero_library_unavailable <- function(public_library_id) {
 #'
 #' @param path
 #' @param keys
+#' @param ignore
 #' @param public_library_id
 #'
 #' @return
-write_bib <- function(path, keys, public_library_id) {
+write_bib <- function(path, keys, ignore, public_library_id) {
 
   if (bbt_zotero_library_unavailable(public_library_id)) {
     path
@@ -42,9 +43,27 @@ write_bib <- function(path, keys, public_library_id) {
       keys = rbbt::bbt_detect_citations(
         path = keys
       ),
+      ignore = paste0("R-", ignore),
       overwrite = TRUE
     )
     path
   }
+
+}
+
+#' Write `packages.bib` file
+#'
+#' @param path
+#' @param packages
+#'
+#' @return
+write_packages_bib <- function(path, packages) {
+
+  knitr::write_bib(
+    x = packages,
+    file = path
+  )
+
+  path
 
 }

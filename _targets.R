@@ -4,11 +4,23 @@
 # Load R packages required to define the pipeline:
 library(targets)
 library(tarchetypes)
+
 library(here)
-library(tibble)
-library(rbbt)
-library(dplyr)
+library(fs)
+library(tidyverse)
+
+library(FactoMineR)
+library(glmmTMB)
+library(emmeans)
 library(performance)
+
+library(ggdist)
+library(ggh4x)
+library(ggnewscale)
+library(patchwork)
+
+library(papaja)
+library(rbbt)
 
 # Load Python packages required to define the pipeline:
 library(reticulate)
@@ -30,6 +42,7 @@ source("R/connectivity.R")
 source("R/similarity.R")
 source("R/descriptives.R")
 source("R/references.R")
+source("R/session_info.R")
 
 # Pipeline params:
 eeg_recordings_unavailable <- FALSE # TODO: Figure out how to implement this, either with tar_skip() or an ifelse
@@ -508,7 +521,42 @@ manuscripts_targets <- list(
     here("manuscripts", "child-documents", "discussion.Rmd"),
     format = "file"
   ),
+  tar_target(
+    appendix,
+    here("manuscripts", "child-documents", "appendix.Rmd"),
+    format = "file"
+  ),
   # Bibliography file ----
+  tar_target(
+    packages,
+    c(
+      "base",
+      "targets",
+      "renv",
+      "reticulate",
+      "FactoMineR",
+      "glmmTMB",
+      "emmeans",
+      "DHARMa",
+      "performance",
+      "ggplot2",
+      "ggdist",
+      "ggh4x",
+      "ggnewscale",
+      "patchwork",
+      "tidyverse",
+      "rmarkdown",
+      "papaja"
+    )
+  ),
+  tar_target(
+    package_references,
+    write_packages_bib(
+      here("manuscripts", "packages.bib"),
+      packages = packages
+    ),
+    format = "file"
+  ),
   tar_target(
     references,
     write_bib(
@@ -519,9 +567,19 @@ manuscripts_targets <- list(
         results,
         discussion
       ),
+      ignore = packages,
       public_library_id = "mccarthymg"
     ),
     format = "file"
+  ),
+  # Session info ----
+  tar_target(
+    session_information_environment,
+    session_info_environment()
+  ),
+  tar_target(
+    session_information_packages,
+    session_info_packages()
   ),
   # Thesis (papaja) ----
   ## Note: The following error is thrown at the start of the pipeline because
@@ -534,7 +592,8 @@ manuscripts_targets <- list(
     thesis,
     here("manuscripts", "thesis", "index.Rmd"),
     params = list(
-      references_path = references
+      references_path = references,
+      packages_path   = package_references
     )
   )
 )

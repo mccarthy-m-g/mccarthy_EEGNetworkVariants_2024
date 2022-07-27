@@ -1,1 +1,23 @@
 # Appendix
+
+## Session Info
+
+```{r session-info-environment}
+#| results = 'asis'
+targets::tar_load(session_information_environment)
+
+papaja::apa_table(
+  session_information_environment,
+  caption = "Session info for R environment."
+)
+```
+
+```{r session-info-packages}
+#| results = 'asis'
+targets::tar_load(session_information_packages)
+
+papaja::apa_table(
+  session_information_packages,
+  caption = "Session info for R packages."
+)
+```

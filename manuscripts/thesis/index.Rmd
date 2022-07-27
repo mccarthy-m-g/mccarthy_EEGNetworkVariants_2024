@@ -1,6 +1,7 @@
 ---
 params:
-  references_path: "path"
+  references_path : "path"
+  packages_path   : "path"
 
 title             : "Studying network variants with electroencephalography"
 shorttitle        : "Network Variants"
@@ -27,7 +28,7 @@ keywords          : |
   Electroencephalography, Functional Connectivity, Network Variants, Individual Differences
 wordcount         : 
 
-bibliography      : "`r params$references_path`"
+bibliography      : ["`r params$references_path`", "`r params$packages_path`"]
 
 floatsintext      : no
 figurelist        : no
@@ -70,6 +71,7 @@ tar_load(introduction)
 tar_load(methods)
 tar_load(results)
 tar_load(discussion)
+tar_load(appendix)
 ```
 
 ```{r introduction}
@@ -98,3 +100,9 @@ tar_load(discussion)
 
 <div id="refs" custom-style="Bibliography"></div>
 \endgroup
+
+\newpage
+
+```{r appendix}
+#| child = here::here("manuscripts/child-documents/appendix.Rmd")
+```

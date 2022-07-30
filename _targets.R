@@ -46,6 +46,7 @@ source("R/session_info.R")
 
 # Pipeline params:
 eeg_recordings_unavailable <- FALSE # TODO: Figure out how to implement this, either with tar_skip() or an ifelse
+participant_descriptives_available <- TRUE
 slices <- 17:24 # currently inactive
 
 participants_final <- c(
@@ -463,7 +464,11 @@ descriptives_targets <- list(
   # Participant descriptive statistics ----
   tar_target(
     participant_descriptives_path,
-    here("data", "participant-descriptives.csv"),
+    ifelse(
+      participant_descriptives_available,
+      here("data", "participant-descriptives.csv"),
+      here("data", "participant-descriptives-synthetic.csv")
+    ),
     format = "file"
   ),
   ## Before exclusions

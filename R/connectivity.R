@@ -419,7 +419,7 @@ plot_connectivity_profiles <- function(input, method) {
     12, h = c(135, 50), c = 0, l = c(25, 95), power = c(0.7, 1.3)
   )
 
-  session_levels <- c("Pre 1", "Pre 2", "Post 1", "Post 2", "Follow-up 1", "Follow-up 2")
+  session_levels <- c("1-1", "1-2", "2-1", "2-2", "3-1", "3-2")
 
   session_legend <- tibble::tibble(
     Session = factor(session_levels, levels = session_levels)
@@ -434,7 +434,9 @@ plot_connectivity_profiles <- function(input, method) {
     ) +
     ggplot2::scale_fill_manual(
       values = session_legend_colours[6:1],
-      guide = ggplot2::guide_legend(order = 3)
+      guide = ggplot2::guide_legend(
+        title = "Session-Recording", order = 3
+      )
     ) +
     ggnewscale::new_scale_fill() +
     ggplot2::geom_rect(

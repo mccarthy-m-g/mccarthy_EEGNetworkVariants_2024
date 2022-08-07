@@ -291,12 +291,24 @@ plot_similarity <- function(similarity_results, estimate) {
   similarity_results_symmetric <- make_symmetric(similarity_results)
 
   # Plot
+
+  ## The axis-tick colours are being used as annotations for the different
+  ## sessions and states. This is a bit hackish, but works for our purposes.
+  axis_tick_colours <- colorspace::diverging_hcl(
+    12, h = c(135, 50), c = 60, l = c(25, 95), power = c(0.7, 1.3)
+  )
+
+  case_colours <- rep(
+    c(rev(axis_tick_colours[7:12]), axis_tick_colours[1:6]),
+    times = 14
+  )
+
   similarity_results_symmetric |>
     ggplot2::ggplot(ggplot2::aes(x = x_label, y = y_label, fill = {{estimate}})) +
     ggplot2::geom_raster() +
     ggplot2::scale_fill_continuous(limits = c(0, 1), type = "viridis") +
     # Expand reduces the spacing between facets
-    ggplot2::scale_x_discrete(expand = c(0, 0)) +
+    ggplot2::scale_x_discrete(expand = c(0, 0), position = "top") +
     # Reverse y-axis so the diagonal goes from the upper-left to lower-right
     ggplot2::scale_y_discrete(expand = c(0, 0), limits = rev) +
     ggplot2::labs(
@@ -308,17 +320,19 @@ plot_similarity <- function(similarity_results, estimate) {
       cols = ggplot2::vars(x_participant),
       rows = ggplot2::vars(y_participant),
       scales = "free",
-      independent = TRUE,
-      switch = "y"
+      switch = "y",
+      remove_labels = "all"
     ) +
     ggplot2::theme(
-      panel.spacing = grid::unit(0, "lines"),
+      panel.spacing = grid::unit(0.1, "lines"),
       strip.text = ggplot2::element_text(face = "bold", size = 9),
       strip.text.y.left = ggplot2::element_text(angle = 0),
-      strip.placement = "inside",
+      strip.placement = "outside",
       strip.switch.pad.grid = grid::unit(0, "lines"),
       axis.text = ggplot2::element_blank(),
-      axis.ticks = ggplot2::element_blank()
+      axis.ticks.x.top = ggplot2::element_line(colour = rev(case_colours), size = 1),
+      axis.ticks.y.left = ggplot2::element_line(colour = case_colours, size = 1),
+      axis.ticks.length = grid::unit(0.5, "lines")
     )
 
 }
@@ -932,7 +946,8 @@ plot_subset_similarity_contrasts <- function(group_object, subset_objects) {
     ) +
     # General plot settings
     ggplot2::scale_x_continuous(
-      breaks = c(-0.3, -0.2, -0.1, 0, 0.1, 0.2, 0.3)
+      breaks = scales::extended_breaks(n = 3),
+      labels = function(x) ifelse(x == 0, 0, x)
     ) +
     # Keep the empty " " facet to enforce facet alignment. It will be removed
     # manually after building the plot. Make the direction vertical so that
@@ -995,15 +1010,62 @@ save_similarity_archetypes_figure <- function(filename, plots) {
 
   # Modify the legend so that it's discrete instead of continuous. This legend
   # will be extracted to represent the entire patchwork, since collecting
-  # legends does not work with these plots.
+  # legends does not work with these plots. Also add legends for session and
+  # state.
+  axis_tick_colours <- colorspace::diverging_hcl(
+    12, h = c(135, 50), c = 60, l = c(25, 95), power = c(0.7, 1.3)
+  )
+
+  case_colours <- rep(
+    c(rev(axis_tick_colours[7:12]), axis_tick_colours[1:6]),
+    times = 14 # length(participant_levels)
+  )
+
+  state_legend <- tibble::tibble(
+    State = factor(c("Eyes closed", "Eyes open"))
+  )
+
+  session_legend_colours <- colorspace::diverging_hcl(
+    12, h = c(135, 50), c = 0, l = c(25, 95), power = c(0.7, 1.3)
+  )
+
+  session_levels <- c("1-1", "1-2", "2-1", "2-2", "3-1", "3-2")
+
+  session_legend <- tibble::tibble(
+    Session = factor(session_levels, levels = session_levels)
+  )
+
   individual_effect <- plots$individual_effect +
+    # Make discrete instead of continuous
     ggplot2::scale_fill_continuous(
       breaks = c(0, 1),
       labels = c("No similarity", "Perfect similarity"),
       type = "viridis",
       guide = ggplot2::guide_legend(
-        title = "Functional\nConnectome\nSimilarity", reverse = TRUE
+        title = "Functional\nConnectome\nSimilarity", reverse = TRUE, order = 1
       )
+    ) +
+    # These rectangles are purely here to make the legend show up; they aren't
+    # actually visible in the plot.
+    ggnewscale::new_scale_fill() +
+    ggplot2::geom_rect(
+      ggplot2::aes(xmin = -Inf, xmax = -Inf, ymin = -Inf, ymax = -Inf, fill = Session),
+      data = session_legend, inherit.aes = FALSE
+    ) +
+    ggplot2::scale_fill_manual(
+      values = session_legend_colours[6:1],
+      guide = ggplot2::guide_legend(
+        title = "Session-Recording", order = 3
+      )
+    ) +
+    ggnewscale::new_scale_fill() +
+    ggplot2::geom_rect(
+      ggplot2::aes(xmin = -Inf, xmax = -Inf, ymin = -Inf, ymax = -Inf, fill = State),
+      data = state_legend, inherit.aes = FALSE
+    ) +
+    ggplot2::scale_fill_manual(
+      values = c(case_colours[9], case_colours[3]),
+      guide = ggplot2::guide_legend(order = 2)
     )
 
   plots_legend <- individual_effect |>
@@ -1030,7 +1092,8 @@ save_similarity_archetypes_figure <- function(filename, plots) {
   p7 <- plots_legend
 
   patch <- patchwork::wrap_plots(
-    A = p1, B = p2, C = p3, D = p4, E = p5, F = p6, G = patchwork::plot_spacer(), H = p7, I = patchwork::plot_spacer(),
+    A = p1, B = p2, C = p3, D = p4, E = p5, F = p6,
+    G = patchwork::plot_spacer(), H = p7, I = patchwork::plot_spacer(),
     design = design,
     guides = "collect",
     widths = c(1, 1, 0.025, 0.2, 0.025)

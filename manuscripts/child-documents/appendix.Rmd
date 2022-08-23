@@ -21,3 +21,61 @@ papaja::apa_table(
   caption = "Session info for R packages."
 )
 ```
+
+## Phase-coupling similarities when using the Hilbert transform
+
+The supplementary results are separated into five sections, one for each frequency band, as in the main results section. Here we report how functional connectivity and phase-coupling similarities change when the phase lag index is estimated using the Hilbert transform method instead of the multitaper method. Across all five frequency bands we find that (1) functional connectivity is generally lower, but individual patterns of connectivity are similar or the same; (2) functional connectome similarity is generally higher, but patterns of similarity are similar or the same.
+
+We extracted the analytic signal from each channel's time-course using the Hilbert transform and then estimated the phase lag index between them [@stametal_PhaseLagIndex_2007], given by:
+
+$$
+\mathrm{PLI}(x, y) = \frac 1 N \sum_{i = 1}^N
+         \left \vert
+           \frac 1 n \sum_{j = 1}^n
+             \operatorname{sign} \left (
+               \operatorname{Im} \left (e^{i (\phi_x - \phi_y)_{ij}} \right )
+             \right )
+         \right \vert,
+$$
+
+where $N$ is the number of epochs, $n$ is the number of samples in each epoch, $\operatorname{sign}(\cdot)$ is the signum operator, $\operatorname{Im}(\cdot)$ is the imaginary operator, and $e^{i(\cdot)}$ is Euler's formula, which we apply to difference of the phase angles between $\phi_x$ and $\phi_y$ at the individual sample points $j$ in the $i$th epoch.
+
+### Delta band
+
+```{r phase-similarity-plots-hilbert-delta}
+#| fig.cap: Connectivity profile matrix (A), similarity matrix (B), interval plot (C), and ridge plots (D) for Hilbert phase coupling functional connectome similarities in the delta band.
+targets::tar_load(phase_similarity_results_figure_hilbert_delta)
+knitr::include_graphics(here::here(phase_similarity_results_figure_hilbert_delta))
+```
+
+### Theta band
+
+```{r phase-similarity-plots-hilbert-theta}
+#| fig.cap: Connectivity profile matrix (A), similarity matrix (B), interval plot (C), and ridge plots (D) for Hilbert phase coupling functional connectome similarities in the theta band.
+targets::tar_load(phase_similarity_results_figure_hilbert_theta)
+knitr::include_graphics(here::here(phase_similarity_results_figure_hilbert_theta))
+```
+
+### Alpha band
+
+```{r phase-similarity-plots-hilbert-alpha}
+#| fig.cap: Connectivity profile matrix (A), similarity matrix (B), interval plot (C), and ridge plots (D) for Hilbert phase coupling functional connectome similarities in the alpha band.
+targets::tar_load(phase_similarity_results_figure_hilbert_alpha)
+knitr::include_graphics(here::here(phase_similarity_results_figure_hilbert_alpha))
+```
+
+### Beta band
+
+```{r phase-similarity-plots-hilbert-beta}
+#| fig.cap: Connectivity profile matrix (A), similarity matrix (B), interval plot (C), and ridge plots (D) for Hilbert phase coupling functional connectome similarities in the beta band.
+targets::tar_load(phase_similarity_results_figure_hilbert_beta)
+knitr::include_graphics(here::here(phase_similarity_results_figure_hilbert_beta))
+```
+
+### Gamma band
+
+```{r phase-similarity-plots-hilbert-gamma}
+#| fig.cap: Connectivity profile matrix (A), similarity matrix (B), interval plot (C), and ridge plots (D) for Hilbert phase coupling functional connectome similarities in the gamma band.
+targets::tar_load(phase_similarity_results_figure_hilbert_gamma)
+knitr::include_graphics(here::here(phase_similarity_results_figure_hilbert_gamma))
+```

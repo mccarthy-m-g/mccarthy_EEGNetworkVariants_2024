@@ -205,6 +205,10 @@ connectivity_estimation_targets <- list(
       iteration = "list"
     ),
     tar_target(
+      phase_connectivity_summary,
+      summarize_connectivity(phase_connectivity_matrix)
+    ),
+    tar_target(
       phase_connectivity_plot,
       plot_connectivity(phase_connectivity_matrix, "PLI"),
       pattern = map(phase_connectivity_matrix),
@@ -330,6 +334,10 @@ connectivity_estimation_targets <- list(
       iteration = "list"
     ),
     tar_target(
+      amplitude_connectivity_summary,
+      summarize_connectivity(amplitude_connectivity_matrix)
+    ),
+    tar_target(
       amplitude_connectivity_plot,
       plot_connectivity(amplitude_connectivity_matrix, "AEC"),
       pattern = map(amplitude_connectivity_matrix),
@@ -422,6 +430,93 @@ connectivity_estimation_targets <- list(
         amplitude_similarity_subset_contrasts
       )
     ),
+    # Estimate phase coupling and similarity (Hilbert transform) ----
+    tar_target(
+      phase_coupling_hilbert,
+      estimate_phase_coupling_hilbert(
+        raw_filt_ds_reref_ica_interp_epoch_filt,
+        absolute_last = TRUE
+      ),
+      pattern = map(raw_filt_ds_reref_ica_interp_epoch_filt),
+      format = "file"
+    ),
+    tar_target(
+      phase_connectivity_matrix_hilbert,
+      get_connectivity_matrix(phase_coupling_hilbert),
+      pattern = map(phase_coupling_hilbert),
+      iteration = "list"
+    ),
+    tar_target(
+      phase_connectivity_profile_plot_hilbert,
+      plot_connectivity_profiles(phase_connectivity_matrix_hilbert, "PLI (Hilbert)")
+    ),
+    # Model phase connectivity similarity
+    tar_target(
+      phase_similarity_hilbert,
+      estimate_similarity(phase_connectivity_matrix_hilbert)
+    ),
+    tar_target(
+      phase_similarity_plot_hilbert,
+      plot_similarity(phase_similarity_hilbert, rv)
+    ),
+    tar_target(
+      phase_similarity_glmmTMB_hilbert,
+      glmmTMB_similarity(
+        rv ~
+          within_participant * within_session * within_state + # Fixed effects
+          (1 | x_label) + (1 | y_label), # Random effects
+        data = phase_similarity_hilbert
+      )
+    ),
+    tar_target(
+      phase_similarity_emmeans_hilbert,
+      emmeans_similarity(phase_similarity_glmmTMB_hilbert)
+    ),
+    tar_target(
+      phase_similarity_emmeans_tidy_hilbert,
+      tidy_emmeans_similarity(phase_similarity_emmeans_hilbert)
+    ),
+    tar_target(
+      phase_similarity_contrasts_hilbert,
+      contrast_similarity(phase_similarity_emmeans_hilbert)
+    ),
+    tar_target(
+      phase_similarity_contrasts_tidy_hilbert,
+      tidy_contrast_similarity(phase_similarity_contrasts_hilbert)
+    ),
+    tar_target(
+      phase_similarity_contrasts_plot_hilbert,
+      plot_similarity_contrasts(phase_similarity_contrasts_hilbert)
+    ),
+    # Fit phase connectivity similarity submodels
+    tar_target(
+      phase_similarity_subset_hilbert,
+      subset_similarity_results(phase_similarity_hilbert, participants_final)
+    ),
+    tar_target(
+      phase_similarity_subset_glmmTMB_hilbert,
+      subset_glmmTMB_similarity(
+        rv ~
+          within_participant * within_session * within_state + # Fixed effects
+          (1 | x_label) + (1 | y_label), # Random effects
+        data = phase_similarity_subset_hilbert
+      )
+    ),
+    tar_target(
+      phase_similarity_subset_emmeans_hilbert,
+      subset_emmeans_similarity(phase_similarity_subset_glmmTMB_hilbert)
+    ),
+    tar_target(
+      phase_similarity_subset_contrasts_hilbert,
+      subset_contrast_similarity(phase_similarity_subset_emmeans_hilbert)
+    ),
+    tar_target(
+      phase_similarity_subset_contrasts_plot_hilbert,
+      plot_subset_similarity_contrasts(
+        phase_similarity_contrasts_hilbert,
+        phase_similarity_subset_contrasts_hilbert
+      )
+    ),
     # Save manuscript figures ----
     tar_target(
       phase_similarity_results_figure,
@@ -442,6 +537,17 @@ connectivity_estimation_targets <- list(
         amplitude_similarity_plot,
         amplitude_similarity_contrasts_plot,
         amplitude_similarity_subset_contrasts_plot
+      ),
+      format = "file"
+    ),
+    tar_target(
+      phase_similarity_results_figure_hilbert,
+      save_results_figure(
+        paste0("figures/", filter_freq_band, "/phase_similarity_results_hilbert.png"),
+        phase_connectivity_profile_plot_hilbert,
+        phase_similarity_plot_hilbert,
+        phase_similarity_contrasts_plot_hilbert,
+        phase_similarity_subset_contrasts_plot_hilbert
       ),
       format = "file"
     )

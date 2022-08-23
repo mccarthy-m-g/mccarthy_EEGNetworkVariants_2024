@@ -1,10 +1,10 @@
-# TODO: test this function
-#' Title
+#' Compute summary statistics for participant data
 #'
-#' @param input_file
-#' @param participants
+#' @param input_file A character vector of the `participant-descriptives.csv`
+#'   file path.
+#' @param participants A character vector of participant IDs to filter to.
 #'
-#' @return
+#' @return A tibble of summary statistics.
 summarize_participant_descriptives <- function(input_file, participants = NULL) {
 
   descriptives <- readr::read_csv(input_file, col_types = readr::cols())
@@ -49,9 +49,9 @@ summarize_participant_descriptives <- function(input_file, participants = NULL) 
 
 #' Calculate the mode of a vector
 #'
-#' @param x
+#' @param A numeric vector.
 #'
-#' @return
+#' @return The mode.
 mode <- function(x) {
   ux <- unique(x)
   ux[which.max(tabulate(match(x, ux)))]
@@ -59,9 +59,9 @@ mode <- function(x) {
 
 #' Get summary statistics about bad EEG channels
 #'
-#' @param input_file
+#' @param input_file A tibble of the file handler.
 #'
-#' @return A list of tibbles.
+#' @return A list of tibbles with summary statistics.
 summarize_bad_channels <- function(input_file) {
 
   file_handler <- input_file |>
@@ -114,9 +114,9 @@ summarize_bad_channels <- function(input_file) {
 
 #' Plot summary statistics about bad EEG channels
 #'
-#' @param input
+#' @param input A tibble of summary statistics.
 #'
-#' @return
+#' @return A list of ggplots.
 plot_bad_channel_counts <- function(input) {
 
   plot_count_per_recording <- input |>
@@ -148,9 +148,9 @@ plot_bad_channel_counts <- function(input) {
 
 #' Get summary statistics about bad segments flagged in EEG data
 #'
-#' @param input_file
+#' @param input_file A tibble of the file handler.
 #'
-#' @return
+#' @return A list of tibbles with summary statistics.
 summarize_bad_segments <- function(input_file) {
 
   file_handler <- input_file |>
@@ -210,9 +210,9 @@ summarize_bad_segments <- function(input_file) {
 
 #' Plot summary statistics about bad segments
 #'
-#' @param input
+#' @param input A tibble of summary statistics.
 #'
-#' @return List.
+#' @return A list of ggplots.
 plot_bad_segment_descriptives <- function(input) {
 
   plot_count_per_recording <- input |>

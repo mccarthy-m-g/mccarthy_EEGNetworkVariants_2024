@@ -1,8 +1,8 @@
 #' Create a vector of channels names ordered from left to centre to right, front to back
 #'
-#' @param input
+#' @param input A connectivity matrix.
 #'
-#' @return Character vector.
+#' @return Character vector of ordered EEG channels names.
 channel_order <- function(input) {
 
   # Define helper functions for sorting
@@ -76,7 +76,7 @@ channel_order <- function(input) {
 #' - <https://mne.tools/0.22/generated/mne.read_epochs.html#mne.read_epochs>
 #' - <https://mne.tools/0.22/generated/mne.connectivity.spectral_connectivity.html#mne.connectivity.spectral_connectivity>
 #'
-#' @return
+#' @return A character vector of file paths.
 estimate_phase_coupling <- function(input_file) {
 
   # Read
@@ -136,10 +136,11 @@ estimate_phase_coupling <- function(input_file) {
     readr::write_csv(output_file)
 
   output_file
+
 }
 
 
-#' Title
+#' Estimate PLI with Hilbert transform
 #'
 #' @param input_file
 #' @param absolute_last Whether to take the absolute value after averaging
@@ -153,8 +154,8 @@ estimate_phase_coupling <- function(input_file) {
 #'
 #' @references
 #'
-#' @return
-estimate_phase_coupling_2 <- function(input_file, absolute_last) {
+#' @return A character vector of file paths.
+estimate_phase_coupling_hilbert <- function(input_file, absolute_last) {
 
   # Read
   epochs_data <-  mne$read_epochs(input_file, preload = TRUE, verbose = FALSE)
@@ -196,9 +197,9 @@ estimate_phase_coupling_2 <- function(input_file, absolute_last) {
   output_file <- input_file |>
     # Directory
     stringr::str_replace("recordings", "sensor-connectivity") |>
-    stringr::str_replace("filt-ds_reref_ica-interp_epoch-filt", "phase") |>
+    stringr::str_replace("filt-ds_reref_ica-interp_epoch-filt", "phase-hilbert") |>
     # File name
-    stringr::str_replace("filt-ds_reref_ica-interp_epoch-filt", "phase") |>
+    stringr::str_replace("filt-ds_reref_ica-interp_epoch-filt", "phase-hilbert") |>
     stringr::str_replace("-epo.fif.gz", ".csv")
 
   fs::dir_create(fs::path_dir(output_file))
@@ -207,6 +208,7 @@ estimate_phase_coupling_2 <- function(input_file, absolute_last) {
     readr::write_csv(output_file)
 
   output_file
+
 }
 
 #' Estimate amplitude coupling between pairs of channels using AEC
@@ -222,7 +224,7 @@ estimate_phase_coupling_2 <- function(input_file, absolute_last) {
 #' - <https://mne.tools/0.22/generated/mne.read_epochs.html#mne.read_epochs>
 #' - <https://mne.tools/0.22/generated/mne.connectivity.envelope_correlation.html#mne.connectivity.envelope_correlation>
 #'
-#' @return Character string of the file path for the `.csv` file
+#' @return A character vector of file paths.
 estimate_amplitude_coupling <- function(input_file, absolute_last) {
 
   # Read
@@ -289,7 +291,8 @@ estimate_amplitude_coupling <- function(input_file, absolute_last) {
 #'
 #' @param input_file
 #'
-#' @return A List.
+#' @return A list of lists. Each list contains two elements: The connectivity
+#' matrix, and the metadata for that matrix.
 get_connectivity_matrix <- function(input_file) {
 
   # Connectivity matrix
@@ -318,57 +321,35 @@ get_connectivity_matrix <- function(input_file) {
 
 }
 
-#' Plot a connectivity matrix
+#' Get participant IDs from connectivity matrix metadata
 #'
-#' @param input
-#' @param method
+#' @param input List of connectivity matrices.
 #'
-#' @return A list.
-plot_connectivity <- function(input, method) {
+#' @return A character vector of participant IDs in ascending order.
+get_participant_levels <- function(input) {
 
-  connectivity_matrix_plot <- input$connectivity_matrix |>
-    as.data.frame.table() |>
-    ggplot2::ggplot(ggplot2::aes(x=Var1, y=Var2, fill=Freq)) +
-    ggplot2::geom_raster() +
-    ggplot2::scale_fill_continuous(limits = c(0,1), type = "viridis") +
-    ggplot2::scale_x_discrete(guide = ggplot2::guide_axis(angle = 90)) +
-    # Reversing the y-axis is needed for the diagonal to go from the upper-left
-    # to the bottom-right.
-    ggplot2::scale_y_discrete(limits = rev) +
-    ggplot2::labs(
-      title = input$metadata$case,
-      x = "EEG Channels",
-      y = "EEG Channels",
-      fill = method
-    )
-
-  list(
-    plot = connectivity_matrix_plot,
-    metadata = append(input$metadata, list(method = method))
-  )
-}
-
-#' Title
-#'
-#' @param input
-#' @param method A character string. Used for the legend label.
-#'
-#' @return A ggplot
-plot_connectivity_profiles <- function(input, method) {
-
-  # Get levels for factors
-  participant_levels <- input |>
+  input |>
     purrr::map(~ .x$metadata$participant) |>
     unlist() |>
     unique() |>
     sort()
-  session_levels <- c("pre", "post", "fu")
-  state_levels <- c("rc1", "rc2", "ro1", "ro2")
+
+}
+
+#' Get connectivity profiles from connectivity matrices
+#'
+#' @param input List of connectivity matrices.
+#'
+#' @return A tibble containing the connectivity profiles from each recording.
+get_connectivity_profiles <- function(input) {
+
+  # Get levels for factors
+  participant_levels <- get_participant_levels(input)
   label_levels <- case_order(participant_levels)
 
   # Get lower triangle of connectivity matrices and store in a tibble to prepare
   # for plotting
-  connectivity_profiles <- input |>
+  input |>
     purrr::map_dfr(
       ~{
 
@@ -397,6 +378,73 @@ plot_connectivity_profiles <- function(input, method) {
       .id = "branch"
     ) |>
     dplyr::mutate(case = factor(case, levels = label_levels))
+
+}
+
+#' Calculate group-wide connectivity summary statistics
+#'
+#' @param input List of connectivity matrices.
+#'
+#' @return A tibble containing summary statistics across all connectomes.
+summarize_connectivity <- function(input) {
+
+  connectivity_profiles <- get_connectivity_profiles(input)
+
+  connectivity_profiles |>
+    dplyr::summarise(
+      min = min(value),
+      max = max(value),
+      mean = mean(value),
+      sd = sd(value)
+    )
+
+}
+
+#' Plot a connectivity matrix
+#'
+#' @param input List of connectivity matrices.
+#' @param method A character string for the legend title.
+#'
+#' @return A list of lists. Each list contains two elements: The connectivity
+#' matrix plot, and the metadata for that plot.
+plot_connectivity <- function(input, method) {
+
+  connectivity_matrix_plot <- input$connectivity_matrix |>
+    as.data.frame.table() |>
+    ggplot2::ggplot(ggplot2::aes(x=Var1, y=Var2, fill=Freq)) +
+    ggplot2::geom_raster() +
+    ggplot2::scale_fill_continuous(limits = c(0,1), type = "viridis") +
+    ggplot2::scale_x_discrete(guide = ggplot2::guide_axis(angle = 90)) +
+    # Reversing the y-axis is needed for the diagonal to go from the upper-left
+    # to the bottom-right.
+    ggplot2::scale_y_discrete(limits = rev) +
+    ggplot2::labs(
+      title = input$metadata$case,
+      x = "EEG Channels",
+      y = "EEG Channels",
+      fill = method
+    )
+
+  list(
+    plot = connectivity_matrix_plot,
+    metadata = append(input$metadata, list(method = method))
+  )
+}
+
+#' Plot connectivity profiles
+#'
+#' @param input List of connectivity matrices.
+#' @param method A character string for the legend title.
+#'
+#' @return A ggplot of connectivity profiles.
+plot_connectivity_profiles <- function(input, method) {
+
+  connectivity_profiles <- get_connectivity_profiles(input)
+
+  # Get levels for factors
+  participant_levels <- get_participant_levels(input)
+  session_levels <- c("pre", "post", "fu")
+  state_levels <- c("rc1", "rc2", "ro1", "ro2")
 
   # Plot
 

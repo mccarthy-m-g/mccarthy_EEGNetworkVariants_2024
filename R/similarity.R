@@ -1,8 +1,8 @@
 #' Create an ordered vector of participant IDs
 #'
-#' @param participant_ids
+#' @param participant_ids A character vector of participant IDs.
 #'
-#' @return
+#' @return A character vector of ordered participant IDs.
 case_order <- function(participant_ids) {
 
   tidyr::expand_grid(
@@ -258,9 +258,10 @@ estimate_similarity <- function(input) {
 
 #' Make the similarity results symmetric for plotting
 #'
-#' @param similarity_results
+#' @param similarity_results A tibble of similarity results.
 #'
-#' @return
+#' @return A tibble of similarity results, with values for the lower and upper
+#'   triangle of a matrix.
 make_symmetric <- function(similarity_results) {
 
   # Only the lower triangle and diagonal are included in the similarity results
@@ -281,10 +282,10 @@ make_symmetric <- function(similarity_results) {
 
 #' Plot a similarity matrix
 #'
-#' @param similarity_results The tibble of similarity results.
+#' @param similarity_results A tibble of similarity results.
 #' @param estimate The similarity estimate to plot. Options are `rv`.
 #'
-#' @return ggplot
+#' @return A ggplot.
 plot_similarity <- function(similarity_results, estimate) {
 
   # Combine the upper, lower, and diagonals to prepare for plotting
@@ -339,10 +340,10 @@ plot_similarity <- function(similarity_results, estimate) {
 
 #' Plot the within-participant similarity block of a participant
 #'
-#' @param similarity_results
-#' @param participant
+#' @param similarity_results A tibble of similarity results.
+#' @param participant A participant ID.
 #'
-#' @return
+#' @return A ggplot.
 plot_similarity_key <- function(similarity_results, participant) {
 
   similarity_results |>
@@ -366,10 +367,10 @@ plot_similarity_key <- function(similarity_results, participant) {
 
 #' Highlight a within-participant block in the similarity matrix
 #'
-#' @param similarity_results
-#' @param participant
+#' @param similarity_results A tibble of similarity results.
+#' @param participant A participant ID.
 #'
-#' @return
+#' @return A ggplot.
 plot_similarity_highlight <- function(similarity_results, participant) {
 
   # Combine the upper, lower, and diagonals to prepare for plotting
@@ -407,7 +408,7 @@ plot_similarity_highlight <- function(similarity_results, participant) {
 
 #' Plot hypothetical similarity matrices
 #'
-#' @param similarity_results
+#' @param similarity_results A tibble of similarity results.
 #'
 #' @return List of ggplots.
 plot_similarity_archetype <- function(similarity_results) {
@@ -481,13 +482,13 @@ summarize_similarity <- function() {
 
 #' Fit a mixed beta regression to similarity results
 #'
-#' @param formula
-#' @param data
+#' @param formula A regression formula.
+#' @param data A tibble of similarity results.
 #'
 #' @note Since each of the predictors are categorical, it doesn't make sense to
 #  include random slopes in this model.
 #'
-#' @return glmmTMB
+#' @return A glmmTMB model object.
 glmmTMB_similarity <- function(formula, data) {
 
   similarity_results <- data |>
@@ -536,7 +537,7 @@ glmmTMB_similarity <- function(formula, data) {
 #' - Hartig, F., & Lohse, L. (2022). DHARMa: Residual Diagnostics for Hierarchical (Multi-Level / Mixed) Regression Models (Version 0.4.5). Retrieved from https://CRAN.R-project.org/package=DHARMa
 #' - Dunn, P. K., & Smyth, G. K. (1996). Randomized Quantile Residuals. Journal of Computational and Graphical Statistics, 5(3), 236. https://doi.org/10.2307/1390802
 #'
-#' @return ggplot.
+#' @return A ggplot.
 check_uniformity <- function(object) {
 
   # Simulated residuals; see vignette("DHARMa")
@@ -562,9 +563,9 @@ check_uniformity <- function(object) {
 
 #' Construct a reference grid from the mixed beta regression
 #'
-#' @param object
+#' @param object A glmmTMB model object.
 #'
-#' @return
+#' @return An emmeans model object.
 emmeans_similarity <- function(object) {
 
   emmeans::emmeans(
@@ -587,11 +588,11 @@ emmeans_similarity <- function(object) {
 
 }
 
-#' Title
+#' Tidy emmeans
 #'
-#' @param object
+#' @param object An emmeans model object.
 #'
-#' @return
+#' @return A tidy tibble.
 tidy_emmeans_similarity <- function(object) {
 
   effect_labels <- c(
@@ -621,9 +622,9 @@ tidy_emmeans_similarity <- function(object) {
 
 #' Estimate pairwise contrasts using the reference grid
 #'
-#' @param object
+#' @param object An emmeans model object.
 #'
-#' @return
+#' @return An emmeans model object.
 contrast_similarity <- function(object) {
 
   emmeans::contrast(
@@ -634,11 +635,11 @@ contrast_similarity <- function(object) {
 
 }
 
-#' Title
+#' Tidy emmeans contrasts
 #'
-#' @param object
+#' @param object An emmeans model object.
 #'
-#' @return A tibble.
+#' @return A tidy tibble.
 tidy_contrast_similarity <- function(object) {
 
   effect_labels <- c(
@@ -670,9 +671,9 @@ tidy_contrast_similarity <- function(object) {
 
 #' Plot similarity contrast intervals
 #'
-#' @param object
+#' @param object An emmeans model object.
 #'
-#' @return
+#' @return A ggplot.
 plot_similarity_contrasts <- function(object) {
 
   # Tidy data to prepare for plotting
@@ -730,7 +731,12 @@ plot_similarity_contrasts <- function(object) {
 
 }
 
-# TODO: Add documentation
+#' Subset similarity results by participant
+#'
+#' @param similarity_results A tibble of similarity results,
+#' @param participants A character vector of participant IDs.
+#'
+#' @return A list of tibbles.
 subset_similarity_results <- function(similarity_results, participants) {
 
   # The similarity results are technically shaped like the lower diagonal of a
@@ -765,6 +771,15 @@ subset_similarity_results <- function(similarity_results, participants) {
 
 }
 
+#' Fit a mixed beta regression to a subset of similarity results
+#'
+#' @param formula A regression formula.
+#' @param data A list of tibbles of similarity results.
+#'
+#' @note Since each of the predictors are categorical, it doesn't make sense to
+#  include random slopes in this model.
+#'
+#' @return A list of glmmTMB model objects.
 subset_glmmTMB_similarity <- function(formula, data) {
 
   purrr::map(
@@ -776,6 +791,11 @@ subset_glmmTMB_similarity <- function(formula, data) {
 
 }
 
+#' Construct a reference grid from the mixed beta regressions
+#'
+#' @param object A list of glmmTMB model objects.
+#'
+#' @return A list of emmeans model objects.
 subset_emmeans_similarity <- function(objects) {
 
   purrr::map(
@@ -787,6 +807,11 @@ subset_emmeans_similarity <- function(objects) {
 
 }
 
+#' Estimate pairwise contrasts using the reference grids
+#'
+#' @param object A list of emmeans model objects.
+#'
+#' @return A list of emmeans model objects.
 subset_contrast_similarity <- function(objects) {
 
   purrr::map(
@@ -798,6 +823,11 @@ subset_contrast_similarity <- function(objects) {
 
 }
 
+#' Tidy emmeans subset contrasts
+#'
+#' @param object A list of emmeans model objects.
+#'
+#' @return A list of tidy tibbles.
 tidy_subset_contrast_similarity <- function(objects) {
 
   effect_labels <- c(
@@ -827,12 +857,12 @@ tidy_subset_contrast_similarity <- function(objects) {
 
 }
 
-#' Title
+#' Plot subset similarity contrasts
 #'
-#' @param group_object
-#' @param subset_objects
+#' @param group_object A tibble of similarity results
+#' @param subset_objects A list of subset similarity results
 #'
-#' @return A ggplot
+#' @return A grob.
 plot_subset_similarity_contrasts <- function(group_object, subset_objects) {
 
   # Tidy data to prepare for plotting
@@ -983,12 +1013,12 @@ plot_subset_similarity_contrasts <- function(group_object, subset_objects) {
 
 }
 
-#' Title
+#' Save similarity archetypes figure
 #'
-#' @param filename
-#' @param plots
+#' @param filename A character string of the file path.
+#' @param plots A list of similarity archetype plots.
 #'
-#' @return
+#' @return A character string of the file path.
 save_similarity_archetypes_figure <- function(filename, plots) {
 
   # Hide the legends so we can only show one for the entire patchwork
@@ -1114,14 +1144,15 @@ save_similarity_archetypes_figure <- function(filename, plots) {
 
 }
 
-#' Title
+#' Save similarity results figure
 #'
-#' @param filename
-#' @param similarity_matrix
-#' @param group_contrasts
-#' @param subset_contrasts
+#' @param filename A character vector of the file path.
+#' @param connectivity_profile The connectivity profile plot
+#' @param similarity_matrix The similarity matrix plot
+#' @param group_contrasts The group-level contrast plot
+#' @param subset_contrasts The individual-level contrast plot
 #'
-#' @return A character vector
+#' @return A character vector of the file path.
 save_results_figure <- function(
   filename,
   connectivity_profile,

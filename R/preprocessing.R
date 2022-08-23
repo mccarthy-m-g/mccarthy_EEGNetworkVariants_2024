@@ -13,11 +13,11 @@ eeg_recordings_unavailable <- function() {
 #'
 #' This function is a wrapper for the
 #'
-#' @param input_file
-#' @param l_freq
-#' @param h_freq
-#' @param phase
-#' @param resample_rate
+#' @param input_file A character vector of file paths to the raw EEG recordings.
+#' @param l_freq High-pass filter cutoff frequency.
+#' @param h_freq Low-pass filter cutoff frequency.
+#' @param phase Phase of the filter.
+#' @param resample_rate Resampling rate.
 #'
 #' @references
 #'
@@ -26,7 +26,7 @@ eeg_recordings_unavailable <- function() {
 #' - <https://mne.tools/0.22/generated/mne.io.Raw.html#mne.io.Raw.resample>
 #' - <https://mne.tools/0.22/generated/mne.io.Raw.html#mne.io.Raw.save>
 #'
-#' @return
+#' @return A character vector of file paths.
 preprocess_filter_downsample <- function(
   input_file,
   l_freq,
@@ -66,13 +66,11 @@ preprocess_filter_downsample <- function(
 
 #' Get EEG channel dictionary for renaming
 #'
-#' @param file
+#' @param file A character string of the `channel-dictionary.csv` file path.
 #'
-#' @return
-#' @export
-#'
-#' @examples
+#' @return A dict.
 get_channel_dictionary <- function(file) {
+
   channel_dictionary <- readr::read_csv(file, col_types = readr::cols())
   channel_dictionary_new <- channel_dictionary |>
     dplyr::select(new_name) |>
@@ -80,14 +78,15 @@ get_channel_dictionary <- function(file) {
     purrr::map(unlist)
   names(channel_dictionary_new) <- channel_dictionary$channel
   dict(channel_dictionary_new)
+
 }
 
-#' Re-reference Raw EEG data to average and set montage
+#' Re-reference EEG data to average and set montage
 #'
-#' Performs the following...
-#'
-#' @param input_file A path to a file.
-#' @param channel_dictionary_file A path to a file.
+#' @param input_file A character vector of file paths to the filtered and
+#'   downsampled EEG recordings.
+#' @param channel_dictionary_file A character string of the
+#'   `channel-dictionary.csv` file path.
 #'
 #' @references
 #'
@@ -98,7 +97,7 @@ get_channel_dictionary <- function(file) {
 #' - <https://mne.tools/0.22/generated/mne.channels.make_standard_montage.html#mne.channels.make_standard_montage>
 #' - <https://mne.tools/0.22/generated/mne.io.Raw.html#mne.io.Raw.set_montage>
 #'
-#' @return A character vector of file paths for files written by the function.
+#' @return A character vector of file paths.
 preprocess_rereference <- function( # maybe rename to rereference
   input_file,
   channel_dictionary_file
@@ -130,16 +129,17 @@ preprocess_rereference <- function( # maybe rename to rereference
   raw_data$save(output_file, overwrite = TRUE)
 
   output_file
+
 }
 
-#' Fit ICA to Raw EEG data then interpolate bad channels
+#' Fit ICA to EEG data then interpolate bad channels
 #'
-#'
-#' @param input_file
-#' @param bad_channels
-#' @param annotation_onsets
-#' @param annotation_durations
-#' @param annotation_labels
+#' @param input_file A character vector of file paths to the rereferenced EEG
+#'   recordings.
+#' @param bad_channels A list of character vectors of bad channels.
+#' @param annotation_onsets A list of character vectors of annotation onsets.
+#' @param annotation_durations A list of character vectors of annotation durations.
+#' @param annotation_labels A list of character vectors of annotation labels.
 #'
 #' @references
 #'
@@ -148,7 +148,7 @@ preprocess_rereference <- function( # maybe rename to rereference
 #' - <https://mne.tools/0.22/generated/mne.preprocessing.ICA.html#mne.preprocessing.ICA>
 #' - <https://mne.tools/0.22/generated/mne.io.Raw.html#mne.io.Raw.interpolate_bads>
 #'
-#' @return
+#' @return A character vector of file paths.
 preprocess_ica <- function(
   input_file,
   bad_channels,
@@ -236,15 +236,16 @@ preprocess_ica <- function(
   raw_data$save(output_file, overwrite = TRUE)
 
   output_file
+
 }
 
-
-#' Epoch Raw EEG data then filter into five frequency bands
+#' Epoch EEG data then filter into five frequency bands
 #'
-#' @param input_file
-#' @param filter_freq_band
-#' @param filter_l_freq
-#' @param filter_h_freq
+#' @param input_file A character vector of file paths to the ICA'ed EEG
+#'   recordings.
+#' @param filter_freq_band A character string of the frequency band.
+#' @param filter_l_freq High-pass filter cutoff frequency.
+#' @param filter_h_freq Low-pass filter cutoff frequency.
 #'
 #' @references
 #'
@@ -253,7 +254,7 @@ preprocess_ica <- function(
 #' - <https://mne.tools/0.22/generated/mne.Epochs.html#mne.Epochs.filter>
 #' - <https://mne.tools/0.22/generated/mne.Epochs.html#mne.Epochs.crop>
 #'
-#' @return
+#' @return A character vector of file paths.
 preprocess_filter_epoch <- function(
   input_file,
   filter_freq_band,
@@ -336,4 +337,5 @@ preprocess_filter_epoch <- function(
   epochs_data$save(output_file, overwrite = TRUE)
 
   output_file
+
 }

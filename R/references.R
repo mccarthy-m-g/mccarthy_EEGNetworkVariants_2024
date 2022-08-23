@@ -1,8 +1,8 @@
 #' Check if the Zotero library with citation keys is available
 #'
-#' @param public_library_id
+#' @param public_library_id Public Zotero library ID for the project.
 #'
-#' @return
+#' @return Logical.
 bbt_zotero_library_unavailable <- function(public_library_id) {
 
   # Check if Zotero (with Better BibTeX) is unavailable. If Zotero (with Better
@@ -27,12 +27,12 @@ bbt_zotero_library_unavailable <- function(public_library_id) {
 
 #' Write `references.json` file using Zotero library
 #'
-#' @param path
-#' @param keys
-#' @param ignore
-#' @param public_library_id
+#' @param path A character string of the file path.
+#' @param keys A character vector of file paths to search for citation keys in.
+#' @param ignore A character vector of R package citation keys to ignore.
+#' @param public_library_id Public Zotero library ID for the project.
 #'
-#' @return
+#' @return A character string of the file path.
 write_bib <- function(path, keys, ignore, public_library_id) {
 
   if (bbt_zotero_library_unavailable(public_library_id)) {
@@ -53,10 +53,11 @@ write_bib <- function(path, keys, ignore, public_library_id) {
 
 #' Write `packages.bib` file
 #'
-#' @param path
-#' @param packages
+#' @param path A character string of the file path.
+#' @param packages A character string of R package names to write citation keys
+#'   for.
 #'
-#' @return
+#' @return A character string of the file path.
 write_packages_bib <- function(path, packages) {
 
   knitr::write_bib(

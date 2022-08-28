@@ -992,7 +992,6 @@ plot_subset_similarity_contrasts <- function(group_object, subset_objects) {
       y = "Participant"
     ) +
     ggplot2::theme_classic()
-  p
 
   # Remove the blank facet. Solution for removing facet modified from:
   # https://stackoverflow.com/a/30372692/16844576

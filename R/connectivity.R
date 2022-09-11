@@ -513,7 +513,7 @@ plot_connectivity_profiles <- function(input, method) {
     ggplot2::scale_x_discrete(expand = c(0, 0)) +
     ggplot2::scale_y_discrete(expand = c(0, 0), limits = rev) +
     ggplot2::labs(
-      x = "Sensor pairs",
+      x = "EEG Channel Pairs",
       y = NULL,
       fill = method
     ) +

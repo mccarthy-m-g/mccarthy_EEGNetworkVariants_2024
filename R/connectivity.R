@@ -395,7 +395,8 @@ summarize_connectivity <- function(input) {
       min = min(value),
       max = max(value),
       mean = mean(value),
-      sd = sd(value)
+      sd = sd(value),
+      mode = mode(value)
     )
 
 }
@@ -451,7 +452,7 @@ plot_connectivity_profiles <- function(input, method) {
   ## The axis-tick colours are being used as annotations for the different
   ## sessions and states. This is a bit hackish, but works for our purposes.
   axis_tick_colours <- colorspace::diverging_hcl(
-    12, h = c(135, 50), c = 60, l = c(25, 95), power = c(0.7, 1.3)
+    12, h = c(299, 135), c = 60, l = c(20, 80), power = c(0.7, 1.3)
   )
 
   case_colours <- rep(
@@ -464,7 +465,7 @@ plot_connectivity_profiles <- function(input, method) {
   )
 
   session_legend_colours <- colorspace::diverging_hcl(
-    12, h = c(135, 50), c = 0, l = c(25, 95), power = c(0.7, 1.3)
+    12, h = c(299, 135), c = 0, l = c(20, 80), power = c(0.7, 1.3)
   )
 
   session_levels <- c("1-1", "1-2", "2-1", "2-2", "3-1", "3-2")

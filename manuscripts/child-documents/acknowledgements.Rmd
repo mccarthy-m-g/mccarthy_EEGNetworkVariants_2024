@@ -1,1 +1,5 @@
 # Acknowledgements
+
+I thank my supervisor, Dr. Andrea Protzner, for her guidance, mentorship, and support throughout my degree and thesis, my committee members, Dr. Penny Pexman and Dr. Signe Bray, for their feedback on my thesis proposal, and Dr. Ford Burles for training me to work with EEG data. I also thank my father, Gord, my brother, Branden, and my grandparents, Joan and Walter, for their love and support—I could not have achieved all that I have without you.
+  
+This research was supported by funding received through the Natural Sciences and Engineering Research Council (NSERC) Canada Graduate Scholarship; University of Calgary Faculty of Graduate Studies Master’s Research Scholarship and Graduate Studies Scholarship; and Alberta Graduate Excellence Scholarships (AGES) Master’s Research Scholarship.

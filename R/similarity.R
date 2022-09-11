@@ -296,7 +296,7 @@ plot_similarity <- function(similarity_results, estimate) {
   ## The axis-tick colours are being used as annotations for the different
   ## sessions and states. This is a bit hackish, but works for our purposes.
   axis_tick_colours <- colorspace::diverging_hcl(
-    12, h = c(135, 50), c = 60, l = c(25, 95), power = c(0.7, 1.3)
+    12, h = c(299, 135), c = 60, l = c(20, 80), power = c(0.7, 1.3)
   )
 
   case_colours <- rep(
@@ -663,7 +663,18 @@ tidy_contrast_similarity <- function(object) {
       )
     ) |>
     ggdist::point_interval(dist, .width = c(.66, .95)) |>
-    tidyr::pivot_wider(names_from = .width, values_from = c(.lower, .upper))
+    tidyr::pivot_wider(names_from = .width, values_from = c(.lower, .upper)) |>
+    dplyr::mutate(
+      effect_direction = dplyr::case_when(
+        .lower_0.95 > 0 & .upper_0.95 > 0 ~ "Positive",
+        .lower_0.95 < 0 & .upper_0.95 > 0 ~ "Unresolved",
+        .lower_0.95 < 0 & .upper_0.95 < 0 ~ "Negative"
+      ),
+      effect_direction = factor(
+        effect_direction,
+        levels = c("Positive", "Unresolved", "Negative")
+      )
+    )
 
   contrasts
 
@@ -680,27 +691,47 @@ plot_similarity_contrasts <- function(object) {
   contrasts <- tidy_contrast_similarity(object)
 
   # Plotting
-  interval_pal <- RColorBrewer::brewer.pal(n = 3, "YlGn")[2:3]
-
   ggplot2::ggplot(contrasts, ggplot2::aes(x = estimate, y = effect_label)) +
-    ggplot2::geom_vline(ggplot2::aes(xintercept = 0), linetype = 2) +
+    ggplot2::geom_vline(ggplot2::aes(xintercept = 0), linetype = 2, alpha = 0.2) +
     ggdist::stat_interval(
       ggplot2::aes(
         xdist = distributional::dist_student_t(
           df = df, mu = estimate, sigma = std.error
-        )
+        ),
+        colour = effect_direction,
+        colour_ramp = stat(level)
       ),
       .width = c(0.66, 0.95)
     ) +
-    ggplot2::scale_colour_manual(values = interval_pal) +
+    ggplot2::scale_colour_discrete(
+      drop = FALSE,
+      type = c(
+        "#3aaf85", # Green
+        "#1b6ca8", # Blue
+        "#cd201f"  # Red
+      )
+    ) +
+    ggdist::scale_colour_ramp_discrete(
+      from = "#fafdce",
+      range = c(0.33, 1)
+    ) +
     # This is a slightly hacky way to get a bar the same height as the interval
     # for the point estimate since the standard ggplot2 geoms aren't well-suited
     # for this.
     ggdist::geom_interval(
-      ggplot2::aes(xmin = estimate - 0.001, xmax = estimate + 0.001)
+      ggplot2::aes(
+        # When the estimate is very small the width of the point estimate
+        # interval should be smaller so it doesn't overplot the CIs.
+        xmin = ifelse(.upper_0.95 - .lower_0.95 < 0.01, estimate - 0.00025, estimate - 0.00075),
+        xmax = ifelse(.upper_0.95 - .lower_0.95 < 0.01, estimate + 0.00025, estimate + 0.00075)
+      )
     ) +
+    # Set the scale of the x-axis so it's easier to compare plots. These values
+    # were selected based on the data, so would need to be changed with different
+    # data.
     ggplot2::scale_x_continuous(
       breaks = c(-0.1, 0, 0.1),
+      labels = function(x) ifelse(x == 0, 0, x),
       sec.axis = ggplot2::sec_axis(
         ~ .,
         breaks = c(-0.075, 0.075),
@@ -720,7 +751,8 @@ plot_similarity_contrasts <- function(object) {
         "(Within participant \U2212 Between participant)"
       ),
       y = "Effect",
-      colour = "Compatibility\nInterval"
+      colour = "Effect Direction",
+      colour_ramp = "Compatibility\nInterval"
     ) +
     ggplot2::theme_classic() +
     ggplot2::theme(
@@ -853,7 +885,25 @@ tidy_subset_contrast_similarity <- function(objects) {
       contrasts
     },
     .id = "participant"
-  )
+  ) |>
+    dplyr::mutate(
+      dist = distributional::dist_student_t(
+        df = df, mu = estimate, sigma = std.error
+      )
+    ) |>
+    ggdist::point_interval(dist, .width = c(.66, .95)) |>
+    tidyr::pivot_wider(names_from = .width, values_from = c(.lower, .upper)) |>
+    dplyr::mutate(
+      effect_direction = dplyr::case_when(
+        .lower_0.95 > 0 & .upper_0.95 > 0 ~ "Positive",
+        .lower_0.95 < 0 & .upper_0.95 > 0 ~ "Unresolved",
+        .lower_0.95 < 0 & .upper_0.95 < 0 ~ "Negative"
+      ),
+      effect_direction = factor(
+        effect_direction,
+        levels = c("Positive", "Unresolved", "Negative")
+      )
+    )
 
 }
 
@@ -864,6 +914,10 @@ tidy_subset_contrast_similarity <- function(objects) {
 #'
 #' @return A grob.
 plot_subset_similarity_contrasts <- function(group_object, subset_objects) {
+
+  # Note: The gradient fill in the ridges is currently commented out, as it's a
+  # bit busy when also filling the ridges by effect direction, with the colour
+  # of a ridge becoming less clear when the effect sizes are very small.
 
   # Tidy data to prepare for plotting
   contrasts <- tidy_contrast_similarity(group_object)
@@ -881,43 +935,52 @@ plot_subset_similarity_contrasts <- function(group_object, subset_objects) {
     )
 
   # Plotting
-  ramp_colours <- viridis::plasma(9)
-  far_colour_index <- 2
-  close_colour_index <- length(ramp_colours) - 1
+  my_scale <- ggplot2::scale_x_continuous(
+    breaks = scales::extended_breaks(n = 3)
+  )
+  my_scale$train(
+    c(min(subset_contrasts$.lower_0.95), max(subset_contrasts$.upper_0.95))
+  )
+  my_breaks <- my_scale$get_breaks()
+  #my_breaks <- ifelse(0 %in% my_breaks, my_breaks, sort(append(my_breaks, 0)))
 
   p <- ggplot2::ggplot(subset_contrasts) +
     ggplot2::geom_vline(ggplot2::aes(xintercept = 0), linetype = 5, alpha = 0.2) +
-    # Point estimate and 95% interval for the group-level effect
-    ggplot2::geom_rect(
+    # Plot group-level intervals so there's a reference point to compare the
+    # sub-models to.
+    ggdist::stat_interval(
       ggplot2::aes(
-        xmin = .lower_0.95,
-        xmax = .upper_0.95,
-        ymin = -Inf,
-        ymax = Inf
+        y = "Group",
+        xdist = distributional::dist_student_t(
+          df = df, mu = estimate, sigma = std.error
+        ),
+        colour = effect_direction,
+        colour_ramp = stat(level)
       ),
-      alpha = 0.2,
+      .width = c(0.66, 0.95),
       data = contrasts
     ) +
-    ggplot2::geom_rect(
-      ggplot2::aes(
-        xmin = .lower_0.66,
-        xmax = .upper_0.66,
-        ymin = -Inf,
-        ymax = Inf
-      ),
-      alpha = 0.2,
-      data = contrasts
+    ggplot2::scale_colour_discrete(
+      drop = FALSE,
+      type = c(
+        "#3aaf85", # Green
+        "#1b6ca8", # Blue
+        "#cd201f"  # Red
+      )
     ) +
-    # This is a slightly hacky way to get a consistent width for the point
-    # estimate since geom_vline() varies with graphics device size.
-    ggplot2::geom_rect(
+    ggdist::scale_colour_ramp_discrete(
+      from = "#fafdce",
+      range = c(0.33, 1)
+    ) +
+    ggdist::geom_interval(
       ggplot2::aes(
-        xmin = estimate - 0.001,
-        xmax = estimate + 0.001,
-        ymin = -Inf,
-        ymax = Inf
+        y = "Group", ymin = "Group", ymax = "Group",
+        # When the estimate is very small the width of the point estimate
+        # interval should be smaller so it doesn't overplot the CIs.
+        xmin = ifelse(.upper_0.95 - .lower_0.95 < 0.01, estimate - 0.00025, estimate - 0.00075),
+        xmax = ifelse(.upper_0.95 - .lower_0.95 < 0.01, estimate + 0.00025, estimate + 0.00075)
       ),
-      alpha = 0.2,
+      orientation = "horizontal",
       data = contrasts
     ) +
     # Confidence distributions for participant sub-models
@@ -929,55 +992,52 @@ plot_subset_similarity_contrasts <- function(group_object, subset_objects) {
         # needed for the code in `fill_ramp` to work.
         group_estimate = group_estimate,
         xdist = distributional::dist_student_t(df = df, mu = estimate, sigma = std.error),
-        fill_ramp = stat(abs(group_estimate - x))
+        fill = effect_direction
+        # fill_ramp = stat(abs(group_estimate - x))
       ),
       color = "black",
       size = 0.25,
       height = 2,
       expand = TRUE, # I can't disable this for whatever reason
       trim = FALSE, # I can't disable this for whatever reason
-      fill = ramp_colours[far_colour_index],
-      fill_type = "gradient"
+      # fill_type = "gradient"
     ) +
-    ggdist::scale_fill_ramp_continuous(
-      from = ramp_colours[close_colour_index],
-      name = "Distance from\ngroup-level\npoint estimate",
-      trans = "identity",
-      # This adjusts how quickly the fill ramps. It should be set to a meaningful
-      # value such as the maximum distance we consider compatible with the
-      # group-level estimate.
-      limits = c(0, 0.05),
-      # Fills outside the distance limit should be given the max colour
-      oob = scales::oob_squish,
-      guide = ggdist::guide_rampbar(
-        to = ramp_colours[far_colour_index],
-        title.vjust = 1.5
+    ggplot2::scale_fill_discrete(
+      type = c(
+        "#3aaf85", # Green
+        "#1b6ca8", # Blue
+        "#cd201f"  # Red
       )
     ) +
-    # Finally, some subtle lines that can be seen when the ridges overlap the
-    # interval.
-    ggplot2::geom_vline(
-      ggplot2::aes(xintercept = .lower_0.95),
-      linetype = 5,
-      alpha = 0.2,
-      data = contrasts
-    ) +
-    ggplot2::geom_vline(
-      ggplot2::aes(xintercept = .upper_0.95),
-      linetype = 5,
-      alpha = 0.2,
-      data = contrasts
-    ) +
-    ggplot2::geom_vline(
-      ggplot2::aes(xintercept = estimate),
-      linetype = 2,
-      alpha = 0.2,
-      data = contrasts
-    ) +
+    # ggdist::scale_fill_ramp_continuous(
+    #   from = "#f2f5c6", #ramp_colours[close_colour_index],
+    #   name = "Distance from\ngroup-level\npoint estimate",
+    #   trans = "identity",
+    #   # This adjusts how quickly the fill ramps. It should be set to a meaningful
+    #   # value such as the maximum distance we consider compatible with the
+    #   # group-level estimate.
+    #   limits = c(0, 0.05),
+    #   # Fills outside the distance limit should be given the max colour
+    #   oob = scales::oob_squish,
+    #   guide = ggdist::guide_rampbar(
+    #     to = "#a0a284", #"gray80",#"white", #ramp_colours[far_colour_index],
+    #     title.vjust = 1.5,
+    #     order = 2
+    #   )
+    # ) +
     # General plot settings
     ggplot2::scale_x_continuous(
-      breaks = scales::extended_breaks(n = 3),
+      breaks = my_breaks,
       labels = function(x) ifelse(x == 0, 0, x)
+    ) +
+    ggplot2::scale_y_discrete(expand = ggplot2::expansion(add = c(1.1, 0))) +
+    ## These legends already appear in the group-level interval plot, so they
+    ## don't need to be repeated here.
+    ggplot2::guides(
+      fill = "none",
+      colour_ramp = "none",
+      # Hacks to keep plot dimensions with an "invisible" legend
+      colour = ggplot2::guide_legend(override.aes = list(color = "white"))
     ) +
     # Keep the empty " " facet to enforce facet alignment. It will be removed
     # manually after building the plot. Make the direction vertical so that
@@ -991,7 +1051,13 @@ plot_subset_similarity_contrasts <- function(group_object, subset_objects) {
       ),
       y = "Participant"
     ) +
-    ggplot2::theme_classic()
+    ggplot2::theme_classic() +
+    # Hacks to keep plot dimensions with an "invisible" legend
+    ggplot2::theme(
+      legend.title = ggplot2::element_text(color = "white"),
+      legend.text = ggplot2::element_text(color = "white"),
+      legend.key = ggplot2::element_rect(color = "white", fill = "white")
+    )
 
   # Remove the blank facet. Solution for removing facet modified from:
   # https://stackoverflow.com/a/30372692/16844576
@@ -1042,7 +1108,7 @@ save_similarity_archetypes_figure <- function(filename, plots) {
   # legends does not work with these plots. Also add legends for session and
   # state.
   axis_tick_colours <- colorspace::diverging_hcl(
-    12, h = c(135, 50), c = 60, l = c(25, 95), power = c(0.7, 1.3)
+    12, h = c(299, 135), c = 60, l = c(20, 80), power = c(0.7, 1.3)
   )
 
   case_colours <- rep(
@@ -1055,7 +1121,7 @@ save_similarity_archetypes_figure <- function(filename, plots) {
   )
 
   session_legend_colours <- colorspace::diverging_hcl(
-    12, h = c(135, 50), c = 0, l = c(25, 95), power = c(0.7, 1.3)
+    12, h = c(299, 135), c = 0, l = c(20, 80), power = c(0.7, 1.3)
   )
 
   session_levels <- c("1-1", "1-2", "2-1", "2-2", "3-1", "3-2")
@@ -1177,7 +1243,7 @@ save_results_figure <- function(
     plot = patch,
     device = ragg::agg_png,
     width = 21.59,
-    height = 25,
+    height = 26,
     units = "cm",
     dpi = "retina",
     scaling = 0.65

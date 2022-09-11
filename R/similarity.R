@@ -312,17 +312,24 @@ plot_similarity <- function(similarity_results, estimate) {
     ggplot2::scale_x_discrete(expand = c(0, 0), position = "top") +
     # Reverse y-axis so the diagonal goes from the upper-left to lower-right
     ggplot2::scale_y_discrete(expand = c(0, 0), limits = rev) +
+    # ggplot2 does not natively support secondary axes for discrete variables,
+    # but they can be added using ggh4x. The choice to use secondary axes is
+    # purely aesthetic, so that the axis titles and facet strips are on opposite
+    # sides of the matrix.
+    ggplot2::guides(
+      x.sec = ggh4x::guide_axis_manual(title = "Functional Connectomes"),
+      y.sec = ggh4x::guide_axis_manual(title = "Functional Connectomes")
+    ) +
     ggplot2::labs(
       x = NULL,
       y = NULL,
       fill = "RV"
     ) +
-    ggh4x::facet_grid2(
+    facet_grid(
       cols = ggplot2::vars(x_participant),
       rows = ggplot2::vars(y_participant),
       scales = "free",
-      switch = "y",
-      remove_labels = "all"
+      switch = "y"
     ) +
     ggplot2::theme(
       panel.spacing = grid::unit(0.1, "lines"),
@@ -332,7 +339,10 @@ plot_similarity <- function(similarity_results, estimate) {
       strip.switch.pad.grid = grid::unit(0, "lines"),
       axis.text = ggplot2::element_blank(),
       axis.ticks.x.top = ggplot2::element_line(colour = rev(case_colours), size = 1),
+      axis.ticks.x.bottom = ggplot2::element_blank(),
       axis.ticks.y.left = ggplot2::element_line(colour = case_colours, size = 1),
+      # axis.title.y.right = ggplot2::element_text(angle = 90),
+      axis.ticks.y.right = ggplot2::element_blank(),
       axis.ticks.length = grid::unit(0.5, "lines")
     )
 

@@ -412,9 +412,12 @@ plot_connectivity <- function(input, method) {
 
   connectivity_matrix_plot <- input$connectivity_matrix |>
     as.data.frame.table() |>
-    ggplot2::ggplot(ggplot2::aes(x=Var1, y=Var2, fill=Freq)) +
+    ggplot2::ggplot(ggplot2::aes(x = Var1, y = Var2, fill = Freq)) +
     ggplot2::geom_raster() +
-    ggplot2::scale_fill_continuous(limits = c(0,1), type = "viridis") +
+    ggplot2::scale_fill_viridis_c(
+      limits = c(0, 1),
+      option = "cividis"
+    ) +
     ggplot2::scale_x_discrete(guide = ggplot2::guide_axis(angle = 90)) +
     # Reversing the y-axis is needed for the diagonal to go from the upper-left
     # to the bottom-right.
@@ -430,6 +433,7 @@ plot_connectivity <- function(input, method) {
     plot = connectivity_matrix_plot,
     metadata = append(input$metadata, list(method = method))
   )
+
 }
 
 #' Plot connectivity profiles

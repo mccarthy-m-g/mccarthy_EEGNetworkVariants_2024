@@ -307,7 +307,11 @@ plot_similarity <- function(similarity_results, estimate) {
   similarity_results_symmetric |>
     ggplot2::ggplot(ggplot2::aes(x = x_label, y = y_label, fill = {{estimate}})) +
     ggplot2::geom_raster() +
-    ggplot2::scale_fill_continuous(limits = c(0, 1), type = "viridis") +
+    ggplot2::scale_fill_viridis_c(
+      limits = c(0, 1),
+      option = "viridis",
+      guide  = ggplot2::guide_colourbar(order = 1)
+    ) +
     # Expand reduces the spacing between facets
     ggplot2::scale_x_discrete(expand = c(0, 0), position = "top") +
     # Reverse y-axis so the diagonal goes from the upper-left to lower-right
@@ -1240,6 +1244,8 @@ save_results_figure <- function(
              BC
              DD"
 
+  # FIXME: Using wrap_elements() may be unnecessary now that I'm no longer using
+  # ggh4x::facet_grid2() for the similarity matrix.
   p1 <- patchwork::wrap_elements(connectivity_profile)
   p2 <- patchwork::wrap_elements(similarity_matrix)
   p3 <- patchwork::wrap_elements(group_contrasts)

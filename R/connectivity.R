@@ -505,7 +505,7 @@ plot_connectivity_profiles <- function(input, method) {
     ggplot2::scale_fill_viridis_c(
       limits = c(0, 1),
       option = "cividis",
-      guide = ggplot2::guide_colourbar(order = 1)
+      guide  = ggplot2::guide_colourbar(order = 1)
     ) +
     ggh4x::facet_nested(
       rows = ggplot2::vars(participant),

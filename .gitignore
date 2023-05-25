@@ -2,9 +2,12 @@
 .Rhistory
 .RData
 .Ruserdata
+.vscode
 
 data/EEG-recordings/
+data/EEG-sensor-connectivity/
 data/participant-descriptives.csv
 
 R/scratch.R
 python/scratch.py
+python/__pycache__/

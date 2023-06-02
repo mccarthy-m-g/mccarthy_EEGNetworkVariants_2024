@@ -1154,8 +1154,21 @@ save_similarity_archetypes_figure <- function(filename, plots) {
         title = "Functional\nConnectome\nSimilarity", reverse = TRUE, order = 1
       )
     ) +
-    # These rectangles are purely here to make the legend show up; they aren't
-    # actually visible in the plot.
+    # These rasters/rectangles are purely here to make the new legends show up;
+    # they aren't actually visible in the plot.
+    ggnewscale::new_scale_fill() +
+    ggplot2::geom_raster(
+      ggplot2::aes(x = NA, y = NA, fill = 1),
+      inherit.aes = FALSE
+    ) +
+    ggplot2::scale_fill_continuous(
+      limits = c(0, 1),
+      breaks = seq(0, 1, by = .1),
+      type = "viridis",
+      guide = ggplot2::guide_legend(
+        title = "Similarity Values", reverse = TRUE, order = 2
+      )
+    ) +
     ggnewscale::new_scale_fill() +
     ggplot2::geom_rect(
       ggplot2::aes(xmin = -Inf, xmax = -Inf, ymin = -Inf, ymax = -Inf, fill = Session),
@@ -1164,7 +1177,7 @@ save_similarity_archetypes_figure <- function(filename, plots) {
     ggplot2::scale_fill_manual(
       values = session_legend_colours[6:1],
       guide = ggplot2::guide_legend(
-        title = "Session-Recording", order = 3
+        title = "Session-Recording", order = 4
       )
     ) +
     ggnewscale::new_scale_fill() +
@@ -1174,7 +1187,7 @@ save_similarity_archetypes_figure <- function(filename, plots) {
     ) +
     ggplot2::scale_fill_manual(
       values = c(case_colours[9], case_colours[3]),
-      guide = ggplot2::guide_legend(order = 2)
+      guide = ggplot2::guide_legend(order = 3)
     )
 
   plots_legend <- individual_effect |>

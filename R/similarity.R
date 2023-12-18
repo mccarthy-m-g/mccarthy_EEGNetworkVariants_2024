@@ -621,6 +621,18 @@ tidy_emmeans_similarity <- function(object) {
     "within_sessions_states"
   )
 
+  effect_labels_nice <- c(
+    "Main effect",
+    "Between sessions",
+    "Within sessions",
+    "Between states",
+    "Within states",
+    "Between sessions and states",
+    "Between sessions and within states",
+    "Within sessions and between states",
+    "Within sessions and states"
+  )
+
   object |>
     purrr::map_dfr(broom::tidy, .id = "effect") |>
     dplyr::mutate(
@@ -629,7 +641,8 @@ tidy_emmeans_similarity <- function(object) {
         within_participant == TRUE  ~ "within_participants",
         within_participant == FALSE ~ "between_participants"
       ),
-      effect_label = paste0(within_participant, "_", effect_label)
+      effect_label = paste0(within_participant, "_", effect_label),
+      effect_label_nice = rep(effect_labels_nice, each = 2)
     )
 
 }
@@ -672,6 +685,9 @@ tidy_contrast_similarity <- function(object) {
     purrr::map_dfr(broom::tidy, .id = "effect", conf.int = TRUE) |>
     dplyr::mutate(
       effect_label = factor(effect_labels, levels = effect_labels),
+      effect_label = forcats::fct_relevel(
+        effect_label, "Between sessions and states", after = 7
+      ),
       dist = distributional::dist_student_t(
         df = df, mu = estimate, sigma = std.error
       )
@@ -894,7 +910,10 @@ tidy_subset_contrast_similarity <- function(objects) {
       contrasts <- .x |>
       purrr::map_dfr(broom::tidy, .id = "effect") |>
       dplyr::mutate(
-        effect_label = factor(effect_labels, levels = effect_labels)
+        effect_label = factor(effect_labels, levels = effect_labels),
+        effect_label = forcats::fct_relevel(
+          effect_label, "Between sessions and states", after = 7
+        )
       )
       contrasts
     },
@@ -1105,10 +1124,10 @@ save_similarity_archetypes_figure <- function(filename, plots) {
     ggplot2::ggtitle("Group effect") +
     ggplot2::theme(legend.position = "none")
   session_effect <- plots$session_effect +
-    ggplot2::ggtitle("Session effect") +
+    ggplot2::ggtitle("Group-session effect") +
     ggplot2::theme(legend.position = "none")
   state_effect <- plots$state_effect +
-    ggplot2::ggtitle("State effect") +
+    ggplot2::ggtitle("Group-state effect") +
     ggplot2::theme(legend.position = "none")
   individual_session_effect <- plots$individual_session_effect +
     ggplot2::ggtitle("Individual-session effect") +
@@ -1273,6 +1292,119 @@ save_results_figure <- function(
     device = ragg::agg_png,
     width = 21.59,
     height = 26,
+    units = "cm",
+    dpi = "retina",
+    scaling = 0.65
+  )
+
+  filename
+
+}
+
+#' Save amplitude similarity patchwork
+#'
+#' @param delta,theta,beta,gamma Similarity matrix for the respective frequency band.
+#'
+#' @return A character vector of the file path.
+save_amplitude_similarity_patchwork_figure <- function(
+  delta, theta, beta, gamma
+) {
+
+  filename <- "figures/amplitude-similarity-patchwork.png"
+
+  delta <- delta +
+    ggplot2::ggtitle("Delta") +
+    ggplot2::theme(legend.position = "none")
+  theta <- theta +
+    ggplot2::ggtitle("Theta") +
+    ggplot2::theme(legend.position = "none")
+  beta <- beta +
+    ggplot2::ggtitle("Beta") +
+    ggplot2::theme(legend.position = "none")
+
+  # Modify the legend so that it's discrete instead of continuous. This legend
+  # will be extracted to represent the entire patchwork, since collecting
+  # legends does not work with these plots. Also add legends for session and
+  # state.
+  axis_tick_colours <- colorspace::diverging_hcl(
+    12, h = c(299, 135), c = 60, l = c(20, 80), power = c(0.7, 1.3)
+  )
+
+  case_colours <- rep(
+    c(rev(axis_tick_colours[7:12]), axis_tick_colours[1:6]),
+    times = 14 # length(participant_levels)
+  )
+
+  state_legend <- tibble::tibble(
+    State = factor(c("Eyes closed", "Eyes open"))
+  )
+
+  session_legend_colours <- colorspace::diverging_hcl(
+    12, h = c(299, 135), c = 0, l = c(20, 80), power = c(0.7, 1.3)
+  )
+
+  session_levels <- c("1-1", "1-2", "2-1", "2-2", "3-1", "3-2")
+
+  session_legend <- tibble::tibble(
+    Session = factor(session_levels, levels = session_levels)
+  )
+
+  gamma <- gamma +
+    # These rasters/rectangles are purely here to make the new legends show up;
+    # they aren't actually visible in the plot.
+    ggnewscale::new_scale_fill() +
+    ggplot2::geom_rect(
+      ggplot2::aes(xmin = -Inf, xmax = -Inf, ymin = -Inf, ymax = -Inf, fill = Session),
+      data = session_legend, inherit.aes = FALSE
+    ) +
+    ggplot2::scale_fill_manual(
+      values = session_legend_colours[6:1],
+      guide = ggplot2::guide_legend(
+        title = "Session-Recording", order = 4
+      )
+    ) +
+    ggnewscale::new_scale_fill() +
+    ggplot2::geom_rect(
+      ggplot2::aes(xmin = -Inf, xmax = -Inf, ymin = -Inf, ymax = -Inf, fill = State),
+      data = state_legend, inherit.aes = FALSE
+    ) +
+    ggplot2::scale_fill_manual(
+      values = c(case_colours[9], case_colours[3]),
+      guide = ggplot2::guide_legend(order = 3)
+    )
+
+  plots_legend <- gamma |>
+    ggpubr::get_legend() |>
+    ggpubr::as_ggplot()
+
+  gamma <- gamma +
+    ggplot2::ggtitle("Gamma") +
+    ggplot2::theme(legend.position = "none")
+
+  design <- "ABEFG
+             CDEFG"
+
+  p1 <- patchwork::wrap_elements(delta)
+  p2 <- patchwork::wrap_elements(theta)
+  p3 <- patchwork::wrap_elements(beta)
+  p4 <- patchwork::wrap_elements(gamma)
+
+  p7 <- plots_legend
+
+  patch <- patchwork::wrap_plots(
+    A = p1, B = p2, C = p3, D = p4,
+    E = patchwork::plot_spacer(), F = p7, G = patchwork::plot_spacer(),
+    design = design,
+    guides = "collect",
+    widths = c(1, 1, 0.025, 0.2, 0.025)
+  )
+
+  ggplot2::ggsave(
+    filename = filename,
+    plot = patch,
+    device = ragg::agg_png,
+    width = 21.59,
+    height = 19,
     units = "cm",
     dpi = "retina",
     scaling = 0.65

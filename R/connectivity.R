@@ -535,7 +535,329 @@ plot_connectivity_profiles <- function(input, method) {
 
 }
 
-# TODO: This is the patchwork plot of all the functional connectivity matrices for a subject
-plot_connectivity_patchwork <- function() {
+#' Plot connectivity histograms
+#'
+#' @param input List of connectivity matrices.
+#' @param method A character string for the x-axis title.
+#'
+#' @return A ggplot of connectivity histograms.
+plot_connectivity_histogram <- function(input, method) {
+
+  connectivity_profiles <- get_connectivity_profiles(input)
+
+  ggplot2::ggplot(
+    connectivity_profiles, ggplot2::aes(x = value, fill = participant)
+  ) +
+    ggplot2::geom_histogram(binwidth = .01) +
+    ggplot2::scale_fill_viridis_d(option = "D") +
+    ggplot2::labs(
+      x = "AEC",
+      y = "Count",
+      fill = "Participant"
+    ) +
+    ggplot2::theme_classic()
+
+}
+
+#' Plot all connectivity matrices per participant
+#'
+#' @param input List of connectivity matrices.
+#' @param method A character string for the legend title.
+#'
+#' @return A named list of patchwork plots, where each index is for all matrices
+#'   of a given participant.
+plot_connectivity_patchwork <- function(input, method) {
+
+  # Get levels for factors
+  participant_levels <- get_participant_levels(input)
+  label_levels <- tidyr::expand_grid(
+    participant = participant_levels,
+    session_state = factor(
+      c(
+        "pre_rc1",
+        "pre_rc2",
+        "pre_ro1",
+        "pre_ro2",
+        "post_rc1",
+        "post_rc2",
+        "post_ro1",
+        "post_ro2",
+        "fu_rc1",
+        "fu_rc2",
+        "fu_ro1",
+        "fu_ro2"
+      )
+    )
+  ) |>
+    dplyr::arrange(participant) |>
+    dplyr::mutate(label = paste0(participant, "_", session_state)) |>
+    purrr::pluck("label")
+
+  session_levels <- c("pre", "post", "fu")
+  state_levels <- c("rc1", "rc2", "ro1", "ro2")
+
+  sensor_levels <- c(
+    "Fp1",
+    "Fp2",
+    "AF7",
+    "AF3",
+    "AFz",
+    "AF4",
+    "AF8",
+    "F7",
+    "F5",
+    "F3",
+    "F1",
+    "Fz",
+    "F2",
+    "F4",
+    "F6",
+    "F8",
+    "FT9",
+    "FT7",
+    "FC5",
+    "FC3",
+    "FC1",
+    "FCz",
+    "FC2",
+    "FC4",
+    "FC6",
+    "FT8",
+    "FT10",
+    "T7",
+    "C5",
+    "C3",
+    "C1",
+    "Cz",
+    "C2",
+    "C4",
+    "C6",
+    "T8",
+    "TP9",
+    "TP7",
+    "CP5",
+    "CP3",
+    "CP1",
+    "CPz",
+    "CP2",
+    "CP4",
+    "CP6",
+    "TP8",
+    "TP10",
+    "P7",
+    "P5",
+    "P3",
+    "P1",
+    "Pz",
+    "P2",
+    "P4",
+    "P6",
+    "P8",
+    "PO7",
+    "PO3",
+    "POz",
+    "PO4",
+    "PO8",
+    "O1",
+    "Oz",
+    "O2"
+  )
+
+  # Get the connectivity matrices as a list of tibbles
+  connectivity_matrices <- input |>
+    purrr::map_dfr(
+      ~{
+        connectivity_matrix <- .x$connectivity_matrix
+        diag(connectivity_matrix) <- NA
+        connectivity_matrix |>
+          as.table() |>
+          as.data.frame(stringsAsFactors = FALSE) |>
+          tibble::as_tibble() |>
+          ####
+          dplyr::mutate(
+            Var1 = factor(Var1, levels = sensor_levels),
+            Var2 = factor(Var2, levels = sensor_levels)
+          ) |>
+          ####
+          tibble::add_column(
+            participant = .x$metadata$participant,
+            case = .x$metadata$case,
+            .before = 1
+          )
+      },
+      .id = "branch"
+    ) |>
+    dplyr::mutate(
+      session = dplyr::case_when(
+        stringr::str_detect(case, "pre")  ~ "Session 1",
+        stringr::str_detect(case, "post") ~ "Session 2",
+        stringr::str_detect(case, "fu")   ~ "Session 3",
+      ),
+      state = dplyr::case_when(
+        stringr::str_detect(case, "rc1") ~ "Eyes closed 1",
+        stringr::str_detect(case, "rc2") ~ "Eyes closed 2",
+        stringr::str_detect(case, "ro1") ~ "Eyes open 1",
+        stringr::str_detect(case, "ro2") ~ "Eyes open 2"
+      ),
+      title = paste0(participant, ", ", session, ", ", state),
+      case = factor(case, levels = label_levels)
+    ) |>
+    dplyr::group_by(participant)
+
+  connectivity_matrices |>
+    dplyr::group_split() |>
+    rlang::set_names(unlist(dplyr::group_keys(connectivity_matrices))) |>
+    purrr::map(
+      ~ {
+        connectivity_matrix <- dplyr::group_by(.x, case)
+
+        connectivity_plots <- connectivity_matrix |>
+          dplyr::group_split() |>
+          rlang::set_names(unlist(dplyr::group_keys(connectivity_matrix))) |>
+          purrr::map(
+            ~ {
+              ggplot2::ggplot(.x, ggplot2::aes(x = Var1, y = Var2, fill = Freq)) +
+                ggplot2::geom_raster() +
+                ggplot2::scale_fill_viridis_c(
+                  limits = c(0, NA)
+                ) +
+                ggplot2::scale_x_discrete(guide = ggplot2::guide_axis(angle = 90)) +
+                # Reversing the y-axis is needed for the diagonal to go from the upper-left
+                # to the bottom-right.
+                ggplot2::scale_y_discrete(limits = rev) +
+                ggplot2::labs(
+                  title = .x$title,
+                  x = "EEG Channels",
+                  y = "EEG Channels",
+                  fill = method
+                ) +
+                ggplot2::theme(
+                  axis.text = ggplot2::element_blank(),
+                  axis.ticks = ggplot2::element_blank()
+                )
+            }
+          )
+
+        patchwork::wrap_plots(connectivity_plots, ncol = 3, byrow = FALSE)
+      }
+    )
+}
+
+#' Save connectivity patchwork figures
+#'
+#' @param connectivity_patchwork The connectivity patchwork plots
+#' @param freq_band The frequency band
+#'
+#' @return A character vector of the file paths.
+save_connectivity_patchwork <- function(connectivity_patchwork, freq_band, mode) {
+
+  purrr::map(
+    names(connectivity_patchwork),
+    ~ {
+
+      filename <- paste0(
+        "figures/", freq_band, "/", mode,"-connectivity-patchwork/", .x, ".png"
+      )
+      names(filename) <- .x
+
+      ggplot2::ggsave(
+        filename = filename,
+        plot = connectivity_patchwork[[.x]],
+        device = ragg::agg_png,
+        width = 21.59,
+        height = 18,
+        units = "cm",
+        dpi = "retina",
+        scaling = 0.65
+      )
+
+      filename
+
+    }
+  ) |>
+    unlist()
+
+}
+
+#' Plot connectivity histograms
+#'
+#' @param phase_delta,phase_theta,phase_alpha,phase_beta,phase_gamma The
+#'   connectivity matrices for a given frequency band.
+#' @param method String. "PLI" or "AEC".
+#'
+#' @return A ggplot2 object.
+plot_connectivity_histograms <- function(
+  phase_delta,
+  phase_theta,
+  phase_alpha,
+  phase_beta,
+  phase_gamma,
+  method
+) {
+
+  connectivity_profiles <- purrr::map_dfr(
+    list(
+      Delta = phase_delta,
+      Theta = phase_theta,
+      Alpha = phase_alpha,
+      Beta  = phase_beta,
+      Gamma = phase_gamma
+    ),
+    get_connectivity_profiles,
+    .id = "frequency_band"
+  ) |>
+    mutate(
+      frequency_band = factor(
+        frequency_band,
+        levels = c("Delta", "Theta", "Alpha", "Beta", "Gamma")
+      )
+    )
+
+  ggplot2::ggplot(
+    connectivity_profiles, ggplot2::aes(x = value, fill = participant)
+  ) +
+    ggplot2::geom_histogram(binwidth = .01) +
+    ggplot2::scale_fill_viridis_d(option = "D") +
+    ggplot2::coord_cartesian(xlim = c(0, 1)) +
+    ggplot2::facet_wrap(
+      ggplot2::vars(frequency_band), ncol = 1, scales = "free_y"
+    ) +
+    ggplot2::labs(
+      x = method,
+      y = "Count",
+      fill = "Participant"
+    ) +
+    ggplot2::theme_classic()
+
+}
+
+#' Save connectivity histogram patchwork figure
+#'
+#' @param phase The phase connectivity histograms plot
+#' @param amplitude The amplitude connectivity histograms plot
+#'
+#' @return A character vector of the file path.
+save_connectivity_histogram_patchwork <- function(
+  phase, amplitude
+) {
+
+  filename <- "figures/connectivity-histogram-patchwork.png"
+
+  connectivity_histogram_patchwork <- phase + amplitude +
+    patchwork::plot_layout(ncol = 2, guides = "collect") +
+    patchwork::plot_annotation(tag_levels = "A")
+
+  ggplot2::ggsave(
+    filename = filename,
+    plot = connectivity_histogram_patchwork,
+    device = ragg::agg_png,
+    width = 21.59,
+    height = 18,
+    units = "cm",
+    dpi = "retina",
+    scaling = 0.65
+  )
+
+  filename
 
 }

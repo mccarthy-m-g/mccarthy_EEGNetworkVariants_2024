@@ -218,6 +218,14 @@ connectivity_estimation_targets <- list(
       phase_connectivity_profile_plot,
       plot_connectivity_profiles(phase_connectivity_matrix, "PLI")
     ),
+    tar_target(
+      phase_connectivity_histogram_plot,
+      plot_connectivity_histogram(phase_connectivity_matrix, "PLI")
+    ),
+    tar_target(
+      phase_connectivity_patchwork_plot,
+      plot_connectivity_patchwork(phase_connectivity_matrix, "PLI")
+    ),
     # Estimate phase connectivity similarity ----
     tar_target(
       phase_similarity,
@@ -288,6 +296,28 @@ connectivity_estimation_targets <- list(
       phase_similarity_glmmTMB_collinearity,
       check_collinearity(phase_similarity_glmmTMB)
     ),
+    # Maximal model
+    tar_target(
+      phase_similarity_glmmTMB_maximal,
+      glmmTMB_similarity(
+        rv ~
+          within_participant * within_session * within_state + # Fixed effects
+          (1 | pair_participant) + (1 | x_label) + (1 | y_label), # Random effects
+        data = phase_similarity
+      )
+    ),
+    tar_target(
+      phase_similarity_emmeans_maximal,
+      emmeans_similarity(phase_similarity_glmmTMB_maximal)
+    ),
+    tar_target(
+      phase_similarity_contrasts_maximal,
+      contrast_similarity(phase_similarity_emmeans_maximal)
+    ),
+    tar_target(
+      phase_similarity_contrasts_plot_maximal,
+      plot_similarity_contrasts(phase_similarity_contrasts_maximal)
+    ),
     # Fit phase connectivity similarity submodels ----
     tar_target(
       phase_similarity_subset,
@@ -347,6 +377,14 @@ connectivity_estimation_targets <- list(
       amplitude_connectivity_profile_plot,
       plot_connectivity_profiles(amplitude_connectivity_matrix, "AEC")
     ),
+    tar_target(
+      amplitude_connectivity_histogram_plot,
+      plot_connectivity_histogram(amplitude_connectivity_matrix, "AEC")
+    ),
+    tar_target(
+      amplitude_connectivity_patchwork_plot,
+      plot_connectivity_patchwork(amplitude_connectivity_matrix, "AEC")
+    ),
     # Estimate amplitude coupling similarity ----
     tar_target(
       amplitude_similarity,
@@ -401,6 +439,28 @@ connectivity_estimation_targets <- list(
     ),
     ## Model diagnostics
 
+    # Maximal model
+    tar_target(
+      amplitude_similarity_glmmTMB_maximal,
+      glmmTMB_similarity(
+        rv ~
+          within_participant * within_session * within_state + # Fixed effects
+          (1 | pair_participant) + (1 | x_label) + (1 | y_label), # Random effects
+        data = amplitude_similarity
+      )
+    ),
+    tar_target(
+      amplitude_similarity_emmeans_maximal,
+      emmeans_similarity(amplitude_similarity_glmmTMB_maximal)
+    ),
+    tar_target(
+      amplitude_similarity_contrasts_maximal,
+      contrast_similarity(amplitude_similarity_emmeans_maximal)
+    ),
+    tar_target(
+      amplitude_similarity_contrasts_plot_maximal,
+      plot_similarity_contrasts(amplitude_similarity_contrasts_maximal)
+    ),
     # Fit amplitude connectivity similarity submodels ----
     tar_target(
       amplitude_similarity_subset,
@@ -530,12 +590,34 @@ connectivity_estimation_targets <- list(
       format = "file"
     ),
     tar_target(
+      phase_similarity_results_figure_maximal,
+      save_results_figure(
+        paste0("figures/", filter_freq_band, "/phase_similarity_results_maximal.png"),
+        phase_connectivity_profile_plot,
+        phase_similarity_plot,
+        phase_similarity_contrasts_plot_maximal,
+        phase_similarity_subset_contrasts_plot
+      ),
+      format = "file"
+    ),
+    tar_target(
       amplitude_similarity_results_figure,
       save_results_figure(
         paste0("figures/", filter_freq_band, "/amplitude_similarity_results.png"),
         amplitude_connectivity_profile_plot,
         amplitude_similarity_plot,
         amplitude_similarity_contrasts_plot,
+        amplitude_similarity_subset_contrasts_plot
+      ),
+      format = "file"
+    ),
+    tar_target(
+      amplitude_similarity_results_figure_maximal,
+      save_results_figure(
+        paste0("figures/", filter_freq_band, "/amplitude_similarity_results_maximal.png"),
+        amplitude_connectivity_profile_plot,
+        amplitude_similarity_plot,
+        amplitude_similarity_contrasts_plot_maximal,
         amplitude_similarity_subset_contrasts_plot
       ),
       format = "file"
@@ -550,6 +632,20 @@ connectivity_estimation_targets <- list(
         phase_similarity_subset_contrasts_plot_hilbert
       ),
       format = "file"
+    ),
+    tar_target(
+      phase_connectivity_patchwork_figure,
+      save_connectivity_patchwork(
+        phase_connectivity_patchwork_plot, filter_freq_band, "phase"
+      ),
+      format = "file"
+    ),
+    tar_target(
+      amplitude_connectivity_patchwork_figure,
+      save_connectivity_patchwork(
+        amplitude_connectivity_patchwork_plot, filter_freq_band, "amplitude"
+      ),
+      format = "file"
     )
   ),
   tar_target(
@@ -561,6 +657,46 @@ connectivity_estimation_targets <- list(
     save_similarity_archetypes_figure(
       "figures/similarity_archetypes.png",
       similarity_archetype_plot
+    ),
+    format = "file"
+  ),
+  tar_target(
+    amplitude_similarity_patchwork_figure,
+    save_amplitude_similarity_patchwork_figure(
+      amplitude_similarity_plot_delta,
+      amplitude_similarity_plot_theta,
+      amplitude_similarity_plot_beta,
+      amplitude_similarity_plot_gamma
+    ),
+    format = "file"
+  ),
+  tar_target(
+    phase_connectivity_histograms_plot,
+    plot_connectivity_histograms(
+      phase_connectivity_matrix_delta,
+      phase_connectivity_matrix_theta,
+      phase_connectivity_matrix_alpha,
+      phase_connectivity_matrix_beta,
+      phase_connectivity_matrix_gamma,
+      "PLI"
+    )
+  ),
+  tar_target(
+    amplitude_connectivity_histograms_plot,
+    plot_connectivity_histograms(
+      amplitude_connectivity_matrix_delta,
+      amplitude_connectivity_matrix_theta,
+      amplitude_connectivity_matrix_alpha,
+      amplitude_connectivity_matrix_beta,
+      amplitude_connectivity_matrix_gamma,
+      "AEC"
+    )
+  ),
+  tar_target(
+    connectivity_histogram_patchwork_figure,
+    save_connectivity_histogram_patchwork(
+      phase_connectivity_histograms_plot,
+      amplitude_connectivity_histograms_plot
     ),
     format = "file"
   )

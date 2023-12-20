@@ -278,6 +278,13 @@ connectivity_estimation_targets <- list(
       phase_similarity_contrasts_plot,
       plot_similarity_contrasts(phase_similarity_contrasts)
     ),
+    tar_target(
+      phase_similarity_contrasts_table,
+      make_contrast_results_table(
+        phase_similarity_emmeans_tidy,
+        phase_similarity_contrasts_tidy
+      )
+    ),
     ## Model diagnostics
     tar_target(
       phase_similarity_glmmTMB_ppreds,
@@ -436,6 +443,13 @@ connectivity_estimation_targets <- list(
     tar_target(
       amplitude_similarity_contrasts_plot,
       plot_similarity_contrasts(amplitude_similarity_contrasts)
+    ),
+    tar_target(
+      amplitude_similarity_contrasts_table,
+      make_contrast_results_table(
+        amplitude_similarity_emmeans_tidy,
+        amplitude_similarity_contrasts_tidy
+      )
     ),
     ## Model diagnostics
 
@@ -841,6 +855,19 @@ manuscripts_targets <- list(
     params = list(
       references_path = references,
       packages_path   = package_references
+    )
+  ),
+  # Supplement ----
+  tar_render(
+    supplement_phase_coupling_functional_connectomes,
+    here(
+      "manuscripts", "supplement", "phase-coupling-functional-connectomes.Rmd"
+    )
+  ),
+  tar_render(
+    supplement_amplitude_coupling_functional_connectomes,
+    here(
+      "manuscripts", "supplement", "amplitude-coupling-functional-connectomes.Rmd"
     )
   )
 )

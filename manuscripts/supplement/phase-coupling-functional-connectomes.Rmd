@@ -1,0 +1,754 @@
+---
+output:
+  bookdown::word_document2:
+    reference_docx: "apa6_man.docx"
+    number_sections: false
+---
+
+```{r setup, include=FALSE}
+library(here)
+library(papaja)
+library(targets)
+
+knitr::opts_chunk$set(
+  echo = FALSE,
+  warning = FALSE,
+  message = FALSE,
+  fig.retina = 0.8, # figures are either vectors or 300 dpi diagrams
+  dpi = 320,
+  fig.width = 6,
+  fig.asp = 0.618, # 1 / phi
+  fig.show = "hold",
+  cache.extra = knitr::rand_seed
+)
+```
+
+```{r functional-connectome-filepaths}
+targets::tar_load(phase_connectivity_patchwork_figure_delta)
+targets::tar_load(phase_connectivity_patchwork_figure_theta)
+targets::tar_load(phase_connectivity_patchwork_figure_alpha)
+targets::tar_load(phase_connectivity_patchwork_figure_beta)
+targets::tar_load(phase_connectivity_patchwork_figure_gamma)
+```
+
+# Phase coupling Functional Connectomes
+
+Note that unlike the connectivity profiles presented in the results section, the fill scale is independent for each functional connectome presented below with a range spanning from zero to the largest connectivity value in a given connectome. This was done to highlight the connectivity structure in each connectome as clearly as possible, rather than to facilitate visual comparisons between connectomes by using a consistent scale spanning the full range of possible values as was done in the results section of the thesis manuscript.
+
+## Delta band
+
+```{r phase-functional-connectomes-P03-delta}
+#| fig.cap: "Phase coupling functional connectomes for participant P03 in the delta band. For each functional connectome, EEG channels are ordered as follows (from left to right, and from top to bottom): Fp1, Fp2, AF7, AF3, AFz, AF4, AF8, F7, F5, F3, F1, Fz, F2, F4, F6, F8, FT9, FT7, FC5, FC3, FC1, FCz, FC2, FC4, FC6, FT8, FT10, T7, C5, C3, C1, Cz, C2, C4, C6, T8, TP9, TP7, CP5, CP3, CP1, CPz, CP2, CP4, CP6, TP8, TP10, P7, P5, P3, P1, Pz, P2, P4, P6, P8, PO7, PO3, POz, PO4, PO8, O1, Oz, O2."
+knitr::include_graphics(
+  here::here(
+    stringr::str_subset(phase_connectivity_patchwork_figure_delta, "P03")
+  ),
+  error = FALSE
+)
+```
+
+```{r phase-functional-connectomes-P04-delta}
+#| fig.cap: "Phase coupling functional connectomes for participant P04 in the delta band. For each functional connectome, EEG channels are ordered as follows (from left to right, and from top to bottom): Fp1, Fp2, AF7, AF3, AFz, AF4, AF8, F7, F5, F3, F1, Fz, F2, F4, F6, F8, FT9, FT7, FC5, FC3, FC1, FCz, FC2, FC4, FC6, FT8, FT10, T7, C5, C3, C1, Cz, C2, C4, C6, T8, TP9, TP7, CP5, CP3, CP1, CPz, CP2, CP4, CP6, TP8, TP10, P7, P5, P3, P1, Pz, P2, P4, P6, P8, PO7, PO3, POz, PO4, PO8, O1, Oz, O2."
+knitr::include_graphics(
+  here::here(
+    stringr::str_subset(phase_connectivity_patchwork_figure_delta, "P04")
+  ),
+  error = FALSE
+)
+```
+
+```{r phase-functional-connectomes-P06-delta}
+#| fig.cap: "Phase coupling functional connectomes for participant P06 in the delta band. For each functional connectome, EEG channels are ordered as follows (from left to right, and from top to bottom): Fp1, Fp2, AF7, AF3, AFz, AF4, AF8, F7, F5, F3, F1, Fz, F2, F4, F6, F8, FT9, FT7, FC5, FC3, FC1, FCz, FC2, FC4, FC6, FT8, FT10, T7, C5, C3, C1, Cz, C2, C4, C6, T8, TP9, TP7, CP5, CP3, CP1, CPz, CP2, CP4, CP6, TP8, TP10, P7, P5, P3, P1, Pz, P2, P4, P6, P8, PO7, PO3, POz, PO4, PO8, O1, Oz, O2."
+knitr::include_graphics(
+  here::here(
+    stringr::str_subset(phase_connectivity_patchwork_figure_delta, "P06")
+  ),
+  error = FALSE
+)
+```
+
+```{r phase-functional-connectomes-P07-delta}
+#| fig.cap: "Phase coupling functional connectomes for participant P07 in the delta band. For each functional connectome, EEG channels are ordered as follows (from left to right, and from top to bottom): Fp1, Fp2, AF7, AF3, AFz, AF4, AF8, F7, F5, F3, F1, Fz, F2, F4, F6, F8, FT9, FT7, FC5, FC3, FC1, FCz, FC2, FC4, FC6, FT8, FT10, T7, C5, C3, C1, Cz, C2, C4, C6, T8, TP9, TP7, CP5, CP3, CP1, CPz, CP2, CP4, CP6, TP8, TP10, P7, P5, P3, P1, Pz, P2, P4, P6, P8, PO7, PO3, POz, PO4, PO8, O1, Oz, O2."
+knitr::include_graphics(
+  here::here(
+    stringr::str_subset(phase_connectivity_patchwork_figure_delta, "P07")
+  ),
+  error = FALSE
+)
+```
+
+```{r phase-functional-connectomes-P08-delta}
+#| fig.cap: "Phase coupling functional connectomes for participant P08 in the delta band. For each functional connectome, EEG channels are ordered as follows (from left to right, and from top to bottom): Fp1, Fp2, AF7, AF3, AFz, AF4, AF8, F7, F5, F3, F1, Fz, F2, F4, F6, F8, FT9, FT7, FC5, FC3, FC1, FCz, FC2, FC4, FC6, FT8, FT10, T7, C5, C3, C1, Cz, C2, C4, C6, T8, TP9, TP7, CP5, CP3, CP1, CPz, CP2, CP4, CP6, TP8, TP10, P7, P5, P3, P1, Pz, P2, P4, P6, P8, PO7, PO3, POz, PO4, PO8, O1, Oz, O2."
+knitr::include_graphics(
+  here::here(
+    stringr::str_subset(phase_connectivity_patchwork_figure_delta, "P08")
+  ),
+  error = FALSE
+)
+```
+
+```{r phase-functional-connectomes-P09-delta}
+#| fig.cap: "Phase coupling functional connectomes for participant P09 in the delta band. For each functional connectome, EEG channels are ordered as follows (from left to right, and from top to bottom): Fp1, Fp2, AF7, AF3, AFz, AF4, AF8, F7, F5, F3, F1, Fz, F2, F4, F6, F8, FT9, FT7, FC5, FC3, FC1, FCz, FC2, FC4, FC6, FT8, FT10, T7, C5, C3, C1, Cz, C2, C4, C6, T8, TP9, TP7, CP5, CP3, CP1, CPz, CP2, CP4, CP6, TP8, TP10, P7, P5, P3, P1, Pz, P2, P4, P6, P8, PO7, PO3, POz, PO4, PO8, O1, Oz, O2."
+knitr::include_graphics(
+  here::here(
+    stringr::str_subset(phase_connectivity_patchwork_figure_delta, "P09")
+  ),
+  error = FALSE
+)
+```
+
+```{r phase-functional-connectomes-P11-delta}
+#| fig.cap: "Phase coupling functional connectomes for participant P11 in the delta band. For each functional connectome, EEG channels are ordered as follows (from left to right, and from top to bottom): Fp1, Fp2, AF7, AF3, AFz, AF4, AF8, F7, F5, F3, F1, Fz, F2, F4, F6, F8, FT9, FT7, FC5, FC3, FC1, FCz, FC2, FC4, FC6, FT8, FT10, T7, C5, C3, C1, Cz, C2, C4, C6, T8, TP9, TP7, CP5, CP3, CP1, CPz, CP2, CP4, CP6, TP8, TP10, P7, P5, P3, P1, Pz, P2, P4, P6, P8, PO7, PO3, POz, PO4, PO8, O1, Oz, O2."
+knitr::include_graphics(
+  here::here(
+    stringr::str_subset(phase_connectivity_patchwork_figure_delta, "P11")
+  ),
+  error = FALSE
+)
+```
+
+```{r phase-functional-connectomes-P14-delta}
+#| fig.cap: "Phase coupling functional connectomes for participant P14 in the delta band. For each functional connectome, EEG channels are ordered as follows (from left to right, and from top to bottom): Fp1, Fp2, AF7, AF3, AFz, AF4, AF8, F7, F5, F3, F1, Fz, F2, F4, F6, F8, FT9, FT7, FC5, FC3, FC1, FCz, FC2, FC4, FC6, FT8, FT10, T7, C5, C3, C1, Cz, C2, C4, C6, T8, TP9, TP7, CP5, CP3, CP1, CPz, CP2, CP4, CP6, TP8, TP10, P7, P5, P3, P1, Pz, P2, P4, P6, P8, PO7, PO3, POz, PO4, PO8, O1, Oz, O2."
+knitr::include_graphics(
+  here::here(
+    stringr::str_subset(phase_connectivity_patchwork_figure_delta, "P14")
+  ),
+  error = FALSE
+)
+```
+
+```{r phase-functional-connectomes-P16-delta}
+#| fig.cap: "Phase coupling functional connectomes for participant P16 in the delta band. For each functional connectome, EEG channels are ordered as follows (from left to right, and from top to bottom): Fp1, Fp2, AF7, AF3, AFz, AF4, AF8, F7, F5, F3, F1, Fz, F2, F4, F6, F8, FT9, FT7, FC5, FC3, FC1, FCz, FC2, FC4, FC6, FT8, FT10, T7, C5, C3, C1, Cz, C2, C4, C6, T8, TP9, TP7, CP5, CP3, CP1, CPz, CP2, CP4, CP6, TP8, TP10, P7, P5, P3, P1, Pz, P2, P4, P6, P8, PO7, PO3, POz, PO4, PO8, O1, Oz, O2."
+knitr::include_graphics(
+  here::here(
+    stringr::str_subset(phase_connectivity_patchwork_figure_delta, "P16")
+  ),
+  error = FALSE
+)
+```
+
+```{r phase-functional-connectomes-P17-delta}
+#| fig.cap: "Phase coupling functional connectomes for participant P17 in the delta band. For each functional connectome, EEG channels are ordered as follows (from left to right, and from top to bottom): Fp1, Fp2, AF7, AF3, AFz, AF4, AF8, F7, F5, F3, F1, Fz, F2, F4, F6, F8, FT9, FT7, FC5, FC3, FC1, FCz, FC2, FC4, FC6, FT8, FT10, T7, C5, C3, C1, Cz, C2, C4, C6, T8, TP9, TP7, CP5, CP3, CP1, CPz, CP2, CP4, CP6, TP8, TP10, P7, P5, P3, P1, Pz, P2, P4, P6, P8, PO7, PO3, POz, PO4, PO8, O1, Oz, O2."
+knitr::include_graphics(
+  here::here(
+    stringr::str_subset(phase_connectivity_patchwork_figure_delta, "P17")
+  ),
+  error = FALSE
+)
+```
+
+```{r phase-functional-connectomes-P19-delta}
+#| fig.cap: "Phase coupling functional connectomes for participant P19 in the delta band. For each functional connectome, EEG channels are ordered as follows (from left to right, and from top to bottom): Fp1, Fp2, AF7, AF3, AFz, AF4, AF8, F7, F5, F3, F1, Fz, F2, F4, F6, F8, FT9, FT7, FC5, FC3, FC1, FCz, FC2, FC4, FC6, FT8, FT10, T7, C5, C3, C1, Cz, C2, C4, C6, T8, TP9, TP7, CP5, CP3, CP1, CPz, CP2, CP4, CP6, TP8, TP10, P7, P5, P3, P1, Pz, P2, P4, P6, P8, PO7, PO3, POz, PO4, PO8, O1, Oz, O2."
+knitr::include_graphics(
+  here::here(
+    stringr::str_subset(phase_connectivity_patchwork_figure_delta, "P19")
+  ),
+  error = FALSE
+)
+```
+
+```{r phase-functional-connectomes-P20-delta}
+#| fig.cap: "Phase coupling functional connectomes for participant P20 in the delta band. For each functional connectome, EEG channels are ordered as follows (from left to right, and from top to bottom): Fp1, Fp2, AF7, AF3, AFz, AF4, AF8, F7, F5, F3, F1, Fz, F2, F4, F6, F8, FT9, FT7, FC5, FC3, FC1, FCz, FC2, FC4, FC6, FT8, FT10, T7, C5, C3, C1, Cz, C2, C4, C6, T8, TP9, TP7, CP5, CP3, CP1, CPz, CP2, CP4, CP6, TP8, TP10, P7, P5, P3, P1, Pz, P2, P4, P6, P8, PO7, PO3, POz, PO4, PO8, O1, Oz, O2."
+knitr::include_graphics(
+  here::here(
+    stringr::str_subset(phase_connectivity_patchwork_figure_delta, "P20")
+  ),
+  error = FALSE
+)
+```
+
+```{r phase-functional-connectomes-P21-delta}
+#| fig.cap: "Phase coupling functional connectomes for participant P21 in the delta band. For each functional connectome, EEG channels are ordered as follows (from left to right, and from top to bottom): Fp1, Fp2, AF7, AF3, AFz, AF4, AF8, F7, F5, F3, F1, Fz, F2, F4, F6, F8, FT9, FT7, FC5, FC3, FC1, FCz, FC2, FC4, FC6, FT8, FT10, T7, C5, C3, C1, Cz, C2, C4, C6, T8, TP9, TP7, CP5, CP3, CP1, CPz, CP2, CP4, CP6, TP8, TP10, P7, P5, P3, P1, Pz, P2, P4, P6, P8, PO7, PO3, POz, PO4, PO8, O1, Oz, O2."
+knitr::include_graphics(
+  here::here(
+    stringr::str_subset(phase_connectivity_patchwork_figure_delta, "P21")
+  ),
+  error = FALSE
+)
+```
+
+```{r phase-functional-connectomes-P22-delta}
+#| fig.cap: "Phase coupling functional connectomes for participant P22 in the delta band. For each functional connectome, EEG channels are ordered as follows (from left to right, and from top to bottom): Fp1, Fp2, AF7, AF3, AFz, AF4, AF8, F7, F5, F3, F1, Fz, F2, F4, F6, F8, FT9, FT7, FC5, FC3, FC1, FCz, FC2, FC4, FC6, FT8, FT10, T7, C5, C3, C1, Cz, C2, C4, C6, T8, TP9, TP7, CP5, CP3, CP1, CPz, CP2, CP4, CP6, TP8, TP10, P7, P5, P3, P1, Pz, P2, P4, P6, P8, PO7, PO3, POz, PO4, PO8, O1, Oz, O2."
+knitr::include_graphics(
+  here::here(
+    stringr::str_subset(phase_connectivity_patchwork_figure_delta, "P22")
+  ),
+  error = FALSE
+)
+```
+
+\newpage
+
+## Theta band
+
+```{r phase-functional-connectomes-P03-theta}
+#| fig.cap: "Phase coupling functional connectomes for participant P03 in the theta band. For each functional connectome, EEG channels are ordered as follows (from left to right, and from top to bottom): Fp1, Fp2, AF7, AF3, AFz, AF4, AF8, F7, F5, F3, F1, Fz, F2, F4, F6, F8, FT9, FT7, FC5, FC3, FC1, FCz, FC2, FC4, FC6, FT8, FT10, T7, C5, C3, C1, Cz, C2, C4, C6, T8, TP9, TP7, CP5, CP3, CP1, CPz, CP2, CP4, CP6, TP8, TP10, P7, P5, P3, P1, Pz, P2, P4, P6, P8, PO7, PO3, POz, PO4, PO8, O1, Oz, O2."
+knitr::include_graphics(
+  here::here(
+    stringr::str_subset(phase_connectivity_patchwork_figure_theta, "P03")
+  ),
+  error = FALSE
+)
+```
+
+```{r phase-functional-connectomes-P04-theta}
+#| fig.cap: "Phase coupling functional connectomes for participant P04 in the theta band. For each functional connectome, EEG channels are ordered as follows (from left to right, and from top to bottom): Fp1, Fp2, AF7, AF3, AFz, AF4, AF8, F7, F5, F3, F1, Fz, F2, F4, F6, F8, FT9, FT7, FC5, FC3, FC1, FCz, FC2, FC4, FC6, FT8, FT10, T7, C5, C3, C1, Cz, C2, C4, C6, T8, TP9, TP7, CP5, CP3, CP1, CPz, CP2, CP4, CP6, TP8, TP10, P7, P5, P3, P1, Pz, P2, P4, P6, P8, PO7, PO3, POz, PO4, PO8, O1, Oz, O2."
+knitr::include_graphics(
+  here::here(
+    stringr::str_subset(phase_connectivity_patchwork_figure_theta, "P04")
+  ),
+  error = FALSE
+)
+```
+
+```{r phase-functional-connectomes-P06-theta}
+#| fig.cap: "Phase coupling functional connectomes for participant P06 in the theta band. For each functional connectome, EEG channels are ordered as follows (from left to right, and from top to bottom): Fp1, Fp2, AF7, AF3, AFz, AF4, AF8, F7, F5, F3, F1, Fz, F2, F4, F6, F8, FT9, FT7, FC5, FC3, FC1, FCz, FC2, FC4, FC6, FT8, FT10, T7, C5, C3, C1, Cz, C2, C4, C6, T8, TP9, TP7, CP5, CP3, CP1, CPz, CP2, CP4, CP6, TP8, TP10, P7, P5, P3, P1, Pz, P2, P4, P6, P8, PO7, PO3, POz, PO4, PO8, O1, Oz, O2."
+knitr::include_graphics(
+  here::here(
+    stringr::str_subset(phase_connectivity_patchwork_figure_theta, "P06")
+  ),
+  error = FALSE
+)
+```
+
+```{r phase-functional-connectomes-P07-theta}
+#| fig.cap: "Phase coupling functional connectomes for participant P07 in the theta band. For each functional connectome, EEG channels are ordered as follows (from left to right, and from top to bottom): Fp1, Fp2, AF7, AF3, AFz, AF4, AF8, F7, F5, F3, F1, Fz, F2, F4, F6, F8, FT9, FT7, FC5, FC3, FC1, FCz, FC2, FC4, FC6, FT8, FT10, T7, C5, C3, C1, Cz, C2, C4, C6, T8, TP9, TP7, CP5, CP3, CP1, CPz, CP2, CP4, CP6, TP8, TP10, P7, P5, P3, P1, Pz, P2, P4, P6, P8, PO7, PO3, POz, PO4, PO8, O1, Oz, O2."
+knitr::include_graphics(
+  here::here(
+    stringr::str_subset(phase_connectivity_patchwork_figure_theta, "P07")
+  ),
+  error = FALSE
+)
+```
+
+```{r phase-functional-connectomes-P08-theta}
+#| fig.cap: "Phase coupling functional connectomes for participant P08 in the theta band. For each functional connectome, EEG channels are ordered as follows (from left to right, and from top to bottom): Fp1, Fp2, AF7, AF3, AFz, AF4, AF8, F7, F5, F3, F1, Fz, F2, F4, F6, F8, FT9, FT7, FC5, FC3, FC1, FCz, FC2, FC4, FC6, FT8, FT10, T7, C5, C3, C1, Cz, C2, C4, C6, T8, TP9, TP7, CP5, CP3, CP1, CPz, CP2, CP4, CP6, TP8, TP10, P7, P5, P3, P1, Pz, P2, P4, P6, P8, PO7, PO3, POz, PO4, PO8, O1, Oz, O2."
+knitr::include_graphics(
+  here::here(
+    stringr::str_subset(phase_connectivity_patchwork_figure_theta, "P08")
+  ),
+  error = FALSE
+)
+```
+
+```{r phase-functional-connectomes-P09-theta}
+#| fig.cap: "Phase coupling functional connectomes for participant P09 in the theta band. For each functional connectome, EEG channels are ordered as follows (from left to right, and from top to bottom): Fp1, Fp2, AF7, AF3, AFz, AF4, AF8, F7, F5, F3, F1, Fz, F2, F4, F6, F8, FT9, FT7, FC5, FC3, FC1, FCz, FC2, FC4, FC6, FT8, FT10, T7, C5, C3, C1, Cz, C2, C4, C6, T8, TP9, TP7, CP5, CP3, CP1, CPz, CP2, CP4, CP6, TP8, TP10, P7, P5, P3, P1, Pz, P2, P4, P6, P8, PO7, PO3, POz, PO4, PO8, O1, Oz, O2."
+knitr::include_graphics(
+  here::here(
+    stringr::str_subset(phase_connectivity_patchwork_figure_theta, "P09")
+  ),
+  error = FALSE
+)
+```
+
+```{r phase-functional-connectomes-P11-theta}
+#| fig.cap: "Phase coupling functional connectomes for participant P11 in the theta band. For each functional connectome, EEG channels are ordered as follows (from left to right, and from top to bottom): Fp1, Fp2, AF7, AF3, AFz, AF4, AF8, F7, F5, F3, F1, Fz, F2, F4, F6, F8, FT9, FT7, FC5, FC3, FC1, FCz, FC2, FC4, FC6, FT8, FT10, T7, C5, C3, C1, Cz, C2, C4, C6, T8, TP9, TP7, CP5, CP3, CP1, CPz, CP2, CP4, CP6, TP8, TP10, P7, P5, P3, P1, Pz, P2, P4, P6, P8, PO7, PO3, POz, PO4, PO8, O1, Oz, O2."
+knitr::include_graphics(
+  here::here(
+    stringr::str_subset(phase_connectivity_patchwork_figure_theta, "P11")
+  ),
+  error = FALSE
+)
+```
+
+```{r phase-functional-connectomes-P14-theta}
+#| fig.cap: "Phase coupling functional connectomes for participant P14 in the theta band. For each functional connectome, EEG channels are ordered as follows (from left to right, and from top to bottom): Fp1, Fp2, AF7, AF3, AFz, AF4, AF8, F7, F5, F3, F1, Fz, F2, F4, F6, F8, FT9, FT7, FC5, FC3, FC1, FCz, FC2, FC4, FC6, FT8, FT10, T7, C5, C3, C1, Cz, C2, C4, C6, T8, TP9, TP7, CP5, CP3, CP1, CPz, CP2, CP4, CP6, TP8, TP10, P7, P5, P3, P1, Pz, P2, P4, P6, P8, PO7, PO3, POz, PO4, PO8, O1, Oz, O2."
+knitr::include_graphics(
+  here::here(
+    stringr::str_subset(phase_connectivity_patchwork_figure_theta, "P14")
+  ),
+  error = FALSE
+)
+```
+
+```{r phase-functional-connectomes-P16-theta}
+#| fig.cap: "Phase coupling functional connectomes for participant P16 in the theta band. For each functional connectome, EEG channels are ordered as follows (from left to right, and from top to bottom): Fp1, Fp2, AF7, AF3, AFz, AF4, AF8, F7, F5, F3, F1, Fz, F2, F4, F6, F8, FT9, FT7, FC5, FC3, FC1, FCz, FC2, FC4, FC6, FT8, FT10, T7, C5, C3, C1, Cz, C2, C4, C6, T8, TP9, TP7, CP5, CP3, CP1, CPz, CP2, CP4, CP6, TP8, TP10, P7, P5, P3, P1, Pz, P2, P4, P6, P8, PO7, PO3, POz, PO4, PO8, O1, Oz, O2."
+knitr::include_graphics(
+  here::here(
+    stringr::str_subset(phase_connectivity_patchwork_figure_theta, "P16")
+  ),
+  error = FALSE
+)
+```
+
+```{r phase-functional-connectomes-P17-theta}
+#| fig.cap: "Phase coupling functional connectomes for participant P17 in the theta band. For each functional connectome, EEG channels are ordered as follows (from left to right, and from top to bottom): Fp1, Fp2, AF7, AF3, AFz, AF4, AF8, F7, F5, F3, F1, Fz, F2, F4, F6, F8, FT9, FT7, FC5, FC3, FC1, FCz, FC2, FC4, FC6, FT8, FT10, T7, C5, C3, C1, Cz, C2, C4, C6, T8, TP9, TP7, CP5, CP3, CP1, CPz, CP2, CP4, CP6, TP8, TP10, P7, P5, P3, P1, Pz, P2, P4, P6, P8, PO7, PO3, POz, PO4, PO8, O1, Oz, O2."
+knitr::include_graphics(
+  here::here(
+    stringr::str_subset(phase_connectivity_patchwork_figure_theta, "P17")
+  ),
+  error = FALSE
+)
+```
+
+```{r phase-functional-connectomes-P19-theta}
+#| fig.cap: "Phase coupling functional connectomes for participant P19 in the theta band. For each functional connectome, EEG channels are ordered as follows (from left to right, and from top to bottom): Fp1, Fp2, AF7, AF3, AFz, AF4, AF8, F7, F5, F3, F1, Fz, F2, F4, F6, F8, FT9, FT7, FC5, FC3, FC1, FCz, FC2, FC4, FC6, FT8, FT10, T7, C5, C3, C1, Cz, C2, C4, C6, T8, TP9, TP7, CP5, CP3, CP1, CPz, CP2, CP4, CP6, TP8, TP10, P7, P5, P3, P1, Pz, P2, P4, P6, P8, PO7, PO3, POz, PO4, PO8, O1, Oz, O2."
+knitr::include_graphics(
+  here::here(
+    stringr::str_subset(phase_connectivity_patchwork_figure_theta, "P19")
+  ),
+  error = FALSE
+)
+```
+
+```{r phase-functional-connectomes-P20-theta}
+#| fig.cap: "Phase coupling functional connectomes for participant P20 in the theta band. For each functional connectome, EEG channels are ordered as follows (from left to right, and from top to bottom): Fp1, Fp2, AF7, AF3, AFz, AF4, AF8, F7, F5, F3, F1, Fz, F2, F4, F6, F8, FT9, FT7, FC5, FC3, FC1, FCz, FC2, FC4, FC6, FT8, FT10, T7, C5, C3, C1, Cz, C2, C4, C6, T8, TP9, TP7, CP5, CP3, CP1, CPz, CP2, CP4, CP6, TP8, TP10, P7, P5, P3, P1, Pz, P2, P4, P6, P8, PO7, PO3, POz, PO4, PO8, O1, Oz, O2."
+knitr::include_graphics(
+  here::here(
+    stringr::str_subset(phase_connectivity_patchwork_figure_theta, "P20")
+  ),
+  error = FALSE
+)
+```
+
+```{r phase-functional-connectomes-P21-theta}
+#| fig.cap: "Phase coupling functional connectomes for participant P21 in the theta band. For each functional connectome, EEG channels are ordered as follows (from left to right, and from top to bottom): Fp1, Fp2, AF7, AF3, AFz, AF4, AF8, F7, F5, F3, F1, Fz, F2, F4, F6, F8, FT9, FT7, FC5, FC3, FC1, FCz, FC2, FC4, FC6, FT8, FT10, T7, C5, C3, C1, Cz, C2, C4, C6, T8, TP9, TP7, CP5, CP3, CP1, CPz, CP2, CP4, CP6, TP8, TP10, P7, P5, P3, P1, Pz, P2, P4, P6, P8, PO7, PO3, POz, PO4, PO8, O1, Oz, O2."
+knitr::include_graphics(
+  here::here(
+    stringr::str_subset(phase_connectivity_patchwork_figure_theta, "P21")
+  ),
+  error = FALSE
+)
+```
+
+```{r phase-functional-connectomes-P22-theta}
+#| fig.cap: "Phase coupling functional connectomes for participant P22 in the theta band. For each functional connectome, EEG channels are ordered as follows (from left to right, and from top to bottom): Fp1, Fp2, AF7, AF3, AFz, AF4, AF8, F7, F5, F3, F1, Fz, F2, F4, F6, F8, FT9, FT7, FC5, FC3, FC1, FCz, FC2, FC4, FC6, FT8, FT10, T7, C5, C3, C1, Cz, C2, C4, C6, T8, TP9, TP7, CP5, CP3, CP1, CPz, CP2, CP4, CP6, TP8, TP10, P7, P5, P3, P1, Pz, P2, P4, P6, P8, PO7, PO3, POz, PO4, PO8, O1, Oz, O2."
+knitr::include_graphics(
+  here::here(
+    stringr::str_subset(phase_connectivity_patchwork_figure_theta, "P22")
+  ),
+  error = FALSE
+)
+```
+
+\newpage
+
+## Alpha band
+
+```{r phase-functional-connectomes-P03-alpha}
+#| fig.cap: "Phase coupling functional connectomes for participant P03 in the alpha band. For each functional connectome, EEG channels are ordered as follows (from left to right, and from top to bottom): Fp1, Fp2, AF7, AF3, AFz, AF4, AF8, F7, F5, F3, F1, Fz, F2, F4, F6, F8, FT9, FT7, FC5, FC3, FC1, FCz, FC2, FC4, FC6, FT8, FT10, T7, C5, C3, C1, Cz, C2, C4, C6, T8, TP9, TP7, CP5, CP3, CP1, CPz, CP2, CP4, CP6, TP8, TP10, P7, P5, P3, P1, Pz, P2, P4, P6, P8, PO7, PO3, POz, PO4, PO8, O1, Oz, O2."
+knitr::include_graphics(
+  here::here(
+    stringr::str_subset(phase_connectivity_patchwork_figure_alpha, "P03")
+  ),
+  error = FALSE
+)
+```
+
+```{r phase-functional-connectomes-P04-alpha}
+#| fig.cap: "Phase coupling functional connectomes for participant P04 in the alpha band. For each functional connectome, EEG channels are ordered as follows (from left to right, and from top to bottom): Fp1, Fp2, AF7, AF3, AFz, AF4, AF8, F7, F5, F3, F1, Fz, F2, F4, F6, F8, FT9, FT7, FC5, FC3, FC1, FCz, FC2, FC4, FC6, FT8, FT10, T7, C5, C3, C1, Cz, C2, C4, C6, T8, TP9, TP7, CP5, CP3, CP1, CPz, CP2, CP4, CP6, TP8, TP10, P7, P5, P3, P1, Pz, P2, P4, P6, P8, PO7, PO3, POz, PO4, PO8, O1, Oz, O2."
+knitr::include_graphics(
+  here::here(
+    stringr::str_subset(phase_connectivity_patchwork_figure_alpha, "P04")
+  ),
+  error = FALSE
+)
+```
+
+```{r phase-functional-connectomes-P06-alpha}
+#| fig.cap: "Phase coupling functional connectomes for participant P06 in the alpha band. For each functional connectome, EEG channels are ordered as follows (from left to right, and from top to bottom): Fp1, Fp2, AF7, AF3, AFz, AF4, AF8, F7, F5, F3, F1, Fz, F2, F4, F6, F8, FT9, FT7, FC5, FC3, FC1, FCz, FC2, FC4, FC6, FT8, FT10, T7, C5, C3, C1, Cz, C2, C4, C6, T8, TP9, TP7, CP5, CP3, CP1, CPz, CP2, CP4, CP6, TP8, TP10, P7, P5, P3, P1, Pz, P2, P4, P6, P8, PO7, PO3, POz, PO4, PO8, O1, Oz, O2."
+knitr::include_graphics(
+  here::here(
+    stringr::str_subset(phase_connectivity_patchwork_figure_alpha, "P06")
+  ),
+  error = FALSE
+)
+```
+
+```{r phase-functional-connectomes-P07-alpha}
+#| fig.cap: "Phase coupling functional connectomes for participant P07 in the alpha band. For each functional connectome, EEG channels are ordered as follows (from left to right, and from top to bottom): Fp1, Fp2, AF7, AF3, AFz, AF4, AF8, F7, F5, F3, F1, Fz, F2, F4, F6, F8, FT9, FT7, FC5, FC3, FC1, FCz, FC2, FC4, FC6, FT8, FT10, T7, C5, C3, C1, Cz, C2, C4, C6, T8, TP9, TP7, CP5, CP3, CP1, CPz, CP2, CP4, CP6, TP8, TP10, P7, P5, P3, P1, Pz, P2, P4, P6, P8, PO7, PO3, POz, PO4, PO8, O1, Oz, O2."
+knitr::include_graphics(
+  here::here(
+    stringr::str_subset(phase_connectivity_patchwork_figure_alpha, "P07")
+  ),
+  error = FALSE
+)
+```
+
+```{r phase-functional-connectomes-P08-alpha}
+#| fig.cap: "Phase coupling functional connectomes for participant P08 in the alpha band. For each functional connectome, EEG channels are ordered as follows (from left to right, and from top to bottom): Fp1, Fp2, AF7, AF3, AFz, AF4, AF8, F7, F5, F3, F1, Fz, F2, F4, F6, F8, FT9, FT7, FC5, FC3, FC1, FCz, FC2, FC4, FC6, FT8, FT10, T7, C5, C3, C1, Cz, C2, C4, C6, T8, TP9, TP7, CP5, CP3, CP1, CPz, CP2, CP4, CP6, TP8, TP10, P7, P5, P3, P1, Pz, P2, P4, P6, P8, PO7, PO3, POz, PO4, PO8, O1, Oz, O2."
+knitr::include_graphics(
+  here::here(
+    stringr::str_subset(phase_connectivity_patchwork_figure_alpha, "P08")
+  ),
+  error = FALSE
+)
+```
+
+```{r phase-functional-connectomes-P09-alpha}
+#| fig.cap: "Phase coupling functional connectomes for participant P09 in the alpha band. For each functional connectome, EEG channels are ordered as follows (from left to right, and from top to bottom): Fp1, Fp2, AF7, AF3, AFz, AF4, AF8, F7, F5, F3, F1, Fz, F2, F4, F6, F8, FT9, FT7, FC5, FC3, FC1, FCz, FC2, FC4, FC6, FT8, FT10, T7, C5, C3, C1, Cz, C2, C4, C6, T8, TP9, TP7, CP5, CP3, CP1, CPz, CP2, CP4, CP6, TP8, TP10, P7, P5, P3, P1, Pz, P2, P4, P6, P8, PO7, PO3, POz, PO4, PO8, O1, Oz, O2."
+knitr::include_graphics(
+  here::here(
+    stringr::str_subset(phase_connectivity_patchwork_figure_alpha, "P09")
+  ),
+  error = FALSE
+)
+```
+
+```{r phase-functional-connectomes-P11-alpha}
+#| fig.cap: "Phase coupling functional connectomes for participant P11 in the alpha band. For each functional connectome, EEG channels are ordered as follows (from left to right, and from top to bottom): Fp1, Fp2, AF7, AF3, AFz, AF4, AF8, F7, F5, F3, F1, Fz, F2, F4, F6, F8, FT9, FT7, FC5, FC3, FC1, FCz, FC2, FC4, FC6, FT8, FT10, T7, C5, C3, C1, Cz, C2, C4, C6, T8, TP9, TP7, CP5, CP3, CP1, CPz, CP2, CP4, CP6, TP8, TP10, P7, P5, P3, P1, Pz, P2, P4, P6, P8, PO7, PO3, POz, PO4, PO8, O1, Oz, O2."
+knitr::include_graphics(
+  here::here(
+    stringr::str_subset(phase_connectivity_patchwork_figure_alpha, "P11")
+  ),
+  error = FALSE
+)
+```
+
+```{r phase-functional-connectomes-P14-alpha}
+#| fig.cap: "Phase coupling functional connectomes for participant P14 in the alpha band. For each functional connectome, EEG channels are ordered as follows (from left to right, and from top to bottom): Fp1, Fp2, AF7, AF3, AFz, AF4, AF8, F7, F5, F3, F1, Fz, F2, F4, F6, F8, FT9, FT7, FC5, FC3, FC1, FCz, FC2, FC4, FC6, FT8, FT10, T7, C5, C3, C1, Cz, C2, C4, C6, T8, TP9, TP7, CP5, CP3, CP1, CPz, CP2, CP4, CP6, TP8, TP10, P7, P5, P3, P1, Pz, P2, P4, P6, P8, PO7, PO3, POz, PO4, PO8, O1, Oz, O2."
+knitr::include_graphics(
+  here::here(
+    stringr::str_subset(phase_connectivity_patchwork_figure_alpha, "P14")
+  ),
+  error = FALSE
+)
+```
+
+```{r phase-functional-connectomes-P16-alpha}
+#| fig.cap: "Phase coupling functional connectomes for participant P16 in the alpha band. For each functional connectome, EEG channels are ordered as follows (from left to right, and from top to bottom): Fp1, Fp2, AF7, AF3, AFz, AF4, AF8, F7, F5, F3, F1, Fz, F2, F4, F6, F8, FT9, FT7, FC5, FC3, FC1, FCz, FC2, FC4, FC6, FT8, FT10, T7, C5, C3, C1, Cz, C2, C4, C6, T8, TP9, TP7, CP5, CP3, CP1, CPz, CP2, CP4, CP6, TP8, TP10, P7, P5, P3, P1, Pz, P2, P4, P6, P8, PO7, PO3, POz, PO4, PO8, O1, Oz, O2."
+knitr::include_graphics(
+  here::here(
+    stringr::str_subset(phase_connectivity_patchwork_figure_alpha, "P16")
+  ),
+  error = FALSE
+)
+```
+
+```{r phase-functional-connectomes-P17-alpha}
+#| fig.cap: "Phase coupling functional connectomes for participant P17 in the alpha band. For each functional connectome, EEG channels are ordered as follows (from left to right, and from top to bottom): Fp1, Fp2, AF7, AF3, AFz, AF4, AF8, F7, F5, F3, F1, Fz, F2, F4, F6, F8, FT9, FT7, FC5, FC3, FC1, FCz, FC2, FC4, FC6, FT8, FT10, T7, C5, C3, C1, Cz, C2, C4, C6, T8, TP9, TP7, CP5, CP3, CP1, CPz, CP2, CP4, CP6, TP8, TP10, P7, P5, P3, P1, Pz, P2, P4, P6, P8, PO7, PO3, POz, PO4, PO8, O1, Oz, O2."
+knitr::include_graphics(
+  here::here(
+    stringr::str_subset(phase_connectivity_patchwork_figure_alpha, "P17")
+  ),
+  error = FALSE
+)
+```
+
+```{r phase-functional-connectomes-P19-alpha}
+#| fig.cap: "Phase coupling functional connectomes for participant P19 in the alpha band. For each functional connectome, EEG channels are ordered as follows (from left to right, and from top to bottom): Fp1, Fp2, AF7, AF3, AFz, AF4, AF8, F7, F5, F3, F1, Fz, F2, F4, F6, F8, FT9, FT7, FC5, FC3, FC1, FCz, FC2, FC4, FC6, FT8, FT10, T7, C5, C3, C1, Cz, C2, C4, C6, T8, TP9, TP7, CP5, CP3, CP1, CPz, CP2, CP4, CP6, TP8, TP10, P7, P5, P3, P1, Pz, P2, P4, P6, P8, PO7, PO3, POz, PO4, PO8, O1, Oz, O2."
+knitr::include_graphics(
+  here::here(
+    stringr::str_subset(phase_connectivity_patchwork_figure_alpha, "P19")
+  ),
+  error = FALSE
+)
+```
+
+```{r phase-functional-connectomes-P20-alpha}
+#| fig.cap: "Phase coupling functional connectomes for participant P20 in the alpha band. For each functional connectome, EEG channels are ordered as follows (from left to right, and from top to bottom): Fp1, Fp2, AF7, AF3, AFz, AF4, AF8, F7, F5, F3, F1, Fz, F2, F4, F6, F8, FT9, FT7, FC5, FC3, FC1, FCz, FC2, FC4, FC6, FT8, FT10, T7, C5, C3, C1, Cz, C2, C4, C6, T8, TP9, TP7, CP5, CP3, CP1, CPz, CP2, CP4, CP6, TP8, TP10, P7, P5, P3, P1, Pz, P2, P4, P6, P8, PO7, PO3, POz, PO4, PO8, O1, Oz, O2."
+knitr::include_graphics(
+  here::here(
+    stringr::str_subset(phase_connectivity_patchwork_figure_alpha, "P20")
+  ),
+  error = FALSE
+)
+```
+
+```{r phase-functional-connectomes-P21-alpha}
+#| fig.cap: "Phase coupling functional connectomes for participant P21 in the alpha band. For each functional connectome, EEG channels are ordered as follows (from left to right, and from top to bottom): Fp1, Fp2, AF7, AF3, AFz, AF4, AF8, F7, F5, F3, F1, Fz, F2, F4, F6, F8, FT9, FT7, FC5, FC3, FC1, FCz, FC2, FC4, FC6, FT8, FT10, T7, C5, C3, C1, Cz, C2, C4, C6, T8, TP9, TP7, CP5, CP3, CP1, CPz, CP2, CP4, CP6, TP8, TP10, P7, P5, P3, P1, Pz, P2, P4, P6, P8, PO7, PO3, POz, PO4, PO8, O1, Oz, O2."
+knitr::include_graphics(
+  here::here(
+    stringr::str_subset(phase_connectivity_patchwork_figure_alpha, "P21")
+  ),
+  error = FALSE
+)
+```
+
+```{r phase-functional-connectomes-P22-alpha}
+#| fig.cap: "Phase coupling functional connectomes for participant P22 in the alpha band. For each functional connectome, EEG channels are ordered as follows (from left to right, and from top to bottom): Fp1, Fp2, AF7, AF3, AFz, AF4, AF8, F7, F5, F3, F1, Fz, F2, F4, F6, F8, FT9, FT7, FC5, FC3, FC1, FCz, FC2, FC4, FC6, FT8, FT10, T7, C5, C3, C1, Cz, C2, C4, C6, T8, TP9, TP7, CP5, CP3, CP1, CPz, CP2, CP4, CP6, TP8, TP10, P7, P5, P3, P1, Pz, P2, P4, P6, P8, PO7, PO3, POz, PO4, PO8, O1, Oz, O2."
+knitr::include_graphics(
+  here::here(
+    stringr::str_subset(phase_connectivity_patchwork_figure_alpha, "P22")
+  ),
+  error = FALSE
+)
+```
+
+\newpage
+
+## Beta band
+
+```{r phase-functional-connectomes-P03-beta}
+#| fig.cap: "Phase coupling functional connectomes for participant P03 in the beta band. For each functional connectome, EEG channels are ordered as follows (from left to right, and from top to bottom): Fp1, Fp2, AF7, AF3, AFz, AF4, AF8, F7, F5, F3, F1, Fz, F2, F4, F6, F8, FT9, FT7, FC5, FC3, FC1, FCz, FC2, FC4, FC6, FT8, FT10, T7, C5, C3, C1, Cz, C2, C4, C6, T8, TP9, TP7, CP5, CP3, CP1, CPz, CP2, CP4, CP6, TP8, TP10, P7, P5, P3, P1, Pz, P2, P4, P6, P8, PO7, PO3, POz, PO4, PO8, O1, Oz, O2."
+knitr::include_graphics(
+  here::here(
+    stringr::str_subset(phase_connectivity_patchwork_figure_beta, "P03")
+  ),
+  error = FALSE
+)
+```
+
+```{r phase-functional-connectomes-P04-beta}
+#| fig.cap: "Phase coupling functional connectomes for participant P04 in the beta band. For each functional connectome, EEG channels are ordered as follows (from left to right, and from top to bottom): Fp1, Fp2, AF7, AF3, AFz, AF4, AF8, F7, F5, F3, F1, Fz, F2, F4, F6, F8, FT9, FT7, FC5, FC3, FC1, FCz, FC2, FC4, FC6, FT8, FT10, T7, C5, C3, C1, Cz, C2, C4, C6, T8, TP9, TP7, CP5, CP3, CP1, CPz, CP2, CP4, CP6, TP8, TP10, P7, P5, P3, P1, Pz, P2, P4, P6, P8, PO7, PO3, POz, PO4, PO8, O1, Oz, O2."
+knitr::include_graphics(
+  here::here(
+    stringr::str_subset(phase_connectivity_patchwork_figure_beta, "P04")
+  ),
+  error = FALSE
+)
+```
+
+```{r phase-functional-connectomes-P06-beta}
+#| fig.cap: "Phase coupling functional connectomes for participant P06 in the beta band. For each functional connectome, EEG channels are ordered as follows (from left to right, and from top to bottom): Fp1, Fp2, AF7, AF3, AFz, AF4, AF8, F7, F5, F3, F1, Fz, F2, F4, F6, F8, FT9, FT7, FC5, FC3, FC1, FCz, FC2, FC4, FC6, FT8, FT10, T7, C5, C3, C1, Cz, C2, C4, C6, T8, TP9, TP7, CP5, CP3, CP1, CPz, CP2, CP4, CP6, TP8, TP10, P7, P5, P3, P1, Pz, P2, P4, P6, P8, PO7, PO3, POz, PO4, PO8, O1, Oz, O2."
+knitr::include_graphics(
+  here::here(
+    stringr::str_subset(phase_connectivity_patchwork_figure_beta, "P06")
+  ),
+  error = FALSE
+)
+```
+
+```{r phase-functional-connectomes-P07-beta}
+#| fig.cap: "Phase coupling functional connectomes for participant P07 in the beta band. For each functional connectome, EEG channels are ordered as follows (from left to right, and from top to bottom): Fp1, Fp2, AF7, AF3, AFz, AF4, AF8, F7, F5, F3, F1, Fz, F2, F4, F6, F8, FT9, FT7, FC5, FC3, FC1, FCz, FC2, FC4, FC6, FT8, FT10, T7, C5, C3, C1, Cz, C2, C4, C6, T8, TP9, TP7, CP5, CP3, CP1, CPz, CP2, CP4, CP6, TP8, TP10, P7, P5, P3, P1, Pz, P2, P4, P6, P8, PO7, PO3, POz, PO4, PO8, O1, Oz, O2."
+knitr::include_graphics(
+  here::here(
+    stringr::str_subset(phase_connectivity_patchwork_figure_beta, "P07")
+  ),
+  error = FALSE
+)
+```
+
+```{r phase-functional-connectomes-P08-beta}
+#| fig.cap: "Phase coupling functional connectomes for participant P08 in the beta band. For each functional connectome, EEG channels are ordered as follows (from left to right, and from top to bottom): Fp1, Fp2, AF7, AF3, AFz, AF4, AF8, F7, F5, F3, F1, Fz, F2, F4, F6, F8, FT9, FT7, FC5, FC3, FC1, FCz, FC2, FC4, FC6, FT8, FT10, T7, C5, C3, C1, Cz, C2, C4, C6, T8, TP9, TP7, CP5, CP3, CP1, CPz, CP2, CP4, CP6, TP8, TP10, P7, P5, P3, P1, Pz, P2, P4, P6, P8, PO7, PO3, POz, PO4, PO8, O1, Oz, O2."
+knitr::include_graphics(
+  here::here(
+    stringr::str_subset(phase_connectivity_patchwork_figure_beta, "P08")
+  ),
+  error = FALSE
+)
+```
+
+```{r phase-functional-connectomes-P09-beta}
+#| fig.cap: "Phase coupling functional connectomes for participant P09 in the beta band. For each functional connectome, EEG channels are ordered as follows (from left to right, and from top to bottom): Fp1, Fp2, AF7, AF3, AFz, AF4, AF8, F7, F5, F3, F1, Fz, F2, F4, F6, F8, FT9, FT7, FC5, FC3, FC1, FCz, FC2, FC4, FC6, FT8, FT10, T7, C5, C3, C1, Cz, C2, C4, C6, T8, TP9, TP7, CP5, CP3, CP1, CPz, CP2, CP4, CP6, TP8, TP10, P7, P5, P3, P1, Pz, P2, P4, P6, P8, PO7, PO3, POz, PO4, PO8, O1, Oz, O2."
+knitr::include_graphics(
+  here::here(
+    stringr::str_subset(phase_connectivity_patchwork_figure_beta, "P09")
+  ),
+  error = FALSE
+)
+```
+
+```{r phase-functional-connectomes-P11-beta}
+#| fig.cap: "Phase coupling functional connectomes for participant P11 in the beta band. For each functional connectome, EEG channels are ordered as follows (from left to right, and from top to bottom): Fp1, Fp2, AF7, AF3, AFz, AF4, AF8, F7, F5, F3, F1, Fz, F2, F4, F6, F8, FT9, FT7, FC5, FC3, FC1, FCz, FC2, FC4, FC6, FT8, FT10, T7, C5, C3, C1, Cz, C2, C4, C6, T8, TP9, TP7, CP5, CP3, CP1, CPz, CP2, CP4, CP6, TP8, TP10, P7, P5, P3, P1, Pz, P2, P4, P6, P8, PO7, PO3, POz, PO4, PO8, O1, Oz, O2."
+knitr::include_graphics(
+  here::here(
+    stringr::str_subset(phase_connectivity_patchwork_figure_beta, "P11")
+  ),
+  error = FALSE
+)
+```
+
+```{r phase-functional-connectomes-P14-beta}
+#| fig.cap: "Phase coupling functional connectomes for participant P14 in the beta band. For each functional connectome, EEG channels are ordered as follows (from left to right, and from top to bottom): Fp1, Fp2, AF7, AF3, AFz, AF4, AF8, F7, F5, F3, F1, Fz, F2, F4, F6, F8, FT9, FT7, FC5, FC3, FC1, FCz, FC2, FC4, FC6, FT8, FT10, T7, C5, C3, C1, Cz, C2, C4, C6, T8, TP9, TP7, CP5, CP3, CP1, CPz, CP2, CP4, CP6, TP8, TP10, P7, P5, P3, P1, Pz, P2, P4, P6, P8, PO7, PO3, POz, PO4, PO8, O1, Oz, O2."
+knitr::include_graphics(
+  here::here(
+    stringr::str_subset(phase_connectivity_patchwork_figure_beta, "P14")
+  ),
+  error = FALSE
+)
+```
+
+```{r phase-functional-connectomes-P16-beta}
+#| fig.cap: "Phase coupling functional connectomes for participant P16 in the beta band. For each functional connectome, EEG channels are ordered as follows (from left to right, and from top to bottom): Fp1, Fp2, AF7, AF3, AFz, AF4, AF8, F7, F5, F3, F1, Fz, F2, F4, F6, F8, FT9, FT7, FC5, FC3, FC1, FCz, FC2, FC4, FC6, FT8, FT10, T7, C5, C3, C1, Cz, C2, C4, C6, T8, TP9, TP7, CP5, CP3, CP1, CPz, CP2, CP4, CP6, TP8, TP10, P7, P5, P3, P1, Pz, P2, P4, P6, P8, PO7, PO3, POz, PO4, PO8, O1, Oz, O2."
+knitr::include_graphics(
+  here::here(
+    stringr::str_subset(phase_connectivity_patchwork_figure_beta, "P16")
+  ),
+  error = FALSE
+)
+```
+
+```{r phase-functional-connectomes-P17-beta}
+#| fig.cap: "Phase coupling functional connectomes for participant P17 in the beta band. For each functional connectome, EEG channels are ordered as follows (from left to right, and from top to bottom): Fp1, Fp2, AF7, AF3, AFz, AF4, AF8, F7, F5, F3, F1, Fz, F2, F4, F6, F8, FT9, FT7, FC5, FC3, FC1, FCz, FC2, FC4, FC6, FT8, FT10, T7, C5, C3, C1, Cz, C2, C4, C6, T8, TP9, TP7, CP5, CP3, CP1, CPz, CP2, CP4, CP6, TP8, TP10, P7, P5, P3, P1, Pz, P2, P4, P6, P8, PO7, PO3, POz, PO4, PO8, O1, Oz, O2."
+knitr::include_graphics(
+  here::here(
+    stringr::str_subset(phase_connectivity_patchwork_figure_beta, "P17")
+  ),
+  error = FALSE
+)
+```
+
+```{r phase-functional-connectomes-P19-beta}
+#| fig.cap: "Phase coupling functional connectomes for participant P19 in the beta band. For each functional connectome, EEG channels are ordered as follows (from left to right, and from top to bottom): Fp1, Fp2, AF7, AF3, AFz, AF4, AF8, F7, F5, F3, F1, Fz, F2, F4, F6, F8, FT9, FT7, FC5, FC3, FC1, FCz, FC2, FC4, FC6, FT8, FT10, T7, C5, C3, C1, Cz, C2, C4, C6, T8, TP9, TP7, CP5, CP3, CP1, CPz, CP2, CP4, CP6, TP8, TP10, P7, P5, P3, P1, Pz, P2, P4, P6, P8, PO7, PO3, POz, PO4, PO8, O1, Oz, O2."
+knitr::include_graphics(
+  here::here(
+    stringr::str_subset(phase_connectivity_patchwork_figure_beta, "P19")
+  ),
+  error = FALSE
+)
+```
+
+```{r phase-functional-connectomes-P20-beta}
+#| fig.cap: "Phase coupling functional connectomes for participant P20 in the beta band. For each functional connectome, EEG channels are ordered as follows (from left to right, and from top to bottom): Fp1, Fp2, AF7, AF3, AFz, AF4, AF8, F7, F5, F3, F1, Fz, F2, F4, F6, F8, FT9, FT7, FC5, FC3, FC1, FCz, FC2, FC4, FC6, FT8, FT10, T7, C5, C3, C1, Cz, C2, C4, C6, T8, TP9, TP7, CP5, CP3, CP1, CPz, CP2, CP4, CP6, TP8, TP10, P7, P5, P3, P1, Pz, P2, P4, P6, P8, PO7, PO3, POz, PO4, PO8, O1, Oz, O2."
+knitr::include_graphics(
+  here::here(
+    stringr::str_subset(phase_connectivity_patchwork_figure_beta, "P20")
+  ),
+  error = FALSE
+)
+```
+
+```{r phase-functional-connectomes-P21-beta}
+#| fig.cap: "Phase coupling functional connectomes for participant P21 in the beta band. For each functional connectome, EEG channels are ordered as follows (from left to right, and from top to bottom): Fp1, Fp2, AF7, AF3, AFz, AF4, AF8, F7, F5, F3, F1, Fz, F2, F4, F6, F8, FT9, FT7, FC5, FC3, FC1, FCz, FC2, FC4, FC6, FT8, FT10, T7, C5, C3, C1, Cz, C2, C4, C6, T8, TP9, TP7, CP5, CP3, CP1, CPz, CP2, CP4, CP6, TP8, TP10, P7, P5, P3, P1, Pz, P2, P4, P6, P8, PO7, PO3, POz, PO4, PO8, O1, Oz, O2."
+knitr::include_graphics(
+  here::here(
+    stringr::str_subset(phase_connectivity_patchwork_figure_beta, "P21")
+  ),
+  error = FALSE
+)
+```
+
+```{r phase-functional-connectomes-P22-beta}
+#| fig.cap: "Phase coupling functional connectomes for participant P22 in the beta band. For each functional connectome, EEG channels are ordered as follows (from left to right, and from top to bottom): Fp1, Fp2, AF7, AF3, AFz, AF4, AF8, F7, F5, F3, F1, Fz, F2, F4, F6, F8, FT9, FT7, FC5, FC3, FC1, FCz, FC2, FC4, FC6, FT8, FT10, T7, C5, C3, C1, Cz, C2, C4, C6, T8, TP9, TP7, CP5, CP3, CP1, CPz, CP2, CP4, CP6, TP8, TP10, P7, P5, P3, P1, Pz, P2, P4, P6, P8, PO7, PO3, POz, PO4, PO8, O1, Oz, O2."
+knitr::include_graphics(
+  here::here(
+    stringr::str_subset(phase_connectivity_patchwork_figure_beta, "P22")
+  ),
+  error = FALSE
+)
+```
+
+\newpage
+
+## Gamma band
+
+```{r phase-functional-connectomes-P03-gamma}
+#| fig.cap: "Phase coupling functional connectomes for participant P03 in the gamma band. For each functional connectome, EEG channels are ordered as follows (from left to right, and from top to bottom): Fp1, Fp2, AF7, AF3, AFz, AF4, AF8, F7, F5, F3, F1, Fz, F2, F4, F6, F8, FT9, FT7, FC5, FC3, FC1, FCz, FC2, FC4, FC6, FT8, FT10, T7, C5, C3, C1, Cz, C2, C4, C6, T8, TP9, TP7, CP5, CP3, CP1, CPz, CP2, CP4, CP6, TP8, TP10, P7, P5, P3, P1, Pz, P2, P4, P6, P8, PO7, PO3, POz, PO4, PO8, O1, Oz, O2."
+knitr::include_graphics(
+  here::here(
+    stringr::str_subset(phase_connectivity_patchwork_figure_gamma, "P03")
+  ),
+  error = FALSE
+)
+```
+
+```{r phase-functional-connectomes-P04-gamma}
+#| fig.cap: "Phase coupling functional connectomes for participant P04 in the gamma band. For each functional connectome, EEG channels are ordered as follows (from left to right, and from top to bottom): Fp1, Fp2, AF7, AF3, AFz, AF4, AF8, F7, F5, F3, F1, Fz, F2, F4, F6, F8, FT9, FT7, FC5, FC3, FC1, FCz, FC2, FC4, FC6, FT8, FT10, T7, C5, C3, C1, Cz, C2, C4, C6, T8, TP9, TP7, CP5, CP3, CP1, CPz, CP2, CP4, CP6, TP8, TP10, P7, P5, P3, P1, Pz, P2, P4, P6, P8, PO7, PO3, POz, PO4, PO8, O1, Oz, O2."
+knitr::include_graphics(
+  here::here(
+    stringr::str_subset(phase_connectivity_patchwork_figure_gamma, "P04")
+  ),
+  error = FALSE
+)
+```
+
+```{r phase-functional-connectomes-P06-gamma}
+#| fig.cap: "Phase coupling functional connectomes for participant P06 in the gamma band. For each functional connectome, EEG channels are ordered as follows (from left to right, and from top to bottom): Fp1, Fp2, AF7, AF3, AFz, AF4, AF8, F7, F5, F3, F1, Fz, F2, F4, F6, F8, FT9, FT7, FC5, FC3, FC1, FCz, FC2, FC4, FC6, FT8, FT10, T7, C5, C3, C1, Cz, C2, C4, C6, T8, TP9, TP7, CP5, CP3, CP1, CPz, CP2, CP4, CP6, TP8, TP10, P7, P5, P3, P1, Pz, P2, P4, P6, P8, PO7, PO3, POz, PO4, PO8, O1, Oz, O2."
+knitr::include_graphics(
+  here::here(
+    stringr::str_subset(phase_connectivity_patchwork_figure_gamma, "P06")
+  ),
+  error = FALSE
+)
+```
+
+```{r phase-functional-connectomes-P07-gamma}
+#| fig.cap: "Phase coupling functional connectomes for participant P07 in the gamma band. For each functional connectome, EEG channels are ordered as follows (from left to right, and from top to bottom): Fp1, Fp2, AF7, AF3, AFz, AF4, AF8, F7, F5, F3, F1, Fz, F2, F4, F6, F8, FT9, FT7, FC5, FC3, FC1, FCz, FC2, FC4, FC6, FT8, FT10, T7, C5, C3, C1, Cz, C2, C4, C6, T8, TP9, TP7, CP5, CP3, CP1, CPz, CP2, CP4, CP6, TP8, TP10, P7, P5, P3, P1, Pz, P2, P4, P6, P8, PO7, PO3, POz, PO4, PO8, O1, Oz, O2."
+knitr::include_graphics(
+  here::here(
+    stringr::str_subset(phase_connectivity_patchwork_figure_gamma, "P07")
+  ),
+  error = FALSE
+)
+```
+
+```{r phase-functional-connectomes-P08-gamma}
+#| fig.cap: "Phase coupling functional connectomes for participant P08 in the gamma band. For each functional connectome, EEG channels are ordered as follows (from left to right, and from top to bottom): Fp1, Fp2, AF7, AF3, AFz, AF4, AF8, F7, F5, F3, F1, Fz, F2, F4, F6, F8, FT9, FT7, FC5, FC3, FC1, FCz, FC2, FC4, FC6, FT8, FT10, T7, C5, C3, C1, Cz, C2, C4, C6, T8, TP9, TP7, CP5, CP3, CP1, CPz, CP2, CP4, CP6, TP8, TP10, P7, P5, P3, P1, Pz, P2, P4, P6, P8, PO7, PO3, POz, PO4, PO8, O1, Oz, O2."
+knitr::include_graphics(
+  here::here(
+    stringr::str_subset(phase_connectivity_patchwork_figure_gamma, "P08")
+  ),
+  error = FALSE
+)
+```
+
+```{r phase-functional-connectomes-P09-gamma}
+#| fig.cap: "Phase coupling functional connectomes for participant P09 in the gamma band. For each functional connectome, EEG channels are ordered as follows (from left to right, and from top to bottom): Fp1, Fp2, AF7, AF3, AFz, AF4, AF8, F7, F5, F3, F1, Fz, F2, F4, F6, F8, FT9, FT7, FC5, FC3, FC1, FCz, FC2, FC4, FC6, FT8, FT10, T7, C5, C3, C1, Cz, C2, C4, C6, T8, TP9, TP7, CP5, CP3, CP1, CPz, CP2, CP4, CP6, TP8, TP10, P7, P5, P3, P1, Pz, P2, P4, P6, P8, PO7, PO3, POz, PO4, PO8, O1, Oz, O2."
+knitr::include_graphics(
+  here::here(
+    stringr::str_subset(phase_connectivity_patchwork_figure_gamma, "P09")
+  ),
+  error = FALSE
+)
+```
+
+```{r phase-functional-connectomes-P11-gamma}
+#| fig.cap: "Phase coupling functional connectomes for participant P11 in the gamma band. For each functional connectome, EEG channels are ordered as follows (from left to right, and from top to bottom): Fp1, Fp2, AF7, AF3, AFz, AF4, AF8, F7, F5, F3, F1, Fz, F2, F4, F6, F8, FT9, FT7, FC5, FC3, FC1, FCz, FC2, FC4, FC6, FT8, FT10, T7, C5, C3, C1, Cz, C2, C4, C6, T8, TP9, TP7, CP5, CP3, CP1, CPz, CP2, CP4, CP6, TP8, TP10, P7, P5, P3, P1, Pz, P2, P4, P6, P8, PO7, PO3, POz, PO4, PO8, O1, Oz, O2."
+knitr::include_graphics(
+  here::here(
+    stringr::str_subset(phase_connectivity_patchwork_figure_gamma, "P11")
+  ),
+  error = FALSE
+)
+```
+
+```{r phase-functional-connectomes-P14-gamma}
+#| fig.cap: "Phase coupling functional connectomes for participant P14 in the gamma band. For each functional connectome, EEG channels are ordered as follows (from left to right, and from top to bottom): Fp1, Fp2, AF7, AF3, AFz, AF4, AF8, F7, F5, F3, F1, Fz, F2, F4, F6, F8, FT9, FT7, FC5, FC3, FC1, FCz, FC2, FC4, FC6, FT8, FT10, T7, C5, C3, C1, Cz, C2, C4, C6, T8, TP9, TP7, CP5, CP3, CP1, CPz, CP2, CP4, CP6, TP8, TP10, P7, P5, P3, P1, Pz, P2, P4, P6, P8, PO7, PO3, POz, PO4, PO8, O1, Oz, O2."
+knitr::include_graphics(
+  here::here(
+    stringr::str_subset(phase_connectivity_patchwork_figure_gamma, "P14")
+  ),
+  error = FALSE
+)
+```
+
+```{r phase-functional-connectomes-P16-gamma}
+#| fig.cap: "Phase coupling functional connectomes for participant P16 in the gamma band. For each functional connectome, EEG channels are ordered as follows (from left to right, and from top to bottom): Fp1, Fp2, AF7, AF3, AFz, AF4, AF8, F7, F5, F3, F1, Fz, F2, F4, F6, F8, FT9, FT7, FC5, FC3, FC1, FCz, FC2, FC4, FC6, FT8, FT10, T7, C5, C3, C1, Cz, C2, C4, C6, T8, TP9, TP7, CP5, CP3, CP1, CPz, CP2, CP4, CP6, TP8, TP10, P7, P5, P3, P1, Pz, P2, P4, P6, P8, PO7, PO3, POz, PO4, PO8, O1, Oz, O2."
+knitr::include_graphics(
+  here::here(
+    stringr::str_subset(phase_connectivity_patchwork_figure_gamma, "P16")
+  ),
+  error = FALSE
+)
+```
+
+```{r phase-functional-connectomes-P17-gamma}
+#| fig.cap: "Phase coupling functional connectomes for participant P17 in the gamma band. For each functional connectome, EEG channels are ordered as follows (from left to right, and from top to bottom): Fp1, Fp2, AF7, AF3, AFz, AF4, AF8, F7, F5, F3, F1, Fz, F2, F4, F6, F8, FT9, FT7, FC5, FC3, FC1, FCz, FC2, FC4, FC6, FT8, FT10, T7, C5, C3, C1, Cz, C2, C4, C6, T8, TP9, TP7, CP5, CP3, CP1, CPz, CP2, CP4, CP6, TP8, TP10, P7, P5, P3, P1, Pz, P2, P4, P6, P8, PO7, PO3, POz, PO4, PO8, O1, Oz, O2."
+knitr::include_graphics(
+  here::here(
+    stringr::str_subset(phase_connectivity_patchwork_figure_gamma, "P17")
+  ),
+  error = FALSE
+)
+```
+
+```{r phase-functional-connectomes-P19-gamma}
+#| fig.cap: "Phase coupling functional connectomes for participant P19 in the gamma band. For each functional connectome, EEG channels are ordered as follows (from left to right, and from top to bottom): Fp1, Fp2, AF7, AF3, AFz, AF4, AF8, F7, F5, F3, F1, Fz, F2, F4, F6, F8, FT9, FT7, FC5, FC3, FC1, FCz, FC2, FC4, FC6, FT8, FT10, T7, C5, C3, C1, Cz, C2, C4, C6, T8, TP9, TP7, CP5, CP3, CP1, CPz, CP2, CP4, CP6, TP8, TP10, P7, P5, P3, P1, Pz, P2, P4, P6, P8, PO7, PO3, POz, PO4, PO8, O1, Oz, O2."
+knitr::include_graphics(
+  here::here(
+    stringr::str_subset(phase_connectivity_patchwork_figure_gamma, "P19")
+  ),
+  error = FALSE
+)
+```
+
+```{r phase-functional-connectomes-P20-gamma}
+#| fig.cap: "Phase coupling functional connectomes for participant P20 in the gamma band. For each functional connectome, EEG channels are ordered as follows (from left to right, and from top to bottom): Fp1, Fp2, AF7, AF3, AFz, AF4, AF8, F7, F5, F3, F1, Fz, F2, F4, F6, F8, FT9, FT7, FC5, FC3, FC1, FCz, FC2, FC4, FC6, FT8, FT10, T7, C5, C3, C1, Cz, C2, C4, C6, T8, TP9, TP7, CP5, CP3, CP1, CPz, CP2, CP4, CP6, TP8, TP10, P7, P5, P3, P1, Pz, P2, P4, P6, P8, PO7, PO3, POz, PO4, PO8, O1, Oz, O2."
+knitr::include_graphics(
+  here::here(
+    stringr::str_subset(phase_connectivity_patchwork_figure_gamma, "P20")
+  ),
+  error = FALSE
+)
+```
+
+```{r phase-functional-connectomes-P21-gamma}
+#| fig.cap: "Phase coupling functional connectomes for participant P21 in the gamma band. For each functional connectome, EEG channels are ordered as follows (from left to right, and from top to bottom): Fp1, Fp2, AF7, AF3, AFz, AF4, AF8, F7, F5, F3, F1, Fz, F2, F4, F6, F8, FT9, FT7, FC5, FC3, FC1, FCz, FC2, FC4, FC6, FT8, FT10, T7, C5, C3, C1, Cz, C2, C4, C6, T8, TP9, TP7, CP5, CP3, CP1, CPz, CP2, CP4, CP6, TP8, TP10, P7, P5, P3, P1, Pz, P2, P4, P6, P8, PO7, PO3, POz, PO4, PO8, O1, Oz, O2."
+knitr::include_graphics(
+  here::here(
+    stringr::str_subset(phase_connectivity_patchwork_figure_gamma, "P21")
+  ),
+  error = FALSE
+)
+```
+
+```{r phase-functional-connectomes-P22-gamma}
+#| fig.cap: "Phase coupling functional connectomes for participant P22 in the gamma band. For each functional connectome, EEG channels are ordered as follows (from left to right, and from top to bottom): Fp1, Fp2, AF7, AF3, AFz, AF4, AF8, F7, F5, F3, F1, Fz, F2, F4, F6, F8, FT9, FT7, FC5, FC3, FC1, FCz, FC2, FC4, FC6, FT8, FT10, T7, C5, C3, C1, Cz, C2, C4, C6, T8, TP9, TP7, CP5, CP3, CP1, CPz, CP2, CP4, CP6, TP8, TP10, P7, P5, P3, P1, Pz, P2, P4, P6, P8, PO7, PO3, POz, PO4, PO8, O1, Oz, O2."
+knitr::include_graphics(
+  here::here(
+    stringr::str_subset(phase_connectivity_patchwork_figure_gamma, "P22")
+  ),
+  error = FALSE
+)
+```

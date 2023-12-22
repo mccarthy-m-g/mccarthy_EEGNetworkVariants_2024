@@ -1,0 +1,40 @@
+---
+output:
+  bookdown::word_document2:
+    reference_docx: "apa6_man.docx"
+    number_sections: false
+---
+
+```{r setup, include=FALSE}
+library(here)
+library(papaja)
+library(targets)
+
+knitr::opts_chunk$set(
+  echo = FALSE,
+  warning = FALSE,
+  message = FALSE,
+  fig.retina = 0.8, # figures are either vectors or 300 dpi diagrams
+  dpi = 320,
+  fig.width = 6,
+  fig.asp = 0.618, # 1 / phi
+  fig.show = "hold",
+  cache.extra = knitr::rand_seed
+)
+```
+
+# EEG preprocessing diagnostics
+
+```{r bad-channels-plots}
+#| fig.cap: Bar plots showing the distribution of bad EEG channels by the total number of EEG channels marked bad per recording (A), and the total number of recordings a given EEG channels was marked bad in (B).
+tar_load(bad_channels_figure)
+knitr::include_graphics(here::here(bad_channels_figure), error = FALSE)
+```
+
+\newpage
+
+```{r bad-segments-plots}
+#| fig.cap: Bar plot showing the distribution of bad segments by the total number of segments marked bad per recording (A); histograms showing the distribution of bad segment durations across all recordings (B), and the total bad segment duration per recording (C).
+tar_load(bad_segments_figure)
+knitr::include_graphics(here::here(bad_segments_figure), error = FALSE)
+```

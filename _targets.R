@@ -902,12 +902,32 @@ descriptives_targets <- list(
     plot_bad_channel_counts(bad_channels_descriptives_final)
   ),
   tar_target(
+    bad_channels_figure,
+    save_figure(
+      "figures/eeg-diagnostics/bad-eeg-channels.png",
+      bad_channels_plots_final,
+      height = 9,
+      scaling = 1
+    ),
+    format = "file"
+  ),
+  tar_target(
     bad_segments_descriptives_final,
     summarize_bad_segments(file_handler_final)
   ),
   tar_target(
     bad_segments_plots_final,
     plot_bad_segment_descriptives(bad_segments_descriptives_final)
+  ),
+  tar_target(
+    bad_segments_figure,
+    save_figure(
+      "figures/eeg-diagnostics/bad-eeg-segments.png",
+      bad_segments_plots_final,
+      height = 18,
+      scaling = 1
+    ),
+    format = "file"
   )
   # TODO: Add targets for bad ICA indices
 )
@@ -1032,6 +1052,12 @@ manuscripts_targets <- list(
     supplement_maximal_model_results,
     here(
       "manuscripts", "supplement", "maximal-model-results.Rmd"
+    )
+  ),
+  tar_render(
+    supplement_eeg_preprocessing_diagnostics,
+    here(
+      "manuscripts", "supplement", "eeg-preprocessing-diagnostics.Rmd"
     )
   )
 )

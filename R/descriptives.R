@@ -116,7 +116,7 @@ summarize_bad_channels <- function(input_file) {
 #'
 #' @param input A tibble of summary statistics.
 #'
-#' @return A list of ggplots.
+#' @return A ggplot2 patchwork.
 plot_bad_channel_counts <- function(input) {
 
   plot_count_per_recording <- input |>
@@ -124,9 +124,10 @@ plot_bad_channel_counts <- function(input) {
     ggplot2::ggplot(ggplot2::aes(x = n, y = factor(bad_channels_n))) +
       ggplot2::geom_col() +
       ggplot2::labs(
-        x = "Number of recordings with n bad channels",
-        y = "Number of bad channels"
-      )
+        x = "Number of recordings with n bad EEG channels",
+        y = "Number of bad EEG channels"
+      ) +
+      ggplot2::theme_classic()
 
   plot_count_per_channel <- input |>
     purrr::pluck("count_per_channel") |>
@@ -136,13 +137,13 @@ plot_bad_channel_counts <- function(input) {
       ggplot2::geom_col() +
       ggplot2::labs(
         x = "Number of recordings marked bad in",
-        y = "Bad channel"
-      )
+        y = "Bad EEG channel"
+      ) +
+      ggplot2::theme_classic()
 
-  list(
-    plot_count_per_recording = plot_count_per_recording,
-    plot_count_per_channel   = plot_count_per_channel
-  )
+  plot_count_per_recording + plot_count_per_channel +
+    patchwork::plot_layout(nrow = 1) +
+    patchwork::plot_annotation(tag_levels = "A")
 
 }
 
@@ -212,37 +213,49 @@ summarize_bad_segments <- function(input_file) {
 #'
 #' @param input A tibble of summary statistics.
 #'
-#' @return A list of ggplots.
+#' @return A ggplot2 patchwork.
 plot_bad_segment_descriptives <- function(input) {
 
   plot_count_per_recording <- input |>
     purrr::pluck("count_per_recording") |>
     ggplot2::ggplot(ggplot2::aes(x = n, y = factor(bad_segments_n))) +
-    ggplot2::geom_col() +
-    ggplot2::labs(
-      x = "Number of recordings with n bad segments",
-      y = "Number of bad segments"
-    )
+      ggplot2::geom_col() +
+      ggplot2::labs(
+        x = "Number of recordings with n bad segments",
+        y = "Number of bad segments"
+      ) +
+      ggplot2::theme_classic()
 
   plot_duration_totals <- input |>
     purrr::pluck("bad_segment_duration_totals") |>
     ggplot2::ggplot(ggplot2::aes(x = sum)) +
       ggplot2::geom_histogram(bins = 60) +
+      ggplot2::scale_x_continuous(labels = ~ paste0(.x, "s")) +
       ggplot2::coord_flip() +
-      ggplot2::xlab("Bad segment duration total per recording (seconds)")
+      ggplot2::labs(
+        x = "Bad segment duration\n(total per recording)",
+        y = "Count"
+      ) +
+      ggplot2::theme_classic()
 
   plot_durations <- input |>
     purrr::pluck("bad_segment_durations") |>
     ggplot2::ggplot(ggplot2::aes(x = annotation_durations)) +
       ggplot2::geom_histogram(bins = 60) +
+      ggplot2::scale_x_continuous(labels = ~ paste0(.x, "s")) +
       ggplot2::coord_flip() +
-      ggplot2::xlab("Bad segment duration (seconds)")
+      ggplot2::labs(
+        x = "Bad segment durations",
+        y = "Count"
+      ) +
+      ggplot2::theme_classic()
 
-  list(
-    plot_count_per_recording = plot_count_per_recording,
-    plot_duration_totals = plot_duration_totals,
-    plot_durations = plot_durations
-  )
+  design <- "AA
+             BC"
+
+  plot_count_per_recording + plot_durations + plot_duration_totals +
+    patchwork::plot_layout(design = design) +
+    patchwork::plot_annotation(tag_levels = "A")
 
 }
 

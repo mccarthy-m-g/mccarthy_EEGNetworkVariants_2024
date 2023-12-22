@@ -8,7 +8,11 @@ data/EEG-recordings/
 data/EEG-sensor-connectivity/
 data/participant-descriptives.csv
 
-R/scratch.R
+R/scratch/
 python/scratch.py
 python/__pycache__/
 Rplots.pdf
+
+manuscripts/thesis/feedback/
+manuscripts/child-documents/scratch/
+manuscripts/supplement/scratch/

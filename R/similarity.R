@@ -1111,6 +1111,153 @@ plot_subset_similarity_contrasts <- function(group_object, subset_objects) {
 
 }
 
+#' Plot subset similarity contrasts
+#'
+#' This is the same as the function above, but includes the legend. Yes, the
+#' function above should just give an argument to do this (DRY principles and
+#' all that), but I need to make targets with and without the legend anyways
+#' since the returned object can't be modified after the fact, and this was
+#' easier.
+#'
+#' @param group_object A tibble of similarity results
+#' @param subset_objects A list of subset similarity results
+#'
+#' @return A grob.
+plot_subset_similarity_contrasts_2 <- function(group_object, subset_objects) {
+
+  # Tidy data to prepare for plotting
+  contrasts <- tidy_contrast_similarity(group_object)
+  subset_contrasts <- tidy_subset_contrast_similarity(subset_objects)
+
+  subset_contrasts <- contrasts |>
+    dplyr::select(effect_label, group_estimate = estimate) |>
+    dplyr::left_join(subset_contrasts) |>
+    # Since we have 9 contrasts, there's an odd number which makes lining up
+    # facets awkward. We'll create a blank factor level, whose facet we will
+    # later remove, to work around this.
+    dplyr::mutate(
+      effect_label = forcats::fct_expand(effect_label, " "),
+      effect_label = forcats::fct_relevel(effect_label, "Main effect", " ")
+    )
+
+  # Plotting
+  my_scale <- ggplot2::scale_x_continuous(
+    breaks = scales::extended_breaks(n = 3)
+  )
+  my_scale$train(
+    c(min(subset_contrasts$.lower_0.95), max(subset_contrasts$.upper_0.95))
+  )
+  my_breaks <- my_scale$get_breaks()
+
+  p <- ggplot2::ggplot(subset_contrasts) +
+    ggplot2::geom_vline(ggplot2::aes(xintercept = 0), linetype = 5, alpha = 0.2) +
+    # Plot group-level intervals so there's a reference point to compare the
+    # sub-models to.
+    ggdist::stat_interval(
+      ggplot2::aes(
+        y = "Group",
+        xdist = distributional::dist_student_t(
+          df = df, mu = estimate, sigma = std.error
+        ),
+        colour = effect_direction,
+        colour_ramp = stat(level)
+      ),
+      .width = c(0.66, 0.95),
+      data = contrasts
+    ) +
+    ggplot2::scale_colour_discrete(
+      drop = FALSE,
+      type = c(
+        "#3aaf85", # Green
+        "#1b6ca8", # Blue
+        "#cd201f"  # Red
+      )
+    ) +
+    ggdist::scale_colour_ramp_discrete(
+      from = "#fafdce",
+      range = c(0.33, 1)
+    ) +
+    ggdist::geom_interval(
+      ggplot2::aes(
+        y = "Group", ymin = "Group", ymax = "Group",
+        # When the estimate is very small the width of the point estimate
+        # interval should be smaller so it doesn't overplot the CIs.
+        xmin = ifelse(.upper_0.95 - .lower_0.95 < 0.01, estimate - 0.00025, estimate - 0.00075),
+        xmax = ifelse(.upper_0.95 - .lower_0.95 < 0.01, estimate + 0.00025, estimate + 0.00075)
+      ),
+      orientation = "horizontal",
+      data = contrasts
+    ) +
+    # Confidence distributions for participant sub-models
+    ggdist::stat_slab(
+      ggplot2::aes(
+        x = estimate,
+        y = participant,
+        # This throws a warning that the aesthetic is being ignored, but it's
+        # needed for the code in `fill_ramp` to work.
+        group_estimate = group_estimate,
+        xdist = distributional::dist_student_t(df = df, mu = estimate, sigma = std.error),
+        fill = effect_direction
+      ),
+      color = "black",
+      size = 0.25,
+      height = 2,
+      expand = TRUE, # I can't disable this for whatever reason
+      trim = FALSE, # I can't disable this for whatever reason
+    ) +
+    ggplot2::scale_fill_discrete(
+      type = c(
+        "#3aaf85", # Green
+        "#1b6ca8", # Blue
+        "#cd201f"  # Red
+      )
+    ) +
+
+    # General plot settings
+    ggplot2::scale_x_continuous(
+      breaks = my_breaks,
+      labels = function(x) ifelse(x == 0, 0, x)
+    ) +
+    ggplot2::scale_y_discrete(expand = ggplot2::expansion(add = c(1.1, 0))) +
+    ## These legends don't need to appear.
+    ggplot2::guides(
+      fill = "none",
+      colour_ramp = "none"
+    ) +
+    # Keep the empty " " facet to enforce facet alignment. It will be removed
+    # manually after building the plot. Make the direction vertical so that
+    # the "Main effect" facet is above the " " facet.
+    ggplot2::facet_wrap(~ effect_label, ncol = 5, drop = FALSE, dir = "v") +
+    ggplot2::labs(
+      x = paste0(
+        "Difference in functional connectome similarity",
+        "\n",
+        "(Within participant y \U2212 Between participant)"
+      ),
+      y = "Participant",
+      colour = "Effect Direction"
+    ) +
+    ggplot2::theme_classic()
+
+  # Remove the blank facet. Solution for removing facet modified from:
+  # https://stackoverflow.com/a/30372692/16844576
+  g <- ggplot2::ggplotGrob(p)
+
+  # Get the grobs that must be removed
+  rm_grobs <- g$layout$name %in% c("strip-t-1-2")
+  # Remove grobs
+  g$grobs[rm_grobs] <- NULL
+  g$layout <- g$layout[!rm_grobs, ]
+  # Move x-axis from " " facet to "Main effect" facet
+  g$layout[g$layout$name == "axis-b-1-2", c("t", "b")] <- c(9, 9)
+  # Move y-axis from " " facet to "Within sessions" facet
+  g$layout[g$layout$name == "axis-l-2-1", c("l", "r")] <- c(8, 8)
+
+  # Transform back to class ggplot and print
+  ggpubr::as_ggplot(g)
+
+}
+
 #' Save similarity archetypes figure
 #'
 #' @param filename A character string of the file path.
@@ -1269,12 +1416,8 @@ save_results_figure <- function(
   connectivity_profile,
   similarity_matrix,
   group_contrasts,
-  subset_contrasts
+  subset_contrasts = NULL
   ) {
-
-  design <- "AA
-             BC
-             DD"
 
   # FIXME: Using wrap_elements() may be unnecessary now that I'm no longer using
   # ggh4x::facet_grid2() for the similarity matrix.
@@ -1283,19 +1426,48 @@ save_results_figure <- function(
   p3 <- patchwork::wrap_elements(group_contrasts)
   p4 <- patchwork::wrap_elements(subset_contrasts)
 
-  patch <- patchwork::wrap_plots(A = p1, B = p2, C = p3, D = p4, design = design) +
-    patchwork::plot_annotation(tag_levels = "A")
+  # Include individual-level sub-models
+  if (!is.null(subset_contrasts)) {
 
-  ggplot2::ggsave(
-    filename = filename,
-    plot = patch,
-    device = ragg::agg_png,
-    width = 21.59,
-    height = 26,
-    units = "cm",
-    dpi = "retina",
-    scaling = 0.65
-  )
+    design <- "AA
+               BC
+               DD"
+
+    patch <- patchwork::wrap_plots(A = p1, B = p2, C = p3, D = p4, design = design) +
+      patchwork::plot_annotation(tag_levels = "A")
+
+    ggplot2::ggsave(
+      filename = filename,
+      plot = patch,
+      device = ragg::agg_png,
+      width = 21.59,
+      height = 26,
+      units = "cm",
+      dpi = "retina",
+      scaling = 0.65
+    )
+
+  # Do not include individual-level sub-models
+  } else {
+
+    design <- "AA
+               BC"
+
+    patch <- patchwork::wrap_plots(A = p1, B = p2, C = p3, design = design) +
+      patchwork::plot_annotation(tag_levels = "A")
+
+    ggplot2::ggsave(
+      filename = filename,
+      plot = patch,
+      device = ragg::agg_png,
+      width = 21.59,
+      height = 18,
+      units = "cm",
+      dpi = "retina",
+      scaling = 0.65
+    )
+
+  }
 
   filename
 
@@ -1551,5 +1723,36 @@ make_contrast_results_table <- function(emmeans_tidy, contrasts_tidy) {
     flextable::fontsize(size = 10, part = "all") |>
     # Dimensions
     flextable::width(j = 1, width = 3.59, unit = "cm")
+
+}
+
+#' Save a figure
+#'
+#' @param filename A character vector of the file path.
+#' @param plot A ggplot2 object.
+#' @param width,height Numeric. Dimensions in cm.
+#' @param scaling Numeric. Plot scaling.
+#'
+#' @return A character vector of the file path.
+save_figure <- function(
+  filename,
+  plot,
+  width = 21.59,
+  height,
+  scaling = 0.65
+) {
+
+  ggplot2::ggsave(
+    filename = filename,
+    plot = plot,
+    device = ragg::agg_png,
+    width = width,
+    height = height,
+    units = "cm",
+    dpi = "retina",
+    scaling = scaling
+  )
+
+  filename
 
 }

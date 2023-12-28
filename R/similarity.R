@@ -1708,13 +1708,13 @@ save_amplitude_similarity_patchwork_figure <- function(
 
 }
 
-#' Make contrast results table
+#' Make contrast results table with significance tests
 #'
 #' @param emmeans_tidy The tidied emmeans data.
 #' @param contrasts_tidy The tidied contrasts data.
 #'
 #' @return A flextable object.
-make_contrast_results_table <- function(emmeans_tidy, contrasts_tidy) {
+make_contrast_results_table_nhst <- function(emmeans_tidy, contrasts_tidy) {
 
   # Prepare data for display
   tidy_data <- emmeans_tidy |>
@@ -1832,6 +1832,183 @@ make_contrast_results_table <- function(emmeans_tidy, contrasts_tidy) {
     # Borders
     flextable::hline(
       i = 1, j = c(1, 6, 7),
+      border = flextable::fp_border_default(width = 0),
+      part = "header"
+    ) |>
+    flextable::hline_bottom(
+      border = flextable::fp_border_default(width = 1.5),
+      part = "footer"
+    ) |>
+    flextable::fix_border_issues(part = "footer") |>
+    # Font
+    flextable::font(fontname = "Times New Roman", part = "all") |>
+    flextable::fontsize(size = 10, part = "all") |>
+    # Dimensions
+    flextable::width(j = 1, width = 3.59, unit = "cm")
+
+}
+
+#' Make contrast results table with standardized mean differences
+#'
+#' @param model A glmmTMB object.
+#' @param emmeans_tidy The tidied emmeans data.
+#' @param contrasts_tidy The tidied contrasts data.
+#' @param contrasts_cohens_d_tidy The tidied Cohen's d contrasts data.
+#'
+#' @return A flextable object.
+make_contrast_results_table_smd <- function(
+  model, emmeans_tidy, contrasts_tidy, contrasts_cohens_d_tidy
+) {
+
+  # Prepare data for display
+  tidy_data <- emmeans_tidy |>
+    dplyr::select(
+      effect_label = effect_label_nice, within_participant, response, std.error
+    ) |>
+    tidyr::pivot_wider(
+      names_from = within_participant,
+      values_from = c(response, std.error)
+    ) |>
+    dplyr::relocate(
+      effect_label,
+      response_within_participants,
+      std.error_within_participants,
+      response_between_participants,
+      std.error_between_participants
+    ) |>
+    dplyr::left_join(
+      dplyr::select(contrasts_tidy, effect_label, estimate:conf.high)
+    ) |>
+    dplyr::left_join(
+      dplyr::select(contrasts_cohens_d_tidy, effect_label, smd:smd_conf.high)
+    ) |>
+    dplyr::mutate(
+      dplyr::across(
+        c(where(is.numeric), -df),
+        function(x) papaja::apa_num(x, digits = 3)
+      ),
+      dplyr::across(
+        dplyr::contains("std.error"),
+        function(x) paste0("(", x, ")")
+      ),
+      df = papaja::print_df(df)
+    ) |>
+    tidyr::unite(
+      "mean_se_within_participant",
+      dplyr::ends_with("within_participants"),
+      sep = " "
+    ) |>
+    tidyr::unite(
+      "mean_se_between_participant",
+      dplyr::ends_with("between_participants"),
+      sep = " "
+    ) |>
+    tidyr::unite(
+      "mean_difference",
+      c(estimate, std.error),
+      sep = " "
+    ) |>
+    tidyr::unite(
+      "ci",
+      c(conf.low, conf.high),
+      sep = ", "
+    ) |>
+    tidyr::unite(
+      "standardized_mean_difference",
+      c(smd, smd_std.error),
+      sep = " "
+    ) |>
+    tidyr::unite(
+      "smd_ci",
+      c(smd_conf.low, smd_conf.high),
+      sep = ", "
+    ) |>
+    dplyr::rename(
+      contrast = effect_label
+    ) |>
+    dplyr::select(-df)
+
+  # Make results table
+  tidy_data |>
+    flextable::flextable() |>
+    # Header
+    flextable::set_header_labels(
+      contrast = "",
+      mean_se_within_participant = "Mean (SE)",
+      mean_se_between_participant = "Mean (SE)",
+      mean_difference = "RV (SE)",
+      ci = "95% CI",
+      standardized_mean_difference = "d",
+      smd_ci = "95% CI"
+    ) |>
+    flextable::prepend_chunks(
+      part = "header", i = 1, j = 4,
+      flextable::as_equation("\\Delta")
+    ) |>
+    flextable::compose(
+      part = "header", i = 1, j = 6,
+      flextable::as_paragraph(
+        flextable::as_i("d"),
+        flextable::as_sub(flextable::as_i("T"))
+      )
+    ) |>
+    flextable::add_header_row(
+      values = c(
+        "Contrast",
+        "Within Participant",
+        "Between Participant",
+        "Mean Difference",
+        "Standardized Mean Difference"
+      ),
+      colwidths = c(1, 1, 1, 2, 2)
+    ) |>
+    #ftExtra::colformat_md(part = "header") |>
+    # Footer
+    flextable::footnote(
+      i = 1, j = 1,
+      value = flextable::as_paragraph(
+        "Results are averaged over the levels of session and state."
+      ),
+      ref_symbols = "1",
+      part = "body",
+    ) |>
+    flextable::footnote(
+      i = 2:3, j = 1,
+      value = flextable::as_paragraph("Results are averaged over the levels of state."),
+      ref_symbols = "2",
+      part = "body",
+    ) |>
+    flextable::footnote(
+      i = 4:5, j = 1,
+      value = flextable::as_paragraph(
+        "Results are averaged over the levels of session."
+      ),
+      ref_symbols = "3",
+      part = "body",
+    ) |>
+    flextable::footnote(
+      i = 2, j = 6,
+      value = flextable::as_paragraph(
+        "Mean differences were standardized using the summed standard ",
+        "deviation of the variance components from the fitted model (",
+        flextable::as_equation("\\sigma_T"),
+        " = ",
+        papaja::apa_num(
+          sqrt(sum(insight::get_variance_intercept(model))), digits = 3
+        ),
+        ")."
+      ),
+      ref_symbols = "4",
+      part = "header",
+    ) |>
+    # Cell alignment
+    flextable::align(part = "header", j = 1, align = "left") |>
+    flextable::align(part = "body", j = 1, align = "left") |>
+    flextable::align(part = "header", j = 2:7, align = "center") |>
+    flextable::align(part = "body", j = 2:7, align = "right") |>
+    # Borders
+    flextable::hline(
+      i = 1, j = 1,
       border = flextable::fp_border_default(width = 0),
       part = "header"
     ) |>

@@ -296,10 +296,19 @@ connectivity_estimation_targets <- list(
       plot_similarity_contrasts(phase_similarity_contrasts)
     ),
     tar_target(
-      phase_similarity_contrasts_table,
-      make_contrast_results_table(
+      phase_similarity_contrasts_table_nhst,
+      make_contrast_results_table_nhst(
         phase_similarity_emmeans_tidy,
         phase_similarity_contrasts_tidy
+      )
+    ),
+    tar_target(
+      phase_similarity_contrasts_table_smd,
+      make_contrast_results_table_smd(
+        phase_similarity_glmmTMB,
+        phase_similarity_emmeans_tidy,
+        phase_similarity_contrasts_tidy,
+        phase_similarity_contrasts_cohens_d_tidy
       )
     ),
     tar_target(
@@ -464,10 +473,19 @@ connectivity_estimation_targets <- list(
       plot_similarity_contrasts(amplitude_similarity_contrasts)
     ),
     tar_target(
-      amplitude_similarity_contrasts_table,
-      make_contrast_results_table(
+      amplitude_similarity_contrasts_table_nhst,
+      make_contrast_results_table_nhst(
         amplitude_similarity_emmeans_tidy,
         amplitude_similarity_contrasts_tidy
+      )
+    ),
+    tar_target(
+      amplitude_similarity_contrasts_table_smd,
+      make_contrast_results_table_smd(
+        amplitude_similarity_glmmTMB,
+        amplitude_similarity_emmeans_tidy,
+        amplitude_similarity_contrasts_tidy,
+        amplitude_similarity_contrasts_cohens_d_tidy
       )
     ),
     tar_target(
@@ -590,6 +608,22 @@ connectivity_estimation_targets <- list(
       plot_similarity_contrasts(phase_similarity_contrasts_hilbert)
     ),
     tar_target(
+      phase_similarity_contrasts_table_nhst_hilbert,
+      make_contrast_results_table_nhst(
+        phase_similarity_emmeans_tidy_hilbert,
+        phase_similarity_contrasts_tidy_hilbert
+      )
+    ),
+    tar_target(
+      phase_similarity_contrasts_table_smd_hilbert,
+      make_contrast_results_table_smd(
+        phase_similarity_glmmTMB_hilbert,
+        phase_similarity_emmeans_tidy_hilbert,
+        phase_similarity_contrasts_tidy_hilbert,
+        phase_similarity_contrasts_cohens_d_tidy_hilbert
+      )
+    ),
+    tar_target(
       phase_similarity_model_fit_table_hilbert,
       make_model_fit_table(phase_similarity_glmmTMB_hilbert)
     ),
@@ -637,8 +671,16 @@ connectivity_estimation_targets <- list(
       emmeans_similarity(phase_similarity_glmmTMB_maximal)
     ),
     tar_target(
+      phase_similarity_emmeans_tidy_maximal,
+      tidy_emmeans_similarity(phase_similarity_emmeans_maximal)
+    ),
+    tar_target(
       phase_similarity_contrasts_maximal,
       contrast_similarity(phase_similarity_emmeans_maximal)
+    ),
+    tar_target(
+      phase_similarity_contrasts_tidy_maximal,
+      tidy_contrast_similarity(phase_similarity_contrasts_maximal)
     ),
     tar_target(
       phase_similarity_contrasts_cohens_d_maximal,
@@ -648,8 +690,30 @@ connectivity_estimation_targets <- list(
       )
     ),
     tar_target(
+      phase_similarity_contrasts_cohens_d_tidy_maximal,
+      tidy_contrast_similarity_cohens_d(
+        phase_similarity_contrasts_cohens_d_maximal
+      )
+    ),
+    tar_target(
       phase_similarity_contrasts_plot_maximal,
       plot_similarity_contrasts(phase_similarity_contrasts_maximal)
+    ),
+    tar_target(
+      phase_similarity_contrasts_table_nhst_maximal,
+      make_contrast_results_table_nhst(
+        phase_similarity_emmeans_tidy_maximal,
+        phase_similarity_contrasts_tidy_maximal
+      )
+    ),
+    tar_target(
+      phase_similarity_contrasts_table_smd_maximal,
+      make_contrast_results_table_smd(
+        phase_similarity_glmmTMB_maximal,
+        phase_similarity_emmeans_tidy_maximal,
+        phase_similarity_contrasts_tidy_maximal,
+        phase_similarity_contrasts_cohens_d_tidy_maximal
+      )
     ),
     tar_target(
       phase_similarity_model_fit_table_maximal,
@@ -697,8 +761,16 @@ connectivity_estimation_targets <- list(
       emmeans_similarity(amplitude_similarity_glmmTMB_maximal)
     ),
     tar_target(
+      amplitude_similarity_emmeans_tidy_maximal,
+      tidy_emmeans_similarity(amplitude_similarity_emmeans_maximal)
+    ),
+    tar_target(
       amplitude_similarity_contrasts_maximal,
       contrast_similarity(amplitude_similarity_emmeans_maximal)
+    ),
+    tar_target(
+      amplitude_similarity_contrasts_tidy_maximal,
+      tidy_contrast_similarity(amplitude_similarity_contrasts_maximal)
     ),
     tar_target(
       amplitude_similarity_contrasts_cohens_d_maximal,
@@ -708,8 +780,30 @@ connectivity_estimation_targets <- list(
       )
     ),
     tar_target(
+      amplitude_similarity_contrasts_cohens_d_tidy_maximal,
+      tidy_contrast_similarity_cohens_d(
+        amplitude_similarity_contrasts_cohens_d_maximal
+      )
+    ),
+    tar_target(
       amplitude_similarity_contrasts_plot_maximal,
       plot_similarity_contrasts(amplitude_similarity_contrasts_maximal)
+    ),
+    tar_target(
+      amplitude_similarity_contrasts_table_nhst_maximal,
+      make_contrast_results_table_nhst(
+        amplitude_similarity_emmeans_tidy_maximal,
+        amplitude_similarity_contrasts_tidy_maximal
+      )
+    ),
+    tar_target(
+      amplitude_similarity_contrasts_table_smd_maximal,
+      make_contrast_results_table_smd(
+        amplitude_similarity_glmmTMB_maximal,
+        amplitude_similarity_emmeans_tidy_maximal,
+        amplitude_similarity_contrasts_tidy_maximal,
+        amplitude_similarity_contrasts_cohens_d_tidy_maximal
+      )
     ),
     tar_target(
       amplitude_similarity_model_fit_table_maximal,
@@ -757,8 +851,16 @@ connectivity_estimation_targets <- list(
       emmeans_similarity(phase_similarity_glmmTMB_hilbert_maximal)
     ),
     tar_target(
+      phase_similarity_emmeans_tidy_hilbert_maximal,
+      tidy_emmeans_similarity(phase_similarity_emmeans_hilbert_maximal)
+    ),
+    tar_target(
       phase_similarity_contrasts_hilbert_maximal,
       contrast_similarity(phase_similarity_emmeans_hilbert_maximal)
+    ),
+    tar_target(
+      phase_similarity_contrasts_tidy_hilbert_maximal,
+      tidy_contrast_similarity(phase_similarity_contrasts_hilbert_maximal)
     ),
     tar_target(
       phase_similarity_contrasts_cohens_d_hilbert_maximal,
@@ -768,8 +870,30 @@ connectivity_estimation_targets <- list(
       )
     ),
     tar_target(
+      phase_similarity_contrasts_cohens_d_tidy_hilbert_maximal,
+      tidy_contrast_similarity_cohens_d(
+        phase_similarity_contrasts_cohens_d_hilbert_maximal
+      )
+    ),
+    tar_target(
       phase_similarity_contrasts_plot_hilbert_maximal,
       plot_similarity_contrasts(phase_similarity_contrasts_hilbert_maximal)
+    ),
+    tar_target(
+      phase_similarity_contrasts_table_nhst_hilbert_maximal,
+      make_contrast_results_table_nhst(
+        phase_similarity_emmeans_tidy_hilbert_maximal,
+        phase_similarity_contrasts_tidy_hilbert_maximal
+      )
+    ),
+    tar_target(
+      phase_similarity_contrasts_table_smd_hilbert_maximal,
+      make_contrast_results_table_smd(
+        phase_similarity_glmmTMB_hilbert_maximal,
+        phase_similarity_emmeans_tidy_hilbert_maximal,
+        phase_similarity_contrasts_tidy_hilbert_maximal,
+        phase_similarity_contrasts_cohens_d_tidy_hilbert_maximal
+      )
     ),
     tar_target(
       phase_similarity_model_fit_table_hilbert_maximal,

@@ -781,27 +781,27 @@ save_connectivity_patchwork <- function(connectivity_patchwork, freq_band, mode)
 
 #' Plot connectivity histograms
 #'
-#' @param phase_delta,phase_theta,phase_alpha,phase_beta,phase_gamma The
-#'   connectivity matrices for a given frequency band.
+#' @param delta,theta,alpha,beta,gamma The connectivity matrices for a given
+#'   frequency band.
 #' @param method String. "PLI" or "AEC".
 #'
 #' @return A ggplot2 object.
 plot_connectivity_histograms <- function(
-  phase_delta,
-  phase_theta,
-  phase_alpha,
-  phase_beta,
-  phase_gamma,
+  delta,
+  theta,
+  alpha,
+  beta,
+  gamma,
   method
 ) {
 
   connectivity_profiles <- purrr::map_dfr(
     list(
-      Delta = phase_delta,
-      Theta = phase_theta,
-      Alpha = phase_alpha,
-      Beta  = phase_beta,
-      Gamma = phase_gamma
+      Delta = delta,
+      Theta = theta,
+      Alpha = alpha,
+      Beta  = beta,
+      Gamma = gamma
     ),
     get_connectivity_profiles,
     .id = "frequency_band"
@@ -817,6 +817,7 @@ plot_connectivity_histograms <- function(
     connectivity_profiles, ggplot2::aes(x = value, fill = participant)
   ) +
     ggplot2::geom_histogram(binwidth = .01) +
+    ggplot2::geom_rug(alpha = 0.1) +
     ggplot2::scale_fill_viridis_d(option = "D") +
     ggplot2::coord_cartesian(xlim = c(0, 1)) +
     ggplot2::facet_wrap(
@@ -856,6 +857,166 @@ save_connectivity_histogram_patchwork <- function(
     units = "cm",
     dpi = "retina",
     scaling = 0.65
+  )
+
+  filename
+
+}
+
+#' Save illustrative connectomes figure
+#'
+#' Save a patchwork figure with the PLI and AEC functional connectome
+#' corresponding to a single participant/recording.
+#'
+#' @param phase The phase connectivity histograms plot
+#' @param amplitude The amplitude connectivity histograms plot
+#' @param participant The participant ID.
+#' @param recording The recording ID. One of "pre_rc1", "pre_rc2", "pre_ro1",
+#'   "pre_ro2", "post_rc1", "post_rc2", "post_ro1", "post_ro2", "fu_rc1",
+#'   "fu_rc2", "fu_ro1", "fu_ro2".
+#'
+#' @return A character vector of the file path.
+save_illustrative_connectomes_figure <- function(
+  phase_matrices,
+  amplitude_matrices,
+  participant,
+  recording
+) {
+
+  filename <- paste0(
+    "figures/illustrative-connectomes-", participant, "_", recording, ".png"
+  )
+
+  # Get levels for factors
+  sensor_levels <- c(
+    "Fp1",
+    "Fp2",
+    "AF7",
+    "AF3",
+    "AFz",
+    "AF4",
+    "AF8",
+    "F7",
+    "F5",
+    "F3",
+    "F1",
+    "Fz",
+    "F2",
+    "F4",
+    "F6",
+    "F8",
+    "FT9",
+    "FT7",
+    "FC5",
+    "FC3",
+    "FC1",
+    "FCz",
+    "FC2",
+    "FC4",
+    "FC6",
+    "FT8",
+    "FT10",
+    "T7",
+    "C5",
+    "C3",
+    "C1",
+    "Cz",
+    "C2",
+    "C4",
+    "C6",
+    "T8",
+    "TP9",
+    "TP7",
+    "CP5",
+    "CP3",
+    "CP1",
+    "CPz",
+    "CP2",
+    "CP4",
+    "CP6",
+    "TP8",
+    "TP10",
+    "P7",
+    "P5",
+    "P3",
+    "P1",
+    "Pz",
+    "P2",
+    "P4",
+    "P6",
+    "P8",
+    "PO7",
+    "PO3",
+    "POz",
+    "PO4",
+    "PO8",
+    "O1",
+    "Oz",
+    "O2"
+  )
+
+  connectomes <- purrr::map(
+    list(phase_matrices, amplitude_matrices),
+    function(.x) {
+      .x |>
+        purrr::keep(
+          function(.y) {
+            .y$metadata$participant == participant &
+              stringr::str_detect(.y$metadata$case, recording)
+          }
+        ) |>
+        purrr::pluck(1, "connectivity_matrix")
+    }
+  )
+
+  connectivity_plots <- purrr::map2(
+    connectomes, c("PLI", "AEC"),
+    function(.x, .y) {
+
+      diag(.x) <- NA
+      .x <- .x |>
+        as.table() |>
+        as.data.frame(stringsAsFactors = FALSE) |>
+        tibble::as_tibble() |>
+        dplyr::mutate(
+          Var1 = factor(Var1, levels = sensor_levels),
+          Var2 = factor(Var2, levels = sensor_levels)
+        )
+
+      ggplot2::ggplot(.x, ggplot2::aes(x = Var1, y = Var2, fill = Freq)) +
+        ggplot2::geom_raster() +
+        ggplot2::scale_fill_viridis_c(
+          limits = c(0, NA)
+        ) +
+        ggplot2::scale_x_discrete(guide = ggplot2::guide_axis(angle = 90)) +
+        # Reversing the y-axis is needed for the diagonal to go from the upper-left
+        # to the bottom-right.
+        ggplot2::scale_y_discrete(limits = rev) +
+        ggplot2::labs(
+          x = "EEG Channels",
+          y = "EEG Channels",
+          fill = .y
+        ) +
+        ggplot2::theme(
+          axis.text  = ggplot2::element_blank(),
+          axis.ticks = ggplot2::element_blank()
+        )
+    }
+  )
+
+  connectivity_patch <- connectivity_plots |>
+    patchwork::wrap_plots() +
+    patchwork::plot_annotation(tag_levels = "A")
+
+  ggplot2::ggsave(
+    filename = filename,
+    plot = connectivity_patch,
+    device = ragg::agg_png,
+    width = 21.59,
+    height = 9,
+    units = "cm",
+    dpi = "retina",
+    scaling = 1
   )
 
   filename

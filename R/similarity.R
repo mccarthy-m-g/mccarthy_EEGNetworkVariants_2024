@@ -710,6 +710,70 @@ tidy_contrast_similarity <- function(object) {
 
 }
 
+#' Estimate standardized mean differences for contrasts
+#'
+#' @param model A glmmTMB model object.
+#' @param contrasts An emmeans contrasts object.
+#'
+#' @return An emmeans object.
+contrast_similarity_cohens_d <- function(model, contrasts) {
+
+  purrr::map(
+    contrasts,
+    \(.x) {
+      emmeans::eff_size(
+        .x,
+        # Add variances then take the square root to get total SD of the
+        # variance components.
+        sigma = sqrt(sum(insight::get_variance_intercept(model))),
+        edf = df.residual(model),
+        method = "identity"
+      )
+    }
+  )
+
+}
+
+#' Tidy emmeans standardized mean differences
+#'
+#' @param object An emmeans model object.
+#'
+#' @return A tidy tibble.
+tidy_contrast_similarity_cohens_d <- function(object) {
+
+  effect_labels <- c(
+    "Main effect",
+    "Between sessions",
+    "Within sessions",
+    "Between states",
+    "Within states",
+    "Between sessions and states",
+    "Between sessions and within states",
+    "Within sessions and between states",
+    "Within sessions and states"
+  )
+
+  contrasts <- object |>
+    purrr::map_dfr(tibble::as_tibble, .id = "effect") |>
+    dplyr::mutate(
+      effect_label = factor(effect_labels, levels = effect_labels),
+      effect_label = forcats::fct_relevel(
+        effect_label, "Between sessions and states", after = 7
+      )
+    ) |>
+    dplyr::select(
+      effect_label,
+      effect,
+      smd = effect.size,
+      smd_std.error = SE,
+      smd_conf.low = lower.CL,
+      smd_conf.high = upper.CL
+    )
+
+  contrasts
+
+}
+
 #' Plot similarity contrast intervals
 #'
 #' @param object An emmeans model object.
@@ -1258,6 +1322,64 @@ plot_subset_similarity_contrasts_2 <- function(group_object, subset_objects) {
 
 }
 
+#' Plot subset similarity contrast bar charts
+#'
+#' @param delta,theta,alpha,beta,gamma A list of subset similarity results for a
+#'   given frequency band.
+#'
+#' @return A ggplot2 object.
+plot_subset_similarity_contrast_bars <- function(
+  delta = NULL, theta = NULL, alpha = NULL, beta = NULL, gamma = NULL
+) {
+
+  subset_contrasts <- purrr::map_dfr(
+    list(
+      Delta = delta, Theta = theta, Alpha = alpha, Beta = beta, Gamma = gamma
+    ),
+    function(.x) {
+
+      if (is.null(.x)) {
+        .x
+      } else {
+        .x |>
+          tidy_subset_contrast_similarity() |>
+          dplyr::select(effect_label, effect_direction) |>
+          dplyr::group_by(effect_label) |>
+          dplyr::count(effect_direction)
+      }
+
+    },
+    .id = "frequency_band"
+  )
+
+  subset_contrasts |>
+    dplyr::mutate(
+      frequency_band = factor(
+        frequency_band,
+        levels = c("Delta", "Theta", "Alpha", "Beta", "Gamma")
+      )
+    ) |>
+    ggplot2::ggplot(ggplot2::aes(x = effect_label, y = n, fill = effect_direction)) +
+    ggplot2::geom_col() +
+    ggplot2::coord_flip() +
+    ggplot2::scale_y_continuous(breaks = c(0, 7, 14)) +
+    ggplot2::scale_fill_discrete(
+      drop = FALSE,
+      type = c(
+        "#3aaf85", # Green
+        "#1b6ca8", # Blue
+        "#cd201f"  # Red
+      )
+    ) +
+    ggplot2::facet_wrap(ggplot2::vars(frequency_band), nrow = 1) +
+    ggplot2::labs(
+      x = "Contrast",
+      y = "Count",
+      fill = "Effect Direction"
+    ) +
+    ggplot2::theme_classic()
+}
+
 #' Save similarity archetypes figure
 #'
 #' @param filename A character string of the file path.
@@ -1723,6 +1845,215 @@ make_contrast_results_table <- function(emmeans_tidy, contrasts_tidy) {
     flextable::fontsize(size = 10, part = "all") |>
     # Dimensions
     flextable::width(j = 1, width = 3.59, unit = "cm")
+
+}
+
+#' Make model fit table
+#'
+#' @param model A glmmTMB object.
+#'
+#' @return A flextable object.
+make_model_fit_table <- function(model, maximal_model = FALSE) {
+
+  model |>
+    gtsummary::tbl_regression(
+      label = if (maximal_model) {
+        list(
+          within_participant ~ "Within Participant",
+          within_session ~ "Within Session",
+          within_state ~ "Within State",
+          "pair_participant.sd__(Intercept)" ~ "Participant Pair",
+          "x_label.sd__(Intercept)" ~ "X Connectome",
+          "y_label.sd__(Intercept)" ~ "Y Connectome"
+        )
+      } else {
+        list(
+          within_participant ~ "Within Participant",
+          within_session ~ "Within Session",
+          within_state ~ "Within State",
+          "x_label.sd__(Intercept)" ~ "X Connectome",
+          "y_label.sd__(Intercept)" ~ "Y Connectome"
+        )
+      },
+      show_single_row = c(
+        within_participant, within_state, within_session,
+        "within_participant:within_session",
+        "within_participant:within_state",
+        "within_session:within_state",
+        "within_participant:within_session:within_state"
+      ),
+      intercept = TRUE,
+      estimate_fun = ~ papaja::print_num(.x, digits = 3, na_string = ""),
+      pvalue_fun = papaja::print_p,
+      tidy_fun = broom.mixed::tidy
+    ) |>
+    gtsummary::modify_footnote(update = everything() ~ NA, abbreviation = TRUE) |>
+    gtsummary::modify_table_body(
+      ~ .x |>
+        dplyr::mutate(
+          Type = c(
+            rep("Fixed Effects", times = 8),
+            rep("Random Effects", times = ifelse(maximal_model, 3, 2))
+          ),
+          .before = label
+        ) |>
+        flextable::as_grouped_data(groups = "Type") |>
+        tibble::as_tibble()
+    ) |>
+    gtsummary::modify_column_unhide(c(Type, std.error)) |>
+    gtsummary::add_glance_source_note(
+      label = list(
+        sigma ~ "Phi coefficient"
+      ),
+      glance_fun = broom.mixed::glance
+    ) |>
+    gtsummary::as_flex_table() |>
+    # Header and grouped rows
+    flextable::set_header_labels(
+      label = "Term",
+      estimate = "Estimate",
+      p.value = "*p*"
+    ) |>
+    ftExtra::colformat_md(part = "header") |>
+    flextable::merge_at(i = 1, part = "body") |>
+    flextable::align(i = 1, align = "left") |>
+    flextable::merge_at(i = 10, part = "body") |>
+    flextable::align(i = 10, align = "left") |>
+    # Footnotes
+    flextable::footnote(
+      j = 3,
+      value = flextable::as_paragraph(
+        "Estimates for fixed effects and random effects are, respectively, ",
+        "coefficients for the mean model (with logit link) and standard ",
+        "deviations for the grouping variables (random intercepts)."
+      ),
+      ref_symbols = "1",
+      part = "header",
+    ) |>
+    # Cell alignment
+    flextable::align(part = "header", i = 1, align = "center") |>
+    flextable::align(part = "body", j = 3:6, align = "right") |>
+    # Borders
+    flextable::hline_bottom(
+      border = flextable::fp_border_default(width = 1.5),
+      part = "footer"
+    ) |>
+    flextable::fix_border_issues(part = "footer") |>
+    # Font
+    flextable::font(fontname = "Times New Roman", part = "all") |>
+    flextable::fontsize(size = 10, part = "all")
+
+}
+
+#' Make conervgence/singularity table
+#'
+#' @param all_arguments A glmmTMB object corresponding to the respective
+#'   coupling type, frequency band, and random effects specification.
+#'
+#' @return A flextable object.
+make_convergence_table <- function(
+  phase_delta_reduced,
+  phase_delta_maximal,
+  phase_theta_reduced,
+  phase_theta_maximal,
+  phase_alpha_reduced,
+  phase_alpha_maximal,
+  phase_beta_reduced,
+  phase_beta_maximal,
+  phase_gamma_reduced,
+  phase_gamma_maximal,
+  amplitude_alpha_reduced,
+  amplitude_alpha_maximal,
+  phase_delta_hilbert_reduced,
+  phase_delta_hilbert_maximal,
+  phase_theta_hilbert_reduced,
+  phase_theta_hilbert_maximal,
+  phase_alpha_hilbert_reduced,
+  phase_alpha_hilbert_maximal,
+  phase_beta_hilbert_reduced,
+  phase_beta_hilbert_maximal,
+  phase_gamma_hilbert_reduced,
+  phase_gamma_hilbert_maximal
+) {
+
+  models <- tibble::tribble(
+    ~model,                            ~coupling_type,              ~freq_band, ~re,
+    list(phase_delta_reduced),         "Phase",                     "Delta", "Reduced",
+    list(phase_delta_maximal),         "Phase",                     "Delta", "Maximal",
+    list(phase_theta_reduced),         "Phase",                     "Theta", "Reduced",
+    list(phase_theta_maximal),         "Phase",                     "Theta", "Maximal",
+    list(phase_alpha_reduced),         "Phase",                     "Alpha", "Reduced",
+    list(phase_alpha_maximal),         "Phase",                     "Alpha", "Maximal",
+    list(phase_beta_reduced),          "Phase",                     "Beta",  "Reduced",
+    list(phase_beta_maximal),          "Phase",                     "Beta",  "Maximal",
+    list(phase_gamma_reduced),         "Phase",                     "Gamma", "Reduced",
+    list(phase_gamma_maximal),         "Phase",                     "Gamma", "Maximal",
+    list(amplitude_alpha_reduced),     "Amplitude",                 "Alpha", "Reduced",
+    list(amplitude_alpha_maximal),     "Amplitude",                 "Alpha", "Maximal",
+    list(phase_delta_hilbert_reduced), "Phase (Hilbert transform)", "Delta", "Reduced",
+    list(phase_delta_hilbert_maximal), "Phase (Hilbert transform)", "Delta", "Maximal",
+    list(phase_theta_hilbert_reduced), "Phase (Hilbert transform)", "Theta", "Reduced",
+    list(phase_theta_hilbert_maximal), "Phase (Hilbert transform)", "Theta", "Maximal",
+    list(phase_alpha_hilbert_reduced), "Phase (Hilbert transform)", "Alpha", "Reduced",
+    list(phase_alpha_hilbert_maximal), "Phase (Hilbert transform)", "Alpha", "Maximal",
+    list(phase_beta_hilbert_reduced),  "Phase (Hilbert transform)", "Beta",  "Reduced",
+    list(phase_beta_hilbert_maximal),  "Phase (Hilbert transform)", "Beta",  "Maximal",
+    list(phase_gamma_hilbert_reduced), "Phase (Hilbert transform)", "Gamma", "Reduced",
+    list(phase_gamma_hilbert_maximal), "Phase (Hilbert transform)", "Gamma", "Maximal"
+  )
+
+  # Check models
+  models |>
+    dplyr::rowwise() |>
+    dplyr::mutate(
+      converged = performance::check_convergence(model[[1]]),
+      singular  = performance::check_singularity(model[[1]])
+    ) |>
+    dplyr::ungroup() |>
+    dplyr::select(-model) |>
+    # Make table
+    tidyr::pivot_wider(
+      names_from = re, values_from = c(converged, singular)
+    ) |>
+    dplyr::relocate(singular_Reduced, .after = converged_Reduced) |>
+    flextable::as_grouped_data(groups = "coupling_type") |>
+    flextable::flextable() |>
+    # Header and grouped rows
+    flextable::set_header_labels(
+      coupling_type = "",
+      freq_band = "",
+      converged_Reduced = "Converged",
+      singular_Reduced = "Singular",
+      converged_Maximal = "Converged",
+      singular_Maximal = "Singular"
+    ) |>
+    flextable::add_header_row(
+      values = c(
+        "Coupling Type",
+        "Frequency Band",
+        "Reduced Model",
+        "Maximal Model"
+      ),
+      colwidths = c(1, 1, 2, 2)
+    ) |>
+    flextable::merge_at(i = 1, part = "body") |>
+    flextable::align(i = 1, align = "left") |>
+    flextable::merge_at(i = 7, part = "body") |>
+    flextable::align(i = 7, align = "left") |>
+    flextable::merge_at(i = 9, part = "body") |>
+    flextable::align(i = 9, align = "left") |>
+    # Cell alignment
+    flextable::align(part = "header", i = c(1, 2), align = "center") |>
+    flextable::align(part = "body", j = 3:6, align = "center") |>
+    # Borders
+    flextable::hline(
+      i = 1, j = c(1, 2),
+      border = flextable::fp_border_default(width = 0),
+      part = "header"
+    ) |>
+    # Font
+    flextable::font(fontname = "Times New Roman", part = "all") |>
+    flextable::fontsize(size = 10, part = "all")
 
 }
 

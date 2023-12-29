@@ -1380,6 +1380,83 @@ plot_subset_similarity_contrast_bars <- function(
     ggplot2::theme_classic()
 }
 
+#' Save similarity matrix figure
+#'
+#' @param filename A character string of the file path.
+#' @param plots A similarity matrix ggplot2 object.
+#'
+#' @return A character string of the file path.
+save_similarity_matrix_figure <- function(filename, similarity_plot) {
+
+  # Add legends for session and state.
+  axis_tick_colours <- colorspace::diverging_hcl(
+    12, h = c(299, 135), c = 60, l = c(20, 80), power = c(0.7, 1.3)
+  )
+
+  case_colours <- rep(
+    c(rev(axis_tick_colours[7:12]), axis_tick_colours[1:6]),
+    times = 14 # length(participant_levels)
+  )
+
+  state_legend <- tibble::tibble(
+    State = factor(c("Eyes closed", "Eyes open"))
+  )
+
+  session_legend_colours <- colorspace::diverging_hcl(
+    12, h = c(299, 135), c = 0, l = c(20, 80), power = c(0.7, 1.3)
+  )
+
+  session_levels <- c("1-1", "1-2", "2-1", "2-2", "3-1", "3-2")
+
+  session_legend <- tibble::tibble(
+    Session = factor(session_levels, levels = session_levels)
+  )
+
+  similarity_plot <- similarity_plot +
+    # The axis ticks need to be a tiny bit wider to prevent gaps when scaling
+    # the plot up in size.
+    ggplot2::theme(
+      axis.ticks.x.top = ggplot2::element_line(size = 1.2),
+      axis.ticks.y.left = ggplot2::element_line(size = 1.1)
+    ) +
+    # These rasters/rectangles are purely here to make the new legends show up;
+    # they aren't actually visible in the plot.
+    ggnewscale::new_scale_fill() +
+    ggplot2::geom_rect(
+      ggplot2::aes(xmin = -Inf, xmax = -Inf, ymin = -Inf, ymax = -Inf, fill = Session),
+      data = session_legend, inherit.aes = FALSE
+    ) +
+    ggplot2::scale_fill_manual(
+      values = session_legend_colours[6:1],
+      guide = ggplot2::guide_legend(
+        title = "Session-Recording", order = 4
+      )
+    ) +
+    ggnewscale::new_scale_fill() +
+    ggplot2::geom_rect(
+      ggplot2::aes(xmin = -Inf, xmax = -Inf, ymin = -Inf, ymax = -Inf, fill = State),
+      data = state_legend, inherit.aes = FALSE
+    ) +
+    ggplot2::scale_fill_manual(
+      values = c(case_colours[9], case_colours[3]),
+      guide = ggplot2::guide_legend(order = 3)
+    )
+
+  ggplot2::ggsave(
+    filename = filename,
+    plot = similarity_plot,
+    device = ragg::agg_png,
+    width = 21.59,
+    height = 16,
+    units = "cm",
+    dpi = "retina",
+    scaling = 1
+  )
+
+  filename
+
+}
+
 #' Save similarity archetypes figure
 #'
 #' @param filename A character string of the file path.

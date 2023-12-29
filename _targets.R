@@ -928,6 +928,14 @@ connectivity_estimation_targets <- list(
     ),
     # Save manuscript figures ----
     tar_target(
+      phase_similarity_matrix_figure,
+      save_similarity_matrix_figure(
+        paste0("figures/", filter_freq_band, "/phase-similarity-matrix.png"),
+        phase_similarity_plot
+      ),
+      format = "file"
+    ),
+    tar_target(
       phase_similarity_results_figure,
       save_results_figure(
         paste0("figures/", filter_freq_band, "/phase_similarity_results.png"),
@@ -958,6 +966,14 @@ connectivity_estimation_targets <- list(
       format = "file"
     ),
     tar_target(
+      amplitude_similarity_matrix_figure,
+      save_similarity_matrix_figure(
+        paste0("figures/", filter_freq_band, "/amplitude-similarity-matrix.png"),
+        amplitude_similarity_plot
+      ),
+      format = "file"
+    ),
+    tar_target(
       amplitude_similarity_results_figure,
       save_results_figure(
         paste0("figures/", filter_freq_band, "/amplitude_similarity_results.png"),
@@ -984,6 +1000,14 @@ connectivity_estimation_targets <- list(
         amplitude_similarity_plot,
         amplitude_similarity_contrasts_plot_maximal,
         amplitude_similarity_subset_contrasts_plot_maximal
+      ),
+      format = "file"
+    ),
+    tar_target(
+      phase_similarity_matrix_figure_hilbert,
+      save_similarity_matrix_figure(
+        paste0("figures/", filter_freq_band, "/phase-similarity-matrix-hilbert.png"),
+        phase_similarity_plot_hilbert
       ),
       format = "file"
     ),
@@ -1342,6 +1366,12 @@ manuscripts_targets <- list(
     supplement_phase_coupling_functional_connectomes_hilbert,
     here(
       "manuscripts", "supplement", "phase-coupling-functional-connectomes-hilbert.Rmd"
+    )
+  ),
+  tar_render(
+    supplement_similarity_matrices,
+    here(
+      "manuscripts", "supplement", "similarity-matrices.Rmd"
     )
   ),
   tar_render(

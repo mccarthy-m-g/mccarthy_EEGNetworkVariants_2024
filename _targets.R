@@ -1157,6 +1157,35 @@ connectivity_estimation_targets <- list(
   ),
   # Make tables ----
   tar_target(
+    phase_connectivity_summaries,
+    summarize_connectivity_distributions(
+      phase_connectivity_matrix_delta,
+      phase_connectivity_matrix_theta,
+      phase_connectivity_matrix_alpha,
+      phase_connectivity_matrix_beta,
+      phase_connectivity_matrix_gamma,
+      "Phase"
+    )
+  ),
+  tar_target(
+    amplitude_connectivity_summaries,
+    summarize_connectivity_distributions(
+      amplitude_connectivity_matrix_delta,
+      amplitude_connectivity_matrix_theta,
+      amplitude_connectivity_matrix_alpha,
+      amplitude_connectivity_matrix_beta,
+      amplitude_connectivity_matrix_gamma,
+      "Amplitude"
+    )
+  ),
+  tar_target(
+    connectivity_summary_table,
+    make_connectivity_summary_table(
+      phase_connectivity_summaries,
+      amplitude_connectivity_summaries
+    )
+  ),
+  tar_target(
     similarity_glmmTMB_convergence_table,
     make_convergence_table(
       phase_similarity_glmmTMB_delta,

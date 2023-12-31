@@ -806,7 +806,7 @@ plot_connectivity_histograms <- function(
     get_connectivity_profiles,
     .id = "frequency_band"
   ) |>
-    mutate(
+    dplyr::mutate(
       frequency_band = factor(
         frequency_band,
         levels = c("Delta", "Theta", "Alpha", "Beta", "Gamma")
@@ -860,6 +860,94 @@ save_connectivity_histogram_patchwork <- function(
   )
 
   filename
+
+}
+
+#' Summarize connectivity distributions
+#'
+#' @param delta,theta,alpha,beta,gamma The connectivity matrices for a given
+#'   frequency band.
+#' @param coupling_mode String. "Phase", "Amplitude", or "Phase (Hilbert transform).
+#'
+#' @return A tibble.
+summarize_connectivity_distributions <- function(
+  delta,
+  theta,
+  alpha,
+  beta,
+  gamma,
+  coupling_mode
+) {
+
+  purrr::map_dfr(
+    list(
+      Delta = delta,
+      Theta = theta,
+      Alpha = alpha,
+      Beta  = beta,
+      Gamma = gamma
+    ),
+    get_connectivity_profiles,
+    .id = "frequency_band"
+  ) |>
+    dplyr::mutate(
+      frequency_band = factor(
+        frequency_band,
+        levels = c("Delta", "Theta", "Alpha", "Beta", "Gamma")
+      )
+    ) |>
+    dplyr::group_by(frequency_band) |>
+    dplyr::summarise(
+      min = min(value),
+      max = max(value),
+      mean = mean(value),
+      sd = sd(value),
+      skewness = datawizard::skewness(value)$Skewness,
+      kurtosis = datawizard::kurtosis(value)$Kurtosis
+    ) |>
+    dplyr::mutate(coupling_mode = coupling_mode, .before = frequency_band)
+
+}
+
+#' Make connectivity summary table
+#'
+#' @param phase_summaries,amplitude_summaries A tibble of connectivity summary
+#'   statistics.
+#'
+#' @return A flextable object.
+make_connectivity_summary_table <- function(
+  phase_summaries,
+  amplitude_summaries
+) {
+
+  phase_summaries |>
+    dplyr::bind_rows(amplitude_summaries) |>
+    dplyr::mutate(
+      dplyr::across(dplyr::where(is.numeric), \(.x) papaja::print_num(.x, digits = 3, na_string = ""))
+    ) |>
+    flextable::as_grouped_data(groups = "coupling_mode") |>
+    flextable::flextable() |>
+    # Header and grouped rows
+    flextable::set_header_labels(
+      coupling_mode = "Coupling Mode",
+      frequency_band = "Frequency Band",
+      min = "Minimum",
+      max = "Maximum",
+      mean = "Mean",
+      sd = "SD",
+      skewness = "Skewness",
+      kurtosis = "Kurtosis"
+    ) |>
+    flextable::merge_at(i = 1, part = "body") |>
+    flextable::align(i = 1, align = "left") |>
+    flextable::merge_at(i = 7, part = "body") |>
+    flextable::align(i = 7, align = "left") |>
+    # Cell alignment
+    flextable::align(part = "header", i = 1, align = "center") |>
+    flextable::align(part = "body", j = 3:8, align = "right") |>
+    # Font
+    flextable::font(fontname = "Times New Roman", part = "all") |>
+    flextable::fontsize(size = 10, part = "all")
 
 }
 

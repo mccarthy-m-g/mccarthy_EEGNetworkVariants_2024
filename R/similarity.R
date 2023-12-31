@@ -2202,7 +2202,7 @@ make_model_fit_table <- function(model, maximal_model = FALSE) {
 #' Make conervgence/singularity table
 #'
 #' @param all_arguments A glmmTMB object corresponding to the respective
-#'   coupling type, frequency band, and random effects specification.
+#'   coupling mode, frequency band, and random effects specification.
 #'
 #' @return A flextable object.
 make_convergence_table <- function(
@@ -2231,7 +2231,7 @@ make_convergence_table <- function(
 ) {
 
   models <- tibble::tribble(
-    ~model,                            ~coupling_type,              ~freq_band, ~re,
+    ~model,                            ~coupling_mode,              ~freq_band, ~re,
     list(phase_delta_reduced),         "Phase",                     "Delta", "Reduced",
     list(phase_delta_maximal),         "Phase",                     "Delta", "Maximal",
     list(phase_theta_reduced),         "Phase",                     "Theta", "Reduced",
@@ -2270,11 +2270,11 @@ make_convergence_table <- function(
       names_from = re, values_from = c(converged, singular)
     ) |>
     dplyr::relocate(singular_Reduced, .after = converged_Reduced) |>
-    flextable::as_grouped_data(groups = "coupling_type") |>
+    flextable::as_grouped_data(groups = "coupling_mode") |>
     flextable::flextable() |>
     # Header and grouped rows
     flextable::set_header_labels(
-      coupling_type = "",
+      coupling_mode = "",
       freq_band = "",
       converged_Reduced = "Converged",
       singular_Reduced = "Singular",
@@ -2283,7 +2283,7 @@ make_convergence_table <- function(
     ) |>
     flextable::add_header_row(
       values = c(
-        "Coupling Type",
+        "Coupling Mode",
         "Frequency Band",
         "Reduced Model",
         "Maximal Model"

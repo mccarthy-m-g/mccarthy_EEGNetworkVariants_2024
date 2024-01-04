@@ -359,14 +359,16 @@ connectivity_estimation_targets <- list(
       phase_similarity_subset_contrasts_plot,
       plot_subset_similarity_contrasts(
         phase_similarity_contrasts,
-        phase_similarity_subset_contrasts
+        phase_similarity_subset_contrasts,
+        phase_similarity_subset_glmmTMB
       )
     ),
     tar_target(
       phase_similarity_subset_contrasts_plot_2,
       plot_subset_similarity_contrasts_2(
         phase_similarity_contrasts,
-        phase_similarity_subset_contrasts
+        phase_similarity_subset_contrasts,
+        phase_similarity_subset_glmmTMB
       )
     ),
     # Estimate amplitude coupling ----
@@ -521,14 +523,16 @@ connectivity_estimation_targets <- list(
       amplitude_similarity_subset_contrasts_plot,
       plot_subset_similarity_contrasts(
         amplitude_similarity_contrasts,
-        amplitude_similarity_subset_contrasts
+        amplitude_similarity_subset_contrasts,
+        amplitude_similarity_subset_glmmTMB
       )
     ),
     tar_target(
       amplitude_similarity_subset_contrasts_plot_2,
       plot_subset_similarity_contrasts_2(
         amplitude_similarity_contrasts,
-        amplitude_similarity_subset_contrasts
+        amplitude_similarity_subset_contrasts,
+        amplitude_similarity_subset_glmmTMB
       )
     ),
     # Estimate phase coupling (Hilbert transform) ----
@@ -653,7 +657,8 @@ connectivity_estimation_targets <- list(
       phase_similarity_subset_contrasts_plot_hilbert,
       plot_subset_similarity_contrasts(
         phase_similarity_contrasts_hilbert,
-        phase_similarity_subset_contrasts_hilbert
+        phase_similarity_subset_contrasts_hilbert,
+        phase_similarity_subset_glmmTMB_hilbert
       )
     ),
     # Model phase connectivity similarity (maximal model) ----
@@ -743,7 +748,8 @@ connectivity_estimation_targets <- list(
       phase_similarity_subset_contrasts_plot_maximal,
       plot_subset_similarity_contrasts(
         phase_similarity_contrasts_maximal,
-        phase_similarity_subset_contrasts_maximal
+        phase_similarity_subset_contrasts_maximal,
+        phase_similarity_subset_glmmTMB_maximal
       )
     ),
     # Model amplitude connectivity similarity (maximal model) ----
@@ -833,7 +839,8 @@ connectivity_estimation_targets <- list(
       amplitude_similarity_subset_contrasts_plot_maximal,
       plot_subset_similarity_contrasts(
         amplitude_similarity_contrasts_maximal,
-        amplitude_similarity_subset_contrasts_maximal
+        amplitude_similarity_subset_contrasts_maximal,
+        amplitude_similarity_subset_glmmTMB_maximal
       )
     ),
     # Model phase connectivity similarity (Hilbert transform, maximal model) ----
@@ -923,7 +930,8 @@ connectivity_estimation_targets <- list(
       phase_similarity_subset_contrasts_plot_hilbert_maximal,
       plot_subset_similarity_contrasts(
         phase_similarity_contrasts_hilbert_maximal,
-        phase_similarity_subset_contrasts_hilbert_maximal
+        phase_similarity_subset_contrasts_hilbert_maximal,
+        phase_similarity_subset_glmmTMB_hilbert_maximal
       )
     ),
     # Save manuscript figures ----

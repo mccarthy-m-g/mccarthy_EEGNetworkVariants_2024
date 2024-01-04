@@ -951,10 +951,13 @@ subset_contrast_similarity <- function(objects) {
 
 #' Tidy emmeans subset contrasts
 #'
-#' @param object A list of emmeans model objects.
+#' @param objects A list of emmeans model objects.
+#' @param objects A list of glmmTMB model objects. Used for convergence checks.
 #'
 #' @return A list of tidy tibbles.
-tidy_subset_contrast_similarity <- function(objects) {
+tidy_subset_contrast_similarity <- function(
+  objects, models = NULL, check_convergence = TRUE
+) {
 
   effect_labels <- c(
     "Main effect",
@@ -968,8 +971,8 @@ tidy_subset_contrast_similarity <- function(objects) {
     "Within sessions and states"
   )
 
-  purrr::map_dfr(
-    objects,
+  purrr::map2_dfr(
+    objects, models,
     ~{
       contrasts <- .x |>
         purrr::map_dfr(broom::tidy, .id = "effect") |>
@@ -978,7 +981,16 @@ tidy_subset_contrast_similarity <- function(objects) {
           effect_label = forcats::fct_relevel(
             effect_label, "Between sessions and states", after = 7
           )
+
         )
+
+      if (check_convergence) {
+        contrasts <- dplyr::mutate(
+          contrasts,
+          converged = performance::check_convergence(.y)
+        )
+      }
+
       contrasts
     },
     .id = "participant"
@@ -1006,11 +1018,14 @@ tidy_subset_contrast_similarity <- function(objects) {
 
 #' Plot subset similarity contrasts
 #'
-#' @param group_object A tibble of similarity results
-#' @param subset_objects A list of subset similarity results
+#' @param group_object A tibble of similarity results.
+#' @param subset_objects A list of subset similarity results.
+#' @param subset_models A list of subset similarity glmmTMB models.
 #'
 #' @return A grob.
-plot_subset_similarity_contrasts <- function(group_object, subset_objects) {
+plot_subset_similarity_contrasts <- function(
+  group_object, subset_objects, subset_models
+) {
 
   # Note: The gradient fill in the ridges is currently commented out, as it's a
   # bit busy when also filling the ridges by effect direction, with the colour
@@ -1018,7 +1033,7 @@ plot_subset_similarity_contrasts <- function(group_object, subset_objects) {
 
   # Tidy data to prepare for plotting
   contrasts <- tidy_contrast_similarity(group_object)
-  subset_contrasts <- tidy_subset_contrast_similarity(subset_objects)
+  subset_contrasts <- tidy_subset_contrast_similarity(subset_objects, subset_models)
 
   subset_contrasts <- contrasts |>
     dplyr::select(effect_label, group_estimate = estimate) |>
@@ -1028,8 +1043,11 @@ plot_subset_similarity_contrasts <- function(group_object, subset_objects) {
     # later remove, to work around this.
     dplyr::mutate(
       effect_label = forcats::fct_expand(effect_label, " "),
-      effect_label = forcats::fct_relevel(effect_label, "Main effect", " ")
-    )
+      effect_label = forcats::fct_relevel(effect_label, "Main effect", " "),
+      participant  = factor(participant)
+    ) |>
+    # Only show results for converged models.
+    dplyr::filter(converged)
 
   # Plotting
   my_scale <- ggplot2::scale_x_continuous(
@@ -1127,7 +1145,10 @@ plot_subset_similarity_contrasts <- function(group_object, subset_objects) {
       breaks = my_breaks,
       labels = function(x) ifelse(x == 0, 0, x)
     ) +
-    ggplot2::scale_y_discrete(expand = ggplot2::expansion(add = c(1.1, 0))) +
+    ggplot2::scale_y_discrete(
+      expand = ggplot2::expansion(add = c(1.1, 0)),
+      drop = FALSE
+    ) +
     ## These legends already appear in the group-level interval plot, so they
     ## don't need to be repeated here.
     ggplot2::guides(
@@ -1185,13 +1206,16 @@ plot_subset_similarity_contrasts <- function(group_object, subset_objects) {
 #'
 #' @param group_object A tibble of similarity results
 #' @param subset_objects A list of subset similarity results
+#' @param subset_models A list of subset similarity glmmTMB models.
 #'
 #' @return A grob.
-plot_subset_similarity_contrasts_2 <- function(group_object, subset_objects) {
+plot_subset_similarity_contrasts_2 <- function(
+  group_object, subset_objects, subset_models
+) {
 
   # Tidy data to prepare for plotting
   contrasts <- tidy_contrast_similarity(group_object)
-  subset_contrasts <- tidy_subset_contrast_similarity(subset_objects)
+  subset_contrasts <- tidy_subset_contrast_similarity(subset_objects, subset_models)
 
   subset_contrasts <- contrasts |>
     dplyr::select(effect_label, group_estimate = estimate) |>
@@ -1201,8 +1225,11 @@ plot_subset_similarity_contrasts_2 <- function(group_object, subset_objects) {
     # later remove, to work around this.
     dplyr::mutate(
       effect_label = forcats::fct_expand(effect_label, " "),
-      effect_label = forcats::fct_relevel(effect_label, "Main effect", " ")
-    )
+      effect_label = forcats::fct_relevel(effect_label, "Main effect", " "),
+      participant  = factor(participant)
+    ) |>
+    # Only show results for converged models.
+    dplyr::filter(converged)
 
   # Plotting
   my_scale <- ggplot2::scale_x_continuous(
@@ -1282,7 +1309,10 @@ plot_subset_similarity_contrasts_2 <- function(group_object, subset_objects) {
       breaks = my_breaks,
       labels = function(x) ifelse(x == 0, 0, x)
     ) +
-    ggplot2::scale_y_discrete(expand = ggplot2::expansion(add = c(1.1, 0))) +
+    ggplot2::scale_y_discrete(
+      expand = ggplot2::expansion(add = c(1.1, 0)),
+      drop = FALSE
+    ) +
     ## These legends don't need to appear.
     ggplot2::guides(
       fill = "none",
@@ -1342,7 +1372,9 @@ plot_subset_similarity_contrast_bars <- function(
         .x
       } else {
         .x |>
-          tidy_subset_contrast_similarity() |>
+          tidy_subset_contrast_similarity(
+            models = NA, check_convergence = FALSE
+          ) |>
           dplyr::select(effect_label, effect_direction) |>
           dplyr::group_by(effect_label) |>
           dplyr::count(effect_direction)

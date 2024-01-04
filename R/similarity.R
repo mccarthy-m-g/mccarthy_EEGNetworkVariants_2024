@@ -972,13 +972,13 @@ tidy_subset_contrast_similarity <- function(objects) {
     objects,
     ~{
       contrasts <- .x |>
-      purrr::map_dfr(broom::tidy, .id = "effect") |>
-      dplyr::mutate(
-        effect_label = factor(effect_labels, levels = effect_labels),
-        effect_label = forcats::fct_relevel(
-          effect_label, "Between sessions and states", after = 7
+        purrr::map_dfr(broom::tidy, .id = "effect") |>
+        dplyr::mutate(
+          effect_label = factor(effect_labels, levels = effect_labels),
+          effect_label = forcats::fct_relevel(
+            effect_label, "Between sessions and states", after = 7
+          )
         )
-      )
       contrasts
     },
     .id = "participant"
@@ -1850,7 +1850,24 @@ make_contrast_results_table_nhst <- function(emmeans_tidy, contrasts_tidy) {
       "*t*({unique(.$df)})" := statistic,
       "*p*" = p.value
     ) |>
-    dplyr::select(-df)
+    dplyr::select(-df) |>
+    dplyr::mutate(
+      contrast = factor(
+        contrast,
+        levels = c(
+          "Main effect",
+          "Between sessions",
+          "Within sessions",
+          "Between states",
+          "Within states",
+          "Between sessions and within states",
+          "Within sessions and between states",
+          "Between sessions and states",
+          "Within sessions and states"
+        )
+      )
+    ) |>
+    dplyr::arrange(contrast)
 
   # Make results table
   tidy_data |>
@@ -2003,7 +2020,24 @@ make_contrast_results_table_smd <- function(
     dplyr::rename(
       contrast = effect_label
     ) |>
-    dplyr::select(-df)
+    dplyr::select(-df) |>
+    dplyr::mutate(
+      contrast = factor(
+        contrast,
+        levels = c(
+          "Main effect",
+          "Between sessions",
+          "Within sessions",
+          "Between states",
+          "Within states",
+          "Between sessions and within states",
+          "Within sessions and between states",
+          "Between sessions and states",
+          "Within sessions and states"
+        )
+      )
+    ) |>
+    dplyr::arrange(contrast)
 
   # Make results table
   tidy_data |>
@@ -2026,7 +2060,8 @@ make_contrast_results_table_smd <- function(
       part = "header", i = 1, j = 6,
       flextable::as_paragraph(
         flextable::as_i("d"),
-        flextable::as_sub(flextable::as_i("T"))
+        flextable::as_sub(flextable::as_i("T")),
+        " (SE)"
       )
     ) |>
     flextable::add_header_row(

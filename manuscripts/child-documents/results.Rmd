@@ -2,7 +2,7 @@
 
 The results section is split into three parts. In the first part, we provide a brief summary of our functional connectivity analyses, which serves to demonstrate that both of our functional connectivity metrics gave reasonable results in each frequency band that were in agreement with previous published published work. In the second part, we investigate differences in functional connectome similarity within and between participants at the group-level.[^7] In the final part, we investigate outcome variability in differences in functional connectome similarity within and between participants at the individual-level.
 
-## Functional Connectivity Analyses
+## Functional connectivity analyses
 
 Figure \@ref(fig:illustrative-connectomes-figure) shows the results from the functional connectivity analyses for a single illustrative recording. Note that although the strength of coupling differs between the phase lag index (Figure \@ref(fig:illustrative-connectomes-figure)A) and the amplitude envelope correlation (Figure \@ref(fig:illustrative-connectomes-figure)B), the two coupling modes are qualitatively similar in their spatial organization. This level of spatial correspondence between phase coupling and amplitude coupling functional connectomes during resting state is in agreement with previous published published work [@mostamesadaghiani_PhaseAmplitudecouplingAre_2020]. We selected this recording for illustrative purposes because the spatial correspondence between its phase coupling and amplitude coupling functional connectome was particularly obvious; however, we emphasize that this observation was generally consistent across recordings and frequency bands for all participants (for figures of all phase and amplitude coupling functional connectomes, see Online Supplement).
 
@@ -38,7 +38,7 @@ connectivity_summary_table
 
 \newpage
 
-## Phase Coupling Functional Connectome Similarity Analyses
+## Phase coupling functional connectome similarity analyses
 
 ### Delta
 
@@ -147,7 +147,7 @@ targets::tar_read(phase_similarity_contrasts_table_nhst_gamma)
 
 \newpage
 
-## Amplitude Coupling Functional Connectome Similarity Analyses
+## Amplitude coupling functional connectome similarity analyses
 
 ### Alpha
 
@@ -174,7 +174,7 @@ targets::tar_read(amplitude_similarity_contrasts_table_nhst_alpha)
 
 Although we conducted all analyses for the delta, theta, beta, and gamma bands, we refrain from interpreting the results of these analyses here based on a post-hoc suggestion from a committee member; however, for transparency, the results for these frequency bands can be found in Figure \@ref(fig:amplitude-similarity-delta-theta-beta-gamma) in Appendix A. In short, the rationale behind this decision was that the functional connectome similarity analyses for these frequency bands appeared misleading, due to an unforeseen limitation of our approach to quantifying functional connectome similarity. Specifically---although the distribution of amplitude envelope correlation estimates in each of these frequency bands was in agreement with previous published published work [e.g., @fraschinietal_RobustnessFunctionalConnectivity_2019; @laietal_ComparisonScalpSourcereconstructed_2018; @mehrkanoonetal_IntrinsicCouplingModes_2014]---any qualitatively distinct differences in spatial organization between any pair of functional connectomes was overshadowed by the fact that the relative position of the observations in each connectome were very close together in space, resulting in very high to near-perfect estimates of functional connectome similarity across participants, sessions, and states. While these estimates are a statistically valid reflection of the data, we felt that they were neurophysiologically unrealistic, greatly exaggerating the magnitude of similarity between any pair of functional connectomes and failing to capture the intended nuance across participants, sessions, and states.
 
-## Outcome Variability of Functional Connectome Similarity Contrasts
+## Outcome variability of functional connectome similarity contrasts
 
 Figure \@ref(fig:subset-similarity-contrast-barplot) summarizes the results of the individual-level phase coupling and amplitude coupling functional connectome similarity contrasts in each frequency band, respectively, showing the proportion of participants whose 95% compatibility intervals for a given contrast were positive, unresolved, or negative. The effect sizes corresponding to these results are shown in Figures \@ref(fig:phase-similarity-subset-plots-delta) to \@ref(fig:amplitude-similarity-subset-plots-alpha) in Appendix A. Note that across all frequency bands and contrasts there was a mixture of participants whose most compatible effect sizes, given the background model, were unresolved or positive, with a smaller portion of negative effect sizes. Thus, although the group-level contrast results for both phase coupling and amplitude coupling functional connectomes across all frequency bands suggested that, on average, differences in functional connectome similarity may have been influenced to a slight or at most small extent by individual-dependent factors---this relationship was not necessarily true at an individual-level for all participants.[^8] 
 

@@ -76,7 +76,7 @@ After artifact rejection, the continuous data was divided into 5 second epochs a
 
 ## Analyses
 
-### Functional Connectivity
+### Functional connectivity
 
 Functional connectivity was estimated between all pairs of EEG channels using the phase lag index [PLI\; @stametal_PhaseLagIndex_2007] and the orthogonalized amplitude envelope correlation [AEC\; @hippetal_LargescaleCorticalCorrelation_2012], which measure phase coupling and amplitude coupling, respectively. Both the phase lag index and the orthogonalized amplitude envelope correlation account for the effects of field spread and volume conduction, reducing the possibility of spurious coupling between channels from influencing our functional connectivity estimates [@bastosschoffelen_TutorialReviewFunctional_2016]. Beyond basic concerns of validity, we selected the phase lag index because it is one of if not the most popular phase coupling metrics that accounts for volume conduction, and thus, is likely to be used in future EEG network variant studies; on the other hand, the orthogonalized amplitude envelope correlation was selected out of necessity, as it is currently the only available metric for estimating amplitude coupling while accounting for volume conduction. After estimating functional connectivity between all pairs of EEG channels, the resulting estimates from each recording were collected into twelve symmetrical $64 \times 64$ matrices (functional connectomes) per frequency band and measure, which reflected electrophysiological cortical functional networks derived from averaged phase or amplitude coupling between each pair of channels. These functional connectomes were the basic unit of observation for subsequent analyses.
 

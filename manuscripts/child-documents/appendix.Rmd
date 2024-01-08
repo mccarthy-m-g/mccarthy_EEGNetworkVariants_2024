@@ -52,7 +52,7 @@ targets::tar_load(amplitude_similarity_subset_results_figure_alpha)
 knitr::include_graphics(here::here(amplitude_similarity_subset_results_figure_alpha))
 ```
 
-## Phase Coupling (Hilbert transform) Results
+## Phase coupling (Hilbert transform) results
 
 In this section we report how functional connectivity and phase-coupling similarities change when the phase lag index is estimated using the Hilbert transform method instead of the multitaper method. Across all five frequency bands we find that (1) functional connectivity is generally lower, but individual patterns of connectivity are similar or the same; (2) functional connectome similarity is generally higher, but patterns of similarity are similar or the same.
 

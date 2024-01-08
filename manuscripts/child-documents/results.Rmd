@@ -1,459 +1,214 @@
 # Results
 
-```{r}
-effect_labels_clean <- c(
-    "main_effect",
-    "between_sessions",
-    "within_sessions",
-    "between_states",
-    "within_states",
-    "between_sessions_states",
-    "between_sessions_within_states",
-    "within_sessions_between_states",
-    "within_sessions_states"
-  )
+The results section is split into three parts. In the first part, we provide a brief summary of our functional connectivity analyses, which serves to demonstrate that both of our functional connectivity metrics gave reasonable results in each frequency band that were in agreement with previous published published work. In the second part, we investigate differences in functional connectome similarity within and between participants at the group-level.[^7] In the final part, we investigate outcome variability in differences in functional connectome similarity within and between participants at the individual-level.
 
-effect_labels <- c(
-    "Main effect",
-    "Between sessions",
-    "Within sessions",
-    "Between states",
-    "Within states",
-    "Between sessions and states",
-    "Between sessions and within states",
-    "Within sessions and between states",
-    "Within sessions and states"
-  )
+## Functional Connectivity Analyses
 
-effect_labels <- purrr::set_names(effect_labels, effect_labels_clean)
+Figure \@ref(fig:illustrative-connectomes-figure) shows the results from the functional connectivity analyses for a single illustrative recording. Note that although the strength of coupling differs between the phase lag index (Figure \@ref(fig:illustrative-connectomes-figure)A) and the amplitude envelope correlation (Figure \@ref(fig:illustrative-connectomes-figure)B), the two coupling modes are qualitatively similar in their spatial organization. This level of spatial correspondence between phase coupling and amplitude coupling functional connectomes during resting state is in agreement with previous published published work [@mostamesadaghiani_PhaseAmplitudecouplingAre_2020]. We selected this recording for illustrative purposes because the spatial correspondence between its phase coupling and amplitude coupling functional connectome was particularly obvious; however, we emphasize that this observation was generally consistent across recordings and frequency bands for all participants (for figures of all phase and amplitude coupling functional connectomes, see Online Supplement).
+
+```{r illustrative-connectomes-figure}
+#| fig.cap: "Results of the phase coupling (A) and amplitude coupling (B) functional connectivity analyses for a single illustrative recording (participant P16, session 3, eyes open 2, delta band). For each functional connectome, EEG channels are ordered as follows (from left to right, and from top to bottom): Fp1, Fp2, AF7, AF3, AFz, AF4, AF8, F7, F5, F3, F1, Fz, F2, F4, F6, F8, FT9, FT7, FC5, FC3, FC1, FCz, FC2, FC4, FC6, FT8, FT10, T7, C5, C3, C1, Cz, C2, C4, C6, T8, TP9, TP7, CP5, CP3, CP1, CPz, CP2, CP4, CP6, TP8, TP10, P7, P5, P3, P1, Pz, P2, P4, P6, P8, PO7, PO3, POz, PO4, PO8, O1, Oz, O2."
+targets::tar_load(illustrative_connectomes_figure)
+knitr::include_graphics(here::here(illustrative_connectomes_figure))
 ```
 
-## Overview
+Figure \@ref(fig:connectivity-histograms-figure) shows the distribution of coupling magnitudes in each frequency band across all recordings and EEG channel pairs, organized by participant. Descriptive statistics summarizing each of these distributions are shown in Table \@ref(tab:connectivity-summary-table). The small mean, wide range, and right-skew of phase lag index (Figure \@ref(fig:connectivity-histograms-figure)A) and amplitude envelope correlation (Figure \@ref(fig:connectivity-histograms-figure)B) estimates in each frequency band were in agreement with previous published published work [e.g., @fraschinietal_RobustnessFunctionalConnectivity_2019; @laietal_ComparisonScalpSourcereconstructed_2018; @mehrkanoonetal_IntrinsicCouplingModes_2014], and can be explained in part by the underestimation of true connectivity inherent to each of these metrics due to their discounting of true zero lag interactions [@cohen_EffectsTimeLag_2015; @fraschinietal_RobustnessFunctionalConnectivity_2019; @hippetal_LargescaleCorticalCorrelation_2012; @stametal_PhaseLagIndex_2007]. Additionally, a clear frequency band response was observed for both coupling modes, with the strongest coupling occurring in the alpha band for each metric. This was unsurprising, as alpha oscillations are known to play a prominent role in intrinsic connectivity networks [@mantinietal_ElectrophysiologicalSignaturesResting_2007; @marinoetal_HemodynamicCorrelatesElectrophysiological_2019; @sadaghianikleinschmidt_BrainNetworksAOscillations_2016; @samoginetal_FrequencyDependentFunctional_2020], and greater coupling in the alpha band relative to other frequency bands during resting state has been reported in previously published work using both the phase lag index [@hardmeieretal_ReproducibilityFunctionalConnectivity_2014; @mehrkanoonetal_IntrinsicCouplingModes_2014; @vandermolenetal_RestingStateEEGOscillatory_2014] and the orthogonalized amplitude envelope correlation [@hippetal_LargescaleCorticalCorrelation_2012; @mehrkanoonetal_IntrinsicCouplingModes_2014; @samoginetal_FrequencyDependentFunctional_2020; @samoginetal_AgeRelatedDifferencesFrequencyDependent_2022; @tabernaetal_DetectionRestingStateFunctional_2021]. 
 
-The results are separated into five sections, one for each frequency band, covering first the similarities of phase coupling functional connectomes, then amplitude coupling functional connectomes. In each section, we present the results in four plots: (1) a connectivity profile matrix showing the vectorized lower-triangle of the phase or amplitude coupling functional connectome from each recording; (2) a similarity matrix showing the RV coefficient estimates between all pairs of phase or amplitude coupling functional connectomes; (3) an interval plot showing the group-level contrasts estimating the difference in functional connectome similarity within and between participants at various levels of the session and state predictors; and (4) ridge plots showing the results for the individual-level contrasts estimating the difference in functional connectome similarity within and between participants at various levels of the session and state predictors. As a reminder, we considered contrasts showing that functional connectomes were approximately 0.2 and 0.3 points (on the response scale) more similar within participants than between participants to correspond to what has been found with shorter and longer fMRI scanning times, respectively. As a lower bound, we considered differences of approximately 0.1 points to be a small effect size, as differences of this size might still provide weak evidence for the presence of network variants. Further descriptions of how each of these plots can be interpreted can be found in the methods section.
+Finally, note that although amplitude envelope correlation estimates were generally smaller than phase lag index estimates in a given frequency band, we caution against a neurophysiological interpretation of these differences in terms of the relative degree of phase to amplitude coupling. Although both metrics provide an indication of coupling consistency and share the same possible range of 0 to 1, they are mathematically and conceptually distinct from one another. Because of this, quantitative comparisons between the two metrics in terms of coupling magnitudes are nebulous at best, and there is no reason to believe these metrics would give similar estimates when the relative degree of phase to amplitude coupling was equal. Instead, we reiterate that both metrics performed as expected based on what has been reported in previous work; thus, we proceeded with our full analysis plan for both coupling modes across all frequency bands, under the assumption that our estimates provided a sound representation of underlying (non-zero lag) global network activity for each participant.
 
-## Delta band
+<!-- Indeed, we would expect the amplitude envelope correlation to be smaller than the phase lag index under such circumstances, given that the former  -->
 
-### Phase coupling similarities
+<!-- Additionally, the distribution of coupling magnitudes in each frequency band was generally right-skewed for both the phase lag index (Figure \@ref(fig:connectivity-histograms-figure)A) and the amplitude envelope correlation (Figure \@ref(fig:connectivity-histograms-figure)B) at a group and individual level. This distribution of coupling magnitudes is commonly observed for both the phase lag index and amplitude envelope correlation [e.g., @laietal_ComparisonScalpSourcereconstructed_2018; @mehrkanoonetal_IntrinsicCouplingModes_2014] and can be explained in part by the underestimation of true connectivity inherent to each of these metrics, due to their discounting of zero lag interactions [@cohen_EffectsTimeLag_2015; @fraschinietal_RobustnessFunctionalConnectivity_2019; @hippetal_LargescaleCorticalCorrelation_2012; @stametal_PhaseLagIndex_2007]. -->
 
-```{r phase-summaries-delta}
-targets::tar_load(phase_connectivity_summary_delta)
-targets::tar_load(phase_similarity_contrasts_tidy_delta)
+<!-- Note also that, within each frequency band, the strength of coupling for the phase lag index was generally stronger than the amplitude envelope correlation. Although each of these functional connectivity metrics share the same possible range of 0 to 1, which may invite quantitative comparisons between the two metrics, we emphasize that  -->
 
-phase_contrasts_min_delta <- phase_similarity_contrasts_tidy_delta |>
-  dplyr::slice_min(estimate)
-phase_contrasts_max_delta <- phase_similarity_contrasts_tidy_delta |>
-  dplyr::slice_max(estimate)
-phase_contrasts_main_delta <- phase_similarity_contrasts_tidy_delta |>
-  dplyr::filter(effect == "main_effect")
+```{r connectivity-histograms-figure}
+#| fig.cap: Distribution of phase lag index (A) and amplitude envelope correlation (B) estimates across all recordings and EEG channel pairs in each frequency band. Note that the scale of the y-axis is free across panels. The marginal rug beneath each histogram shows the observed coupling estimates.
+targets::tar_load(connectivity_histogram_patchwork_figure)
+knitr::include_graphics(here::here(connectivity_histogram_patchwork_figure))
 ```
 
-Figure \@ref(fig:phase-similarity-plots-delta) shows the connectivity profile matrix, similarity matrix, interval, and ridge plots for phase coupling functional connectome similarities in the delta band. Across all functional connectomes and sensor pairs, the phase lag index ranged from `r papaja::apa_num(phase_connectivity_summary_delta$min)` to `r papaja::apa_num(phase_connectivity_summary_delta$max)` (M = `r papaja::apa_num(phase_connectivity_summary_delta$mean)`, SD = `r papaja::apa_num(phase_connectivity_summary_delta$sd)`; Figure \@ref(fig:phase-similarity-plots-delta)A). There was a visually obvious group effect, with high similarity between functional connectomes regardless of participant, session, or state (Figure \@ref(fig:phase-similarity-plots-delta)B). This was supported by the group-level contrasts, which showed that although functional connectomes were more similar within participants than between participants at all levels of the session and state predictors, the effect sizes most compatible with our data, given the background model, were at most very small (Figure \@ref(fig:phase-similarity-plots-delta)C). On average, differences in similarity were largest when contrasting functional connectomes from the same session and state ($\Delta$RV = `r papaja::apa_num(phase_contrasts_max_delta$estimate, digits = 3)`, 95% CI = [`r papaja::apa_num(phase_contrasts_max_delta$conf.low, digits = 3)`, `r papaja::apa_num(phase_contrasts_max_delta$conf.high, digits = 3)`]), and smallest when contrasting functional connectomes from different sessions and states ($\Delta$RV = `r papaja::apa_num(phase_contrasts_min_delta$estimate, digits = 3)`, 95% CI = [`r papaja::apa_num(phase_contrasts_min_delta$conf.low, digits = 3)`, `r papaja::apa_num(phase_contrasts_min_delta$conf.high, digits = 3)`]), with an overall difference of $\Delta$RV = `r papaja::apa_num(phase_contrasts_main_delta$estimate, digits = 3)`, 95% CI = [`r papaja::apa_num(phase_contrasts_main_delta$conf.low, digits = 3)`, `r papaja::apa_num(phase_contrasts_main_delta$conf.high, digits = 3)`]. Moreover, the individual-level contrasts also made it clear that the slightly higher within participant similarity at the group-level should not be overinterpreted, given that the data did not resolve whether the most compatible effect sizes were positive or negative for nearly all participants at most levels of the session and state predictors (Figure \@ref(fig:phase-similarity-plots-delta)D).
+\newpage
+
+```{r connectivity-summary-table}
+#| tab.cap: Summary statistics describing the distribution of phase lag index and amplitude envelope correlation estimates across all functional connectomes and EEG channel pairs in each frequency band.
+targets::tar_load(connectivity_summary_table)
+connectivity_summary_table
+```
+
+\newpage
+
+## Phase Coupling Functional Connectome Similarity Analyses
+
+### Delta
+
+Figure \@ref(fig:phase-similarity-plots-delta)A shows the connectivity profiles for all phase coupling functional connectomes in the delta band, organized by participant and recording. Plots and summary statistics of the distribution of coupling magnitudes across all recordings and EEG channel pairs are shown above in Figure \@ref(fig:connectivity-histograms-figure) and Table \@ref(tab:connectivity-summary-table), respectively.
+
+Figure \@ref(fig:phase-similarity-plots-delta)B shows the functional connectome similarity estimates between all pairs of phase coupling functional connectomes in the delta band. There was a visually obvious group effect, with high similarity between functional connectomes regardless of participant, session, or state. This was supported by the group-level contrast results in Figure \@ref(fig:phase-similarity-plots-delta)C, which showed that although functional connectomes were more similar within participants than between participants at all levels of the session and state predictors, on average, the effect sizes most compatible with our data, given the background model, ranged from practically nil to at most small. Table \@ref(tab:phase-similarity-table-delta) shows the estimated marginal means and targeted hypothesis tests of zero difference within and between participants corresponding to each of these contrasts. Note that the between-participant functional connectome similarity means were stable across contexts, whereas the within-participant means were more variable, indicating that the (at most small) positive differences in functional connectome similarity can be attributed to individual-dependent factors with slight modulations by session and states. Jointly, these results suggest that, on average, the phase coupling dynamics of underlying global network activity in the delta band was largely undifferentiated between individuals across contexts, with only a slight, negligible influence of individual-dependent factors.
+
+These results remained largely consistent when the phase lag index was estimated using the Hilbert transform method instead of the the multitaper method (Figure \@ref(fig:phase-similarity-plots-hilbert-delta)), with some minor differences: (1) phase coupling was generally weaker, but individual patterns of coupling were similar or the same; (2) functional connectome similarity was generally higher, but patterns of similarity were similar or the same; and (3) differences in functional connectome similarity were generally smaller, but were still positive with a similar pattern of variation across contexts. Likewise, the contrast results remained consistent between the reduced and maximal mixed beta regression models of functional connectome similarity when the phase lag index was estimated using the Hilbert transform method, but with slightly more uncertainty in the estimates (Figure \@ref(fig:phase-similarity-plots-hilbert-maximal-delta)). The maximal model of functional connectome similarity did not converge when the phase lag index was estimated using the multitaper method. 
 
 ```{r phase-similarity-plots-delta}
-#| fig.cap: Connectivity profiles for all recordings by participant (A), functional connectome similarities within and between participants (B), group-level contrasts estimating the difference in functional connectome similarity within and between participants at various levels of the session and state predictors (C), and individual-level contrasts estimating the difference in functional connectome similarity within and between participants at various levels of the session and state predictors (D) for phase coupling functional connectome similarities in the delta band.
+#| fig.cap: "Results of phase coupling analyses in the delta band: (A) connectivity profiles for all functional connectomes, organized by participant and recording; (B) estimates of functional connectome similarity between all pairs of functional connectomes, organized by participant and recording; and (C) group-level contrasts estimating the average difference in functional connectome similarity within and between participants across contexts."
 targets::tar_load(phase_similarity_results_figure_delta)
 knitr::include_graphics(here::here(phase_similarity_results_figure_delta))
 ```
 
-### Amplitude-coupling similarities
-
-```{r amplitude-summaries-delta}
-targets::tar_load(amplitude_connectivity_summary_delta)
-targets::tar_load(amplitude_similarity_contrasts_tidy_delta)
-
-amplitude_contrasts_min_delta <- amplitude_similarity_contrasts_tidy_delta |>
-  dplyr::slice_min(estimate)
-amplitude_contrasts_max_delta <- amplitude_similarity_contrasts_tidy_delta |>
-  dplyr::slice_max(estimate)
-amplitude_contrasts_main_delta <- amplitude_similarity_contrasts_tidy_delta |>
-  dplyr::filter(effect == "main_effect")
+```{r phase-similarity-table-delta}
+#| tab.cap: Estimated marginal means, mean differences, and targeted hypothesis tests of zero difference in delta band phase coupling functional connectome similarity within and between participants across contexts.
+targets::tar_read(phase_similarity_contrasts_table_nhst_delta)
 ```
 
-Figure \@ref(fig:amplitude-similarity-plots-delta) shows the connectivity profile matrix, similarity matrix, interval, and ridge plots for amplitude coupling functional connectome similarities in the delta band. Across all functional connectomes and sensor pairs, the orthogonalized amplitude envelope correlation ranged from `r papaja::apa_num(amplitude_connectivity_summary_delta$min)` to `r papaja::apa_num(amplitude_connectivity_summary_delta$max)` (M = `r papaja::apa_num(amplitude_connectivity_summary_delta$mean)`, SD = `r papaja::apa_num(amplitude_connectivity_summary_delta$sd)`; Figure \@ref(fig:amplitude-similarity-plots-delta)A). There was a visually obvious group effect, with near-perfect similarity between functional connectomes regardless of participant, session, or state (Figure \@ref(fig:amplitude-similarity-plots-delta)B). This was supported by the group-level contrasts, which showed that the differences in functional connectome similarity within and between individuals most compatible with our data, given the background model, were practically nil at all levels of the session and state predictors, with an overall difference of $\Delta$RV = `r papaja::apa_num(amplitude_contrasts_main_delta$estimate, digits = 3)`, 95% CI = [`r papaja::apa_num(amplitude_contrasts_main_delta$conf.low, digits = 3)`, `r papaja::apa_num(amplitude_contrasts_main_delta$conf.high, digits = 3)`] (Figure \@ref(fig:amplitude-similarity-plots-delta)C).
+\newpage
 
-<!-- On average, differences in similarity were largest when contrasting functional connectomes from the same session and state ($\Delta$RV = `r papaja::apa_num(amplitude_contrasts_max_delta$estimate, digits = 3)`, 95% CI = [`r papaja::apa_num(amplitude_contrasts_max_delta$conf.low, digits = 3)`, `r papaja::apa_num(amplitude_contrasts_max_delta$conf.high, digits = 3)`]), and smallest when contrasting functional connectomes from different sessions and states ($\Delta$RV = `r papaja::apa_num(amplitude_contrasts_min_delta$estimate, digits = 3)`, 95% CI = [`r papaja::apa_num(amplitude_contrasts_min_delta$conf.low, digits = 3)`, `r papaja::apa_num(amplitude_contrasts_min_delta$conf.high, digits = 3)`]), with an overall difference of $\Delta$RV = `r papaja::apa_num(amplitude_contrasts_main_delta$estimate, digits = 3)`, 95% CI = [`r papaja::apa_num(amplitude_contrasts_main_delta$conf.low, digits = 3)`, `r papaja::apa_num(amplitude_contrasts_main_delta$conf.high, digits = 3)`]. -->
+### Theta
 
-```{r amplitude-similarity-plots-delta}
-#| fig.cap: Connectivity profile matrix (A), similarity matrix (B), interval plot (C), and ridge plots (D) for amplitude coupling functional connectome similarities in the delta band.
-targets::tar_load(amplitude_similarity_results_figure_delta)
-knitr::include_graphics(here::here(amplitude_similarity_results_figure_delta))
-```
+Figure \@ref(fig:phase-similarity-plots-theta)A shows the connectivity profiles for all phase coupling functional connectomes in the theta band, organized by participant and recording. Plots and summary statistics of the distribution of coupling magnitudes across all recordings and EEG channel pairs are shown above in Figure \@ref(fig:connectivity-histograms-figure) and Table \@ref(tab:connectivity-summary-table), respectively.
 
-## Theta band
+Figure \@ref(fig:phase-similarity-plots-theta)B shows the functional connectome similarity estimates between all pairs of phase coupling functional connectomes in the theta band. There was a visually obvious group effect, with high similarity between functional connectomes regardless of participant, session, or state. This was supported by the group-level contrast results in Figure \@ref(fig:phase-similarity-plots-theta)C, which showed that although functional connectomes were more similar within participants than between participants at all levels of the session and state predictors, on average, the effect sizes most compatible with our data, given the background model, were at most small. Table \@ref(tab:phase-similarity-table-theta) shows the estimated marginal means and targeted hypothesis tests of zero difference within and between participants corresponding to each of these contrasts. Note that the between-participant functional connectome similarity means were stable across contexts, whereas the within-participant means were more variable, indicating that the (at most small) positive differences in functional connectome similarity can be attributed to individual-dependent factors with slight modulations by session and states. Jointly, these results suggest that, on average, the phase coupling dynamics of underlying global network activity in the theta band was largely undifferentiated between individuals across contexts, with only a slight influence of individual-dependent factors.
 
-### Phase-coupling similarities
-
-```{r phase-summaries-theta}
-targets::tar_load(phase_connectivity_summary_theta)
-targets::tar_load(phase_similarity_contrasts_tidy_theta)
-
-phase_contrasts_min_theta <- phase_similarity_contrasts_tidy_theta |>
-  dplyr::slice_min(estimate)
-phase_contrasts_max_theta <- phase_similarity_contrasts_tidy_theta |>
-  dplyr::slice_max(estimate)
-phase_contrasts_main_theta <- phase_similarity_contrasts_tidy_theta |>
-  dplyr::filter(effect == "main_effect")
-```
-
-Figure \@ref(fig:phase-similarity-plots-theta) shows the connectivity profile matrix, similarity matrix, interval, and ridge plots for phase coupling functional connectome similarities in the theta band. Across all functional connectomes and sensor pairs, the phase lag index ranged from `r papaja::apa_num(phase_connectivity_summary_theta$min)` to `r papaja::apa_num(phase_connectivity_summary_theta$max)` (M = `r papaja::apa_num(phase_connectivity_summary_theta$mean)`, SD = `r papaja::apa_num(phase_connectivity_summary_theta$sd)`; Figure \@ref(fig:phase-similarity-plots-theta)A). There was a visually obvious group effect, with high similarity between functional connectomes regardless of participant, session, or state (Figure \@ref(fig:phase-similarity-plots-theta)B). This was supported by the group-level contrasts, which showed that although functional connectomes were more similar within participants than between participants at all levels of the session and state predictors, the effect sizes most compatible with our data, given the background model, were at most small (Figure \@ref(fig:phase-similarity-plots-theta)C). On average, differences in similarity were largest when contrasting functional connectomes from the same session and state ($\Delta$RV = `r papaja::apa_num(phase_contrasts_max_theta$estimate, digits = 3)`, 95% CI = [`r papaja::apa_num(phase_contrasts_max_theta$conf.low, digits = 3)`, `r papaja::apa_num(phase_contrasts_max_theta$conf.high, digits = 3)`]), and smallest when contrasting functional connectomes from different sessions and states ($\Delta$RV = `r papaja::apa_num(phase_contrasts_min_theta$estimate, digits = 3)`, 95% CI = [`r papaja::apa_num(phase_contrasts_min_theta$conf.low, digits = 3)`, `r papaja::apa_num(phase_contrasts_min_theta$conf.high, digits = 3)`]), with an overall difference of $\Delta$RV = `r papaja::apa_num(phase_contrasts_main_theta$estimate, digits = 3)`, 95% CI = [`r papaja::apa_num(phase_contrasts_main_theta$conf.low, digits = 3)`, `r papaja::apa_num(phase_contrasts_main_theta$conf.high, digits = 3)`]. Again the individual-level contrasts made it clear that the higher within participant similarity at the group-level should not be overinterpreted, given that the data did not resolve whether the most compatible effect sizes were positive or negative for roughly half the participants at most levels of the session and state predictors; however, roughly one-third of the participants did have effect sizes that, although small, were consistently positive (\@ref(fig:phase-similarity-plots-theta)D).
+These results remained largely consistent when the phase lag index was estimated using the Hilbert transform method instead of the the multitaper method (Figure \@ref(fig:phase-similarity-plots-hilbert-theta)), with some minor differences: (1) phase coupling was generally weaker, but individual patterns of coupling were similar or the same; (2) functional connectome similarity was generally higher, but patterns of similarity were similar or the same; and (3) differences in functional connectome similarity were generally of similar magnitudes, with the exception of the within sessions and between states contrast which was visibly smaller. Likewise, the contrast results remained consistent between the reduced and maximal mixed beta regression models of functional connectome similarity when the phase lag index was estimated using both the multitaper method and the Hilbert transform method, but with slightly more uncertainty in the estimates (Figures \@ref(fig:phase-similarity-plots-maximal-theta) and \@ref(fig:phase-similarity-plots-hilbert-maximal-theta)).
 
 ```{r phase-similarity-plots-theta}
-#| fig.cap: Connectivity profile matrix (A), similarity matrix (B), interval plot (C), and ridge plots (D) for phase coupling functional connectome similarities in the theta band.
+#| fig.cap: "Results of phase coupling analyses in the theta band: (A) connectivity profiles for all functional connectomes, organized by participant and recording; (B) estimates of functional connectome similarity between all pairs of functional connectomes, organized by participant and recording; and (C) group-level contrasts estimating the average difference in functional connectome similarity within and between participants across contexts."
 targets::tar_load(phase_similarity_results_figure_theta)
 knitr::include_graphics(here::here(phase_similarity_results_figure_theta))
 ```
 
-### Amplitude-coupling similarities
-
-```{r amplitude-summaries-theta}
-targets::tar_load(amplitude_connectivity_summary_theta)
-targets::tar_load(amplitude_similarity_contrasts_tidy_theta)
-
-amplitude_contrasts_min_theta <- amplitude_similarity_contrasts_tidy_theta |>
-  dplyr::slice_min(estimate)
-amplitude_contrasts_max_theta <- amplitude_similarity_contrasts_tidy_theta |>
-  dplyr::slice_max(estimate)
-amplitude_contrasts_main_theta <- amplitude_similarity_contrasts_tidy_theta |>
-  dplyr::filter(effect == "main_effect")
+```{r phase-similarity-table-theta}
+#| tab.cap: Estimated marginal means, mean differences, and targeted hypothesis tests of zero difference in theta band phase coupling functional connectome similarity within and between participants across contexts.
+targets::tar_read(phase_similarity_contrasts_table_nhst_theta)
 ```
 
-Figure \@ref(fig:amplitude-similarity-plots-theta) shows the connectivity profile matrix, similarity matrix, interval, and ridge plots for amplitude coupling functional connectome similarities in the theta band. Across all functional connectomes and sensor pairs, the orthogonalized amplitude envelope correlation ranged from `r papaja::apa_num(amplitude_connectivity_summary_theta$min)` to `r papaja::apa_num(amplitude_connectivity_summary_theta$max)` (M = `r papaja::apa_num(amplitude_connectivity_summary_theta$mean)`, SD = `r papaja::apa_num(amplitude_connectivity_summary_theta$sd)`; Figure \@ref(fig:amplitude-similarity-plots-theta)A). There was a visually obvious group effect, with high to near-perfect similarity between functional connectomes regardless of participant, session, or state (Figure \@ref(fig:amplitude-similarity-plots-theta)B). This was supported by the group-level contrasts, which showed that the differences in functional connectome similarity within and between individuals most compatible with our data, given the background model, were practically nil at all levels of the session and state predictors, with an overall difference of $\Delta$RV = `r papaja::apa_num(amplitude_contrasts_main_theta$estimate, digits = 3)`, 95% CI = [`r papaja::apa_num(amplitude_contrasts_main_theta$conf.low, digits = 3)`, `r papaja::apa_num(amplitude_contrasts_main_theta$conf.high, digits = 3)`] (Figure \@ref(fig:amplitude-similarity-plots-theta)C).
+\newpage
 
-<!-- On average, differences in similarity were largest when contrasting functional connectomes from the same session and state ($\Delta$RV = `r papaja::apa_num(amplitude_contrasts_max_theta$estimate, digits = 3)`, 95% CI = [`r papaja::apa_num(amplitude_contrasts_max_theta$conf.low, digits = 3)`, `r papaja::apa_num(amplitude_contrasts_max_theta$conf.high, digits = 3)`]), and smallest when contrasting functional connectomes from different sessions and states ($\Delta$RV = `r papaja::apa_num(amplitude_contrasts_min_theta$estimate, digits = 3)`, 95% CI = [`r papaja::apa_num(amplitude_contrasts_min_theta$conf.low, digits = 3)`, `r papaja::apa_num(amplitude_contrasts_min_theta$conf.high, digits = 3)`]), with an overall difference of $\Delta$RV = `r papaja::apa_num(amplitude_contrasts_main_theta$estimate, digits = 3)`, 95% CI = [`r papaja::apa_num(amplitude_contrasts_main_theta$conf.low, digits = 3)`, `r papaja::apa_num(amplitude_contrasts_main_theta$conf.high, digits = 3)`]. -->
+### Alpha
 
-```{r amplitude-similarity-plots-theta}
-#| fig.cap: Connectivity profile matrix (A), similarity matrix (B), interval plot (C), and ridge plots (D) for amplitude coupling functional connectome similarities in the theta band.
-targets::tar_load(amplitude_similarity_results_figure_theta)
-knitr::include_graphics(here::here(amplitude_similarity_results_figure_theta))
-```
+Figure \@ref(fig:phase-similarity-plots-alpha)A shows the connectivity profiles for all phase coupling functional connectomes in the alpha band, organized by participant and recording. Plots and summary statistics of the distribution of coupling magnitudes across all recordings and EEG channel pairs are shown above in Figure \@ref(fig:connectivity-histograms-figure) and Table \@ref(tab:connectivity-summary-table), respectively.
 
-## Alpha band
+Figure \@ref(fig:phase-similarity-plots-alpha)B shows the functional connectome similarity estimates between all pairs of phase coupling functional connectomes in the alpha band. There were no visually obvious patterns of similarity consistent across participants, but there were some individual differences worth highlighting: Participant P03 showed high similarity across sessions and states, corresponding to an individual effect; Participants P14, P17, and P19 showed moderate to high similarity in the eyes open state across sessions, and moderate similarity between participants, corresponding to a partial state effect; and participants P07, P08, P11, and P20 showed moderate similarity across sessions and states with themselves and each other, corresponding to a partial group effect. The remaining participants showed no distinctive patterns. Additionally, unlike the delta, theta, beta, and gamma bands, the amount of similarity between participants was generally moderate and considerably more variable; not consistently high.
 
-### Phase-coupling similarities
+However, despite the presence of more visually apparent individual effects, there was still a strong group effect. This was supported by the group-level contrast results in Figure \@ref(fig:phase-similarity-plots-alpha)C, which showed that although functional connectomes were more similar within participants than between participants at all levels of the session and state predictors, on average, the effect sizes most compatible with our data, given the background model, were still at most small. Table \@ref(tab:phase-similarity-table-alpha) shows the estimated marginal means and targeted hypothesis tests of zero difference within and between participants corresponding to each of these contrasts. Note that the between-participant functional connectome similarity means were stable across contexts, whereas the within-participant means were more variable, indicating that the (at most small) positive differences in functional connectome similarity can be attributed to individual-dependent factors with small modulations by session and states. Jointly, these results suggest that, on average, the phase coupling dynamics of underlying global network activity in the alpha band was differentiated between individuals across contexts, but with only a small influence of individual-dependent factors over and above the influence of stable group-dependent factors.
 
-```{r phase-similarity-emmeans-alpha, eval=FALSE}
-# emmeans
-targets::tar_load(phase_similarity_emmeans_tidy_alpha)
-
-phase_similarity_emmeans_alpha <- split(
-  phase_similarity_emmeans_tidy_alpha,
-  phase_similarity_emmeans_tidy_alpha$effect_label
-)
-
-## Assign values to objects in global environment for inline printing
-xyz <- purrr::map(
-  names(phase_similarity_emmeans_alpha),
-  ~{
-    assign(
-      paste0(.x, "_mean"),
-      phase_similarity_emmeans_alpha[[.x]][["response"]],
-      pos = ".GlobalEnv"
-    )
-    assign(
-      paste0(.x, "_se"),
-      phase_similarity_emmeans_alpha[[.x]][["std.error"]],
-      pos = ".GlobalEnv"
-    )
-  }
-)
-
-# Contrasts
-targets::tar_load(phase_similarity_contrasts_tidy_alpha)
-
-phase_similarity_contrasts_alpha <- phase_similarity_contrasts_tidy_alpha |>
-  dplyr::mutate(
-    effect_label = forcats::fct_recode(effect_label, !!!effect_labels)
-  )
-
-phase_similarity_contrasts_alpha <- split(
-  phase_similarity_contrasts_alpha,
-  phase_similarity_contrasts_alpha$effect_label
-)
-
-## Assign values to objects in global environment for inline printing
-zzz <- purrr::map(
-  effect_labels_clean,
-  ~{
-    assign(
-      paste0(.x, "_estimate"),
-      phase_similarity_contrasts_alpha[[.x]][["estimate"]],
-      pos = ".GlobalEnv"
-    )
-    assign(
-      paste0(.x, "_lower"),
-      phase_similarity_contrasts_alpha[[.x]][["conf.low"]],
-      pos = ".GlobalEnv"
-    )
-    assign(
-      paste0(.x, "_upper"),
-      phase_similarity_contrasts_alpha[[.x]][["conf.high"]],
-      pos = ".GlobalEnv"
-    )
-  }
-)
-
-# Table
-# phase_similarity_emmeans_tidy_alpha |>
-#   dplyr::select(effect_label, within_participant, response, std.error) |>
-#   dplyr::mutate(
-#     effect_label = stringr::str_remove(effect_label, ".+participants_")
-#   ) |>
-#   tidyr::pivot_wider(
-#     names_from = within_participant,
-#     values_from = c(response, std.error)
-#   ) |> 
-#   dplyr::left_join(
-#     dplyr::select(
-#       phase_similarity_contrasts_alpha,
-#       effect_label, estimate, std.error, conf.low, conf.high
-#     ),
-#   by = "effect_label"
-#   ) |> 
-#   dplyr::relocate(
-#     response_between_participants, std.error_between_participants,
-#     .after = std.error_within_participants
-#   ) |>
-#   dplyr::mutate(dplyr::across(where(is.numeric), papaja::apa_num, digits = 3)) |>
-#   gt::gt() |>
-#   gt::tab_spanner(
-#     "Within Participant",
-#     columns = c(response_within_participants,	std.error_within_participants)
-#   ) |>
-#   gt::tab_spanner(
-#     "Between Participant",
-#     columns = c(response_between_participants, std.error_between_participants)
-#   ) |>
-#   gt::tab_spanner(
-#     "Contrast",
-#     columns = c(estimate, std.error, conf.low, conf.high)
-#   ) |>
-#   gt::cols_label(
-#     effect_label = "Effect",
-#     response_within_participants = gt::md("*M*"),
-#     std.error_within_participants = gt::md("*SE*"),
-#     response_between_participants = gt::md("*M*"),
-#     std.error_between_participants = gt::md("*SE*"),
-#     estimate = gt::md("*M*"),
-#     std.error = gt::md("*SE*"),
-#     conf.low = gt::md("95% CI lower"),
-#     conf.high = gt::md("95% CI upper")
-#   ) |>
-#   gt::cols_align(
-#     align = "center",
-#     columns = -effect_label
-#   ) |>
-#   gt::tab_options(
-#     table.border.top.width = 3,
-#     table.border.top.color = "black",
-#     table.border.bottom.width = 3,
-#     table.border.bottom.color = "black",
-#     table_body.hlines.color = "white",
-#     column_labels.border.bottom.width = 2,
-#     column_labels.border.bottom.color = "black"
-#   )
-```
-
-```{r phase-summaries-alpha}
-targets::tar_load(phase_connectivity_summary_alpha)
-targets::tar_load(phase_similarity_contrasts_tidy_alpha)
-
-phase_contrasts_min_alpha <- phase_similarity_contrasts_tidy_alpha |>
-  dplyr::slice_min(estimate)
-phase_contrasts_max_alpha <- phase_similarity_contrasts_tidy_alpha |>
-  dplyr::slice_max(estimate)
-phase_contrasts_main_alpha <- phase_similarity_contrasts_tidy_alpha |>
-  dplyr::filter(effect == "main_effect")
-```
-
-Figure \@ref(fig:phase-similarity-plots-alpha) shows the connectivity profile matrix, similarity matrix, interval, and ridge plots for phase coupling functional connectome similarities in the alpha band. Across all functional connectomes and sensor pairs, the phase lag index ranged from `r papaja::apa_num(phase_connectivity_summary_alpha$min)` to `r papaja::apa_num(phase_connectivity_summary_alpha$max)` (M = `r papaja::apa_num(phase_connectivity_summary_alpha$mean)`, SD = `r papaja::apa_num(phase_connectivity_summary_alpha$sd)`; Figure \@ref(fig:phase-similarity-plots-alpha)A). There were no visually obvious patterns of similarity consistent across participants, but there were some individual differences worth highlighting: Participant P03 showed high similarity across sessions and states, corresponding to an individual effect; Participants P14, P17, and P19 showed moderate to high similarity in the eyes open state across sessions, and moderate similarity between participants, corresponding to a partial state effect; and participants P07, P08, P11, and P20 showed moderate similarity across sessions and states with themselves and each other, corresponding to a partial group effect. The remaining participants showed no distinctive patterns. Additionally, unlike the delta and theta bands, the amount of similarity between participants was generally moderate and considerably more variable; not consistently high (Figure \@ref(fig:phase-similarity-plots-alpha)B).
-
-However, despite the presence of more visually apparent individual effects, there was still a strong group effect. This was supported by the group-level contrasts, which showed that although functional connectomes were more similar within participants than between participants at all levels of the session and state predictors, the effect sizes most compatible with our data, given the background model, were still at most small (Figure \@ref(fig:phase-similarity-plots-alpha)C). On average, differences in similarity were largest when contrasting functional connectomes from the same session and state ($\Delta$RV = `r papaja::apa_num(phase_contrasts_max_alpha$estimate, digits = 3)`, 95% CI = [`r papaja::apa_num(phase_contrasts_max_alpha$conf.low, digits = 3)`, `r papaja::apa_num(phase_contrasts_max_alpha$conf.high, digits = 3)`]), and smallest when contrasting functional connectomes from different sessions and states ($\Delta$RV = `r papaja::apa_num(phase_contrasts_min_alpha$estimate, digits = 3)`, 95% CI = [`r papaja::apa_num(phase_contrasts_min_alpha$conf.low, digits = 3)`, `r papaja::apa_num(phase_contrasts_min_alpha$conf.high, digits = 3)`]), with an overall difference of $\Delta$RV = `r papaja::apa_num(phase_contrasts_main_alpha$estimate, digits = 3)`, 95% CI = [`r papaja::apa_num(phase_contrasts_main_alpha$conf.low, digits = 3)`, `r papaja::apa_num(phase_contrasts_main_alpha$conf.high, digits = 3)`]. The individual-level contrasts better highlight the inter-individual variability in functional connectome similarities at different levels of the effect, and again highlight that group-level contrasts should not be overinterpreted, given that the data did not resolve whether the most compatible effect sizes were positive or negative for roughly one-third of the participants at most levels of the session and state predictors. However, there was more individual-level consistency with the group-level contrasts for the within state and the within session and state effects, where nearly all participants had effect sizes that, although small, were consistently positive (\@ref(fig:phase-similarity-plots-alpha)D).
+These results remained largely consistent when the phase lag index was estimated using the Hilbert transform method instead of the the multitaper method (Figure \@ref(fig:phase-similarity-plots-hilbert-alpha)), with some minor differences: (1) phase coupling was generally weaker, but individual patterns of coupling were similar or the same; and (2) functional connectome similarity was generally higher, but patterns of similarity were similar or the same; however, differences in functional connectome similarity were generally of similar magnitudes. Likewise, the contrast results remained consistent between the reduced and maximal mixed beta regression models of functional connectome similarity when the phase lag index was estimated using both the multitaper method and the Hilbert transform method, but with slightly more uncertainty in the estimates (Figures \@ref(fig:phase-similarity-plots-maximal-alpha) and \@ref(fig:phase-similarity-plots-hilbert-maximal-alpha)).
 
 ```{r phase-similarity-plots-alpha}
-#| fig.cap: Connectivity profile matrix (A), similarity matrix (B), interval plot (C), and ridge plots (D) for phase coupling functional connectome similarities in the alpha band.
+#| fig.cap: "Results of phase coupling analyses in the alpha band: (A) connectivity profiles for all functional connectomes, organized by participant and recording; (B) estimates of functional connectome similarity between all pairs of functional connectomes, organized by participant and recording; and (C) group-level contrasts estimating the average difference in functional connectome similarity within and between participants across contexts."
 targets::tar_load(phase_similarity_results_figure_alpha)
 knitr::include_graphics(here::here(phase_similarity_results_figure_alpha))
 ```
 
-### Amplitude-coupling similarities
-
-```{r amplitude-similarity-emmeans-alpha, eval=FALSE}
-# emmeans
-targets::tar_load(amplitude_similarity_emmeans_tidy_alpha)
-
-amplitude_similarity_emmeans_alpha <- split(
-  amplitude_similarity_emmeans_tidy_alpha,
-  amplitude_similarity_emmeans_tidy_alpha$effect_label
-)
-
-## Assign values to objects in global environment for inline printing
-xyz <- purrr::map(
-  names(amplitude_similarity_emmeans_alpha),
-  ~{
-    assign(
-      paste0(.x, "_mean"),
-      amplitude_similarity_emmeans_alpha[[.x]][["response"]],
-      pos = ".GlobalEnv"
-    )
-    assign(
-      paste0(.x, "_se"),
-      amplitude_similarity_emmeans_alpha[[.x]][["std.error"]],
-      pos = ".GlobalEnv"
-    )
-  }
-)
-
-# Contrasts
-targets::tar_load(amplitude_similarity_contrasts_tidy_alpha)
-
-amplitude_similarity_contrasts_alpha <- amplitude_similarity_contrasts_tidy_alpha |>
-  dplyr::mutate(
-    effect_label = forcats::fct_recode(effect_label, !!!effect_labels)
-  )
-
-amplitude_similarity_contrasts_alpha <- split(
-  amplitude_similarity_contrasts_alpha,
-  amplitude_similarity_contrasts_alpha$effect_label
-)
-
-## Assign values to objects in global environment for inline printing
-zzz <- purrr::map(
-  effect_labels_clean,
-  ~{
-    assign(
-      paste0(.x, "_estimate"),
-      amplitude_similarity_contrasts_alpha[[.x]][["estimate"]],
-      pos = ".GlobalEnv"
-    )
-    assign(
-      paste0(.x, "_lower"),
-      amplitude_similarity_contrasts_alpha[[.x]][["conf.low"]],
-      pos = ".GlobalEnv"
-    )
-    assign(
-      paste0(.x, "_upper"),
-      amplitude_similarity_contrasts_alpha[[.x]][["conf.high"]],
-      pos = ".GlobalEnv"
-    )
-  }
-)
+```{r phase-similarity-table-alpha}
+#| tab.cap: Estimated marginal means, mean differences, and targeted hypothesis tests of zero difference in alpha band phase coupling functional connectome similarity within and between participants across contexts.
+targets::tar_read(phase_similarity_contrasts_table_nhst_alpha)
 ```
 
-```{r amplitude-summaries-alpha}
-targets::tar_load(amplitude_connectivity_summary_alpha)
-targets::tar_load(amplitude_similarity_contrasts_tidy_alpha)
+\newpage
 
-amplitude_contrasts_min_alpha <- amplitude_similarity_contrasts_tidy_alpha |>
-  dplyr::slice_min(estimate)
-amplitude_contrasts_max_alpha <- amplitude_similarity_contrasts_tidy_alpha |>
-  dplyr::slice_max(estimate)
-amplitude_contrasts_main_alpha <- amplitude_similarity_contrasts_tidy_alpha |>
-  dplyr::filter(effect == "main_effect")
-```
+### Beta
 
-Figure \@ref(fig:amplitude-similarity-plots-alpha) shows the connectivity profile matrix, similarity matrix, interval, and ridge plots for amplitude coupling functional connectome similarities in the alpha band. Across all functional connectomes and sensor pairs, the orthogonalized amplitude envelope correlation ranged from `r papaja::apa_num(amplitude_connectivity_summary_alpha$min)` to `r papaja::apa_num(amplitude_connectivity_summary_alpha$max)` (M = `r papaja::apa_num(amplitude_connectivity_summary_alpha$mean)`, SD = `r papaja::apa_num(amplitude_connectivity_summary_alpha$sd)`; Figure \@ref(fig:amplitude-similarity-plots-alpha)A). Interestingly, similar patterns of individual differences in functional connectome similarity as we found for phase coupling similarities in the alpha band (Figure \@ref(fig:phase-similarity-plots-alpha)B) were also found here; however, here too there was a visually obvious group effect, with high similarity between functional connectomes regardless of participant, session, or state (Figure \@ref(fig:amplitude-similarity-plots-alpha)B). This was supported by the group-level contrasts, which showed that although functional connectomes were more similar within participants than between participants at all levels of the session and state predictors, the effect sizes most compatible with our data, given the background model, were practically nil or at most small (Figure \@ref(fig:amplitude-similarity-plots-alpha)C). On average, differences in similarity were largest when contrasting functional connectomes from the same session and state ($\Delta$RV = `r papaja::apa_num(amplitude_contrasts_max_alpha$estimate, digits = 3)`, 95% CI = [`r papaja::apa_num(amplitude_contrasts_max_alpha$conf.low, digits = 3)`, `r papaja::apa_num(amplitude_contrasts_max_alpha$conf.high, digits = 3)`]), and smallest when contrasting functional connectomes from different sessions and states ($\Delta$RV = `r papaja::apa_num(amplitude_contrasts_min_alpha$estimate, digits = 3)`, 95% CI = [`r papaja::apa_num(amplitude_contrasts_min_alpha$conf.low, digits = 3)`, `r papaja::apa_num(amplitude_contrasts_min_alpha$conf.high, digits = 3)`]), with an overall difference of $\Delta$RV = `r papaja::apa_num(amplitude_contrasts_main_alpha$estimate, digits = 3)`, 95% CI = [`r papaja::apa_num(amplitude_contrasts_main_alpha$conf.low, digits = 3)`, `r papaja::apa_num(amplitude_contrasts_main_alpha$conf.high, digits = 3)`]. The individual-level contrasts also showed similar individual differences as seen with phase coupling functional connectome similarities in Figure \@ref(fig:phase-similarity-plots-alpha)C, but with smaller magnitudes and variation (Figure \@ref(fig:amplitude-similarity-plots-alpha)D). However, the individual-level contrasts also made it clear that that the higher within participant similarity at the group-level should not be overinterpreted, given that the data did not resolve whether the most compatible effect sizes were positive or negative for roughly half the participants at most levels of the session and state predictors, and the roughly one-third of participants whose most compatible effect sizes were consistently positive were still at most small.
+Figure \@ref(fig:phase-similarity-plots-beta)A shows the connectivity profiles for all phase coupling functional connectomes in the beta band, organized by participant and recording. Plots and summary statistics of the distribution of coupling magnitudes across all recordings and EEG channel pairs are shown above in Figure \@ref(fig:connectivity-histograms-figure) and Table \@ref(tab:connectivity-summary-table), respectively.
 
-<!-- This is perhaps unsurprising, given that phase values estimated with the cross spectral density are weighted by amplitude [@cohen_AnalyzingNeuralTime_2014] -->
+Figure \@ref(fig:phase-similarity-plots-beta)B shows the functional connectome similarity estimates between all pairs of phase coupling functional connectomes in the beta band. There was a visually obvious group effect, with high similarity between functional connectomes regardless of participant, session, or state. This was supported by the group-level contrast results in Figure \@ref(fig:phase-similarity-plots-beta)C, which showed that although functional connectomes were more similar within participants than between participants at all levels of the session and state predictors, on average, the effect sizes most compatible with our data, given the background model, were at most small. Table \@ref(tab:phase-similarity-table-beta) shows the estimated marginal means and targeted hypothesis tests of zero difference within and between participants corresponding to each of these contrasts. Note that the between-participant functional connectome similarity means were stable across contexts, whereas the within-participant means were more variable, indicating that the (at most small) positive differences in functional connectome similarity can be attributed to individual-dependent factors with slight modulations by session and states. Jointly, these results suggest that, on average, the phase coupling dynamics of underlying global network activity in the beta band was largely undifferentiated between individuals across contexts, with only a slight influence of individual-dependent factors.
 
-```{r amplitude-similarity-plots-alpha}
-#| fig.cap: Connectivity profile matrix (A), similarity matrix (B), interval plot (C), and ridge plots (D) for amplitude coupling functional connectome similarities in the alpha band.
-targets::tar_load(amplitude_similarity_results_figure_alpha)
-knitr::include_graphics(here::here(amplitude_similarity_results_figure_alpha))
-```
-
-## Beta band
-
-### Phase-coupling similarities
-
-```{r phase-summaries-beta}
-targets::tar_load(phase_connectivity_summary_beta)
-targets::tar_load(phase_similarity_contrasts_tidy_beta)
-
-phase_contrasts_min_beta <- phase_similarity_contrasts_tidy_beta |>
-  dplyr::slice_min(estimate)
-phase_contrasts_max_beta <- phase_similarity_contrasts_tidy_beta |>
-  dplyr::slice_max(estimate)
-phase_contrasts_main_beta <- phase_similarity_contrasts_tidy_beta |>
-  dplyr::filter(effect == "main_effect")
-```
-
-Figure \@ref(fig:phase-similarity-plots-beta) shows the connectivity profile matrix, similarity matrix, interval, and ridge plots for phase coupling functional connectome similarities in the beta band. Across all functional connectomes and sensor pairs, the phase lag index ranged from `r papaja::apa_num(phase_connectivity_summary_beta$min)` to `r papaja::apa_num(phase_connectivity_summary_beta$max)` (M = `r papaja::apa_num(phase_connectivity_summary_beta$mean)`, SD = `r papaja::apa_num(phase_connectivity_summary_beta$sd)`; Figure \@ref(fig:phase-similarity-plots-beta)A). There was a visually obvious group effect, with high similarity between functional connectomes regardless of participant, session, or state (Figure \@ref(fig:phase-similarity-plots-beta)B). This was supported by the group-level contrasts, which showed that although functional connectomes were more similar within participants than between participants at all levels of the session and state predictors, the effect sizes most compatible with our data, given the background model, were at most small (Figure \@ref(fig:phase-similarity-plots-beta)C). On average, differences in similarity were largest when contrasting functional connectomes from the same session and state ($\Delta$RV = `r papaja::apa_num(phase_contrasts_max_beta$estimate, digits = 3)`, 95% CI = [`r papaja::apa_num(phase_contrasts_max_beta$conf.low, digits = 3)`, `r papaja::apa_num(phase_contrasts_max_beta$conf.high, digits = 3)`]), and smallest when contrasting functional connectomes from different sessions and states ($\Delta$RV = `r papaja::apa_num(phase_contrasts_min_beta$estimate, digits = 3)`, 95% CI = [`r papaja::apa_num(phase_contrasts_min_beta$conf.low, digits = 3)`, `r papaja::apa_num(phase_contrasts_min_beta$conf.high, digits = 3)`]), with an overall difference of $\Delta$RV = `r papaja::apa_num(phase_contrasts_main_beta$estimate, digits = 3)`, 95% CI = [`r papaja::apa_num(phase_contrasts_main_beta$conf.low, digits = 3)`, `r papaja::apa_num(phase_contrasts_main_beta$conf.high, digits = 3)`]. Again the individual-level contrasts made it clear that the higher within participant similarity at the group-level should not be overinterpreted, given that the data did not resolve whether the most compatible effect sizes were positive or negative for roughly one-third of the participants at most levels of the session and state predictors; however, roughly two-thirds of the participants did have effect sizes that, although small, were consistently positive (\@ref(fig:phase-similarity-plots-beta)D).
+These results remained largely consistent when the phase lag index was estimated using the Hilbert transform method instead of the the multitaper method (Figure \@ref(fig:phase-similarity-plots-hilbert-beta)), with some minor differences: (1) phase coupling was generally weaker, but individual patterns of coupling were similar or the same; (2) functional connectome similarity was generally higher, but patterns of similarity were similar or the same; and (3) differences in functional connectome similarity were generally smaller, but were still positive with a similar pattern of variation across contexts. Likewise, the contrast results remained consistent between the reduced and maximal mixed beta regression models of functional connectome similarity when the phase lag index was estimated using both the multitaper method and the Hilbert transform method, but with slightly more uncertainty in the estimates (Figures \@ref(fig:phase-similarity-plots-maximal-beta) and \@ref(fig:phase-similarity-plots-hilbert-maximal-beta)).
 
 ```{r phase-similarity-plots-beta}
-#| fig.cap: Connectivity profile matrix (A), similarity matrix (B), interval plot (C), and ridge plots (D) for phase coupling functional connectome similarities in the beta band.
+#| fig.cap: "Results of phase coupling analyses in the beta band: (A) connectivity profiles for all functional connectomes, organized by participant and recording; (B) estimates of functional connectome similarity between all pairs of functional connectomes, organized by participant and recording; and (C) group-level contrasts estimating the average difference in functional connectome similarity within and between participants across contexts."
 targets::tar_load(phase_similarity_results_figure_beta)
 knitr::include_graphics(here::here(phase_similarity_results_figure_beta))
 ```
 
-### Amplitude-coupling similarities
-
-```{r amplitude-summaries-beta}
-targets::tar_load(amplitude_connectivity_summary_beta)
-targets::tar_load(amplitude_similarity_contrasts_tidy_beta)
-
-amplitude_contrasts_min_beta <- amplitude_similarity_contrasts_tidy_beta |>
-  dplyr::slice_min(estimate)
-amplitude_contrasts_max_beta <- amplitude_similarity_contrasts_tidy_beta |>
-  dplyr::slice_max(estimate)
-amplitude_contrasts_main_beta <- amplitude_similarity_contrasts_tidy_beta |>
-  dplyr::filter(effect == "main_effect")
+```{r phase-similarity-table-beta}
+#| tab.cap: Estimated marginal means, mean differences, and targeted hypothesis tests of zero difference in beta band phase coupling functional connectome similarity within and between participants across contexts.
+targets::tar_read(phase_similarity_contrasts_table_nhst_beta)
 ```
 
-Figure \@ref(fig:amplitude-similarity-plots-beta) shows the connectivity profile matrix, similarity matrix, interval, and ridge plots for amplitude coupling functional connectome similarities in the beta band. Across all functional connectomes and sensor pairs, the orthogonalized amplitude envelope correlation ranged from `r papaja::apa_num(amplitude_connectivity_summary_beta$min)` to `r papaja::apa_num(amplitude_connectivity_summary_beta$max)` (M = `r papaja::apa_num(amplitude_connectivity_summary_beta$mean)`, SD = `r papaja::apa_num(amplitude_connectivity_summary_beta$sd)`; Figure \@ref(fig:amplitude-similarity-plots-beta)A). There was a visually obvious group effect, with near-perfect similarity between functional connectomes regardless of participant, session, or state (Figure \@ref(fig:amplitude-similarity-plots-beta)B). This was supported by the group-level contrasts, which showed that the differences in functional connectome similarity between and within individuals most compatible with our data, given the background model, were practically nil at all levels of the session and state predictors, with an overall difference of $\Delta$RV = `r papaja::apa_num(amplitude_contrasts_main_beta$estimate, digits = 3)`, 95% CI = [`r papaja::apa_num(amplitude_contrasts_main_beta$conf.low, digits = 3)`, `r papaja::apa_num(amplitude_contrasts_main_beta$conf.high, digits = 3)`] (Figure \@ref(fig:amplitude-similarity-plots-beta)C).
+\newpage
 
-<!-- On average, differences in similarity were largest when contrasting functional connectomes from the same session and state ($\Delta$RV = `r papaja::apa_num(amplitude_contrasts_max_beta$estimate, digits = 3)`, 95% CI = [`r papaja::apa_num(amplitude_contrasts_max_beta$conf.low, digits = 3)`, `r papaja::apa_num(amplitude_contrasts_max_beta$conf.high, digits = 3)`]), and smallest when contrasting functional connectomes from different sessions and states ($\Delta$RV = `r papaja::apa_num(amplitude_contrasts_min_beta$estimate, digits = 3)`, 95% CI = [`r papaja::apa_num(amplitude_contrasts_min_beta$conf.low, digits = 3)`, `r papaja::apa_num(amplitude_contrasts_min_beta$conf.high, digits = 3)`]), with an overall difference of $\Delta$RV = `r papaja::apa_num(amplitude_contrasts_main_beta$estimate, digits = 3)`, 95% CI = [`r papaja::apa_num(amplitude_contrasts_main_beta$conf.low, digits = 3)`, `r papaja::apa_num(amplitude_contrasts_main_beta$conf.high, digits = 3)`]. -->
+### Gamma
 
-```{r amplitude-similarity-plots-beta}
-#| fig.cap: Connectivity profile matrix (A), similarity matrix (B), interval plot (C), and ridge plots (D) for amplitude coupling functional connectome similarities in the beta band.
-targets::tar_load(amplitude_similarity_results_figure_beta)
-knitr::include_graphics(here::here(amplitude_similarity_results_figure_beta))
-```
+Figure \@ref(fig:phase-similarity-plots-gamma)A shows the connectivity profiles for all phase coupling functional connectomes in the gamma band, organized by participant and recording. Plots and summary statistics of the distribution of coupling magnitudes across all recordings and EEG channel pairs are shown above in Figure \@ref(fig:connectivity-histograms-figure) and Table \@ref(tab:connectivity-summary-table), respectively.
 
-## Gamma band
+Figure \@ref(fig:phase-similarity-plots-gamma)B shows the functional connectome similarity estimates between all pairs of phase coupling functional connectomes in the gamma band. There was a visually obvious group effect, with high similarity between functional connectomes regardless of participant, session, or state. This was supported by the group-level contrast results in Figure \@ref(fig:phase-similarity-plots-gamma)C, which showed that although functional connectomes were more similar within participants than between participants at all levels of the session and state predictors, on average, the effect sizes most compatible with our data, given the background model, ranged from practically nil to at most small. Table \@ref(tab:phase-similarity-table-gamma) shows the estimated marginal means and targeted hypothesis tests of zero difference within and between participants corresponding to each of these contrasts. Note that the between-participant functional connectome similarity means were stable across contexts, whereas the within-participant means were more variable, indicating that the (at most small) positive differences in functional connectome similarity can be attributed to individual-dependent factors with slight modulations by session and states. Jointly, these results suggest that, on average, the phase coupling dynamics of underlying global network activity in the gamma band was largely undifferentiated between individuals across contexts, with only a slight, negligible influence of individual-dependent factors.
 
-### Phase-coupling similarities
-
-```{r phase-summaries-gamma}
-targets::tar_load(phase_connectivity_summary_gamma)
-targets::tar_load(phase_similarity_contrasts_tidy_gamma)
-
-phase_contrasts_min_gamma <- phase_similarity_contrasts_tidy_gamma |>
-  dplyr::slice_min(estimate)
-phase_contrasts_max_gamma <- phase_similarity_contrasts_tidy_gamma |>
-  dplyr::slice_max(estimate)
-phase_contrasts_main_gamma <- phase_similarity_contrasts_tidy_gamma |>
-  dplyr::filter(effect == "main_effect")
-```
-
-Figure \@ref(fig:phase-similarity-plots-gamma) shows the connectivity profile matrix, similarity matrix, interval, and ridge plots for phase coupling functional connectome similarities in the gamma band. Across all functional connectomes and sensor pairs, the phase lag index ranged from `r papaja::apa_num(phase_connectivity_summary_gamma$min)` to `r papaja::apa_num(phase_connectivity_summary_gamma$max)` (M = `r papaja::apa_num(phase_connectivity_summary_gamma$mean)`, SD = `r papaja::apa_num(phase_connectivity_summary_gamma$sd)`; Figure \@ref(fig:phase-similarity-plots-gamma)A). There was a visually obvious group effect, with high similarity between functional connectomes regardless of participant, session, or state for all participants but P21 (Figure \@ref(fig:phase-similarity-plots-gamma)B). This was supported by the group-level contrasts, which showed that although functional connectomes were more similar within participants than between participants at all levels of the session and state predictors, the effect sizes most compatible with our data, given the background model, were at most very small (Figure \@ref(fig:phase-similarity-plots-gamma)C). On average, differences in similarity were largest when contrasting functional connectomes from the same session and state ($\Delta$RV = `r papaja::apa_num(phase_contrasts_max_gamma$estimate, digits = 3)`, 95% CI = [`r papaja::apa_num(phase_contrasts_max_gamma$conf.low, digits = 3)`, `r papaja::apa_num(phase_contrasts_max_gamma$conf.high, digits = 3)`]), and smallest when contrasting functional connectomes from different sessions and states ($\Delta$RV = `r papaja::apa_num(phase_contrasts_min_gamma$estimate, digits = 3)`, 95% CI = [`r papaja::apa_num(phase_contrasts_min_gamma$conf.low, digits = 3)`, `r papaja::apa_num(phase_contrasts_min_gamma$conf.high, digits = 3)`]), with an overall difference of $\Delta$RV = `r papaja::apa_num(phase_contrasts_main_gamma$estimate, digits = 3)`, 95% CI = [`r papaja::apa_num(phase_contrasts_main_gamma$conf.low, digits = 3)`, `r papaja::apa_num(phase_contrasts_main_gamma$conf.high, digits = 3)`]. Moreover, the individual-level contrasts also made it clear that the slightly higher within participant similarity at the group-level should not be overinterpreted, given that the data did not resolve whether the most compatible effect sizes were positive or negative for nearly all participants at most levels of the session and state predictors (Figure \@ref(fig:phase-similarity-plots-gamma)D).
+These results remained largely consistent when the phase lag index was estimated using the Hilbert transform method instead of the the multitaper method (Figure \@ref(fig:phase-similarity-plots-hilbert-gamma)), with some minor differences: (1) phase coupling was generally weaker, but individual patterns of coupling were similar or the same; (2) functional connectome similarity was generally higher, but patterns of similarity were similar or the same; and (3) differences in functional connectome similarity were generally smaller, but were still positive with a similar pattern of variation across contexts. Likewise, the contrast results remained largely consistent between the reduced and maximal mixed beta regression models of functional connectome similarity when the phase lag index was estimated using both the multitaper method and the Hilbert transform method, but with slightly more uncertainty in the estimates (Figures \@ref(fig:phase-similarity-plots-maximal-gamma) and \@ref(fig:phase-similarity-plots-hilbert-maximal-gamma)). This increased uncertainty resulted in the direction of the between sessions, between sessions and within states, and between sessions and states contrasts to become unresolved; however, the difference in meaning between a precise zero effect [@anderson_AssessingStatisticalResults_2019] for the maximal models and a very small positive effect for the reduced models observed here is trivial, and does not detract from the main point that the results of both models suggest that the phase coupling dynamics of underlying global network activity in the gamma band was undifferentiated between individuals across contexts, with only a slight, negligible influence of individual-dependent factors.
 
 ```{r phase-similarity-plots-gamma}
-#| fig.cap: Connectivity profile matrix (A), similarity matrix (B), interval plot (C), and ridge plots (D) for phase coupling functional connectome similarities in the gamma band.
+#| fig.cap: "Results of phase coupling analyses in the gamma band: (A) connectivity profiles for all functional connectomes, organized by participant and recording; (B) estimates of functional connectome similarity between all pairs of functional connectomes, organized by participant and recording; and (C) group-level contrasts estimating the average difference in functional connectome similarity within and between participants across contexts."
 targets::tar_load(phase_similarity_results_figure_gamma)
 knitr::include_graphics(here::here(phase_similarity_results_figure_gamma))
 ```
 
-### Amplitude-coupling similarities
-
-```{r amplitude-summaries-gamma}
-targets::tar_load(amplitude_connectivity_summary_gamma)
-targets::tar_load(amplitude_similarity_contrasts_tidy_gamma)
-
-amplitude_contrasts_min_gamma <- amplitude_similarity_contrasts_tidy_gamma |>
-  dplyr::slice_min(estimate)
-amplitude_contrasts_max_gamma <- amplitude_similarity_contrasts_tidy_gamma |>
-  dplyr::slice_max(estimate)
-amplitude_contrasts_main_gamma <- amplitude_similarity_contrasts_tidy_gamma |>
-  dplyr::filter(effect == "main_effect")
+```{r phase-similarity-table-gamma}
+#| tab.cap: Estimated marginal means, mean differences, and targeted hypothesis tests of zero difference in gamma band phase coupling functional connectome similarity within and between participants across contexts.
+targets::tar_read(phase_similarity_contrasts_table_nhst_gamma)
 ```
 
-Figure \@ref(fig:amplitude-similarity-plots-gamma) shows the connectivity profile matrix, similarity matrix, interval, and ridge plots for amplitude coupling functional connectome similarities in the gamma band. Across all functional connectomes and sensor pairs, the orthogonalized amplitude envelope correlation ranged from `r papaja::apa_num(amplitude_connectivity_summary_gamma$min)` to `r papaja::apa_num(amplitude_connectivity_summary_gamma$max)` (M = `r papaja::apa_num(amplitude_connectivity_summary_gamma$mean)`, SD = `r papaja::apa_num(amplitude_connectivity_summary_gamma$sd)`; Figure \@ref(fig:amplitude-similarity-plots-gamma)A). There was a visually obvious group effect, with near-perfect similarity between functional connectomes regardless of participant, session, or state (Figure \@ref(fig:amplitude-similarity-plots-beta)B). This was also apparent from the group- and individual-level contrasts, which showed that the differences in functional connectome similarity between and within individuals most compatible with our data, given the background model, were practically nil at all levels of the session and state predictors, with an overall difference of $\Delta$RV = `r papaja::apa_num(amplitude_contrasts_main_gamma$estimate, digits = 3)`, 95% CI = [`r papaja::apa_num(amplitude_contrasts_main_gamma$conf.low, digits = 3)`, `r papaja::apa_num(amplitude_contrasts_main_gamma$conf.high, digits = 3)`] (Figure \@ref(fig:amplitude-similarity-plots-gamma)C).
+\newpage
 
-<!-- On average, differences in similarity were largest when contrasting functional connectomes from the same session and state ($\Delta$RV = `r papaja::apa_num(amplitude_contrasts_max_gamma$estimate, digits = 3)`, 95% CI = [`r papaja::apa_num(amplitude_contrasts_max_gamma$conf.low, digits = 3)`, `r papaja::apa_num(amplitude_contrasts_max_gamma$conf.high, digits = 3)`]), and smallest when contrasting functional connectomes from different sessions and states ($\Delta$RV = `r papaja::apa_num(amplitude_contrasts_min_gamma$estimate, digits = 3)`, 95% CI = [`r papaja::apa_num(amplitude_contrasts_min_gamma$conf.low, digits = 3)`, `r papaja::apa_num(amplitude_contrasts_min_gamma$conf.high, digits = 3)`]), with an overall difference of $\Delta$RV = `r papaja::apa_num(amplitude_contrasts_main_gamma$estimate, digits = 3)`, 95% CI = [`r papaja::apa_num(amplitude_contrasts_main_gamma$conf.low, digits = 3)`, `r papaja::apa_num(amplitude_contrasts_main_gamma$conf.high, digits = 3)`]. -->
+## Amplitude Coupling Functional Connectome Similarity Analyses
 
-```{r amplitude-similarity-plots-gamma}
-#| fig.cap: Connectivity profile matrix (A), similarity matrix (B), interval plot (C), and ridge plots (D) for amplitude coupling functional connectome similarities in the gamma band.
-targets::tar_load(amplitude_similarity_results_figure_gamma)
-knitr::include_graphics(here::here(amplitude_similarity_results_figure_gamma))
+### Alpha
+
+Figure \@ref(fig:amplitude-similarity-plots-alpha)A shows the connectivity profiles for all amplitude coupling functional connectomes in the alpha band, organized by participant and recording. Plots and summary statistics of the distribution of coupling magnitudes across all recordings and EEG channel pairs are shown above in Figure \@ref(fig:connectivity-histograms-figure) and Table \@ref(tab:connectivity-summary-table), respectively.
+
+Figure \@ref(fig:amplitude-similarity-plots-alpha)B shows the functional connectome similarity estimates between all pairs of amplitude coupling functional connectomes in the alpha band. Interestingly---although perhaps not surprisingly given the spatial correspondence between phase coupling and amplitude coupling functional connectomes (Figure \@ref(fig:illustrative-connectomes-figure))---similar patterns of individual differences in functional connectome similarity were observed here in relation to the phase coupling similarities observed in the alpha band (Figure \@ref(fig:phase-similarity-plots-alpha)B). However, there was also a visually obvious group effect, with high similarity between functional connectomes regardless of participant, session, or state.
+
+This was supported by the group-level contrast results in Figure \@ref(fig:amplitude-similarity-plots-alpha)C, which showed that although functional connectomes were more similar within participants than between participants at all levels of the session and state predictors, on average, the effect sizes most compatible with our data, given the background model, ranged from practically nil to at most small. Table \@ref(tab:amplitude-similarity-table-alpha) shows the estimated marginal means and targeted hypothesis tests of zero difference within and between participants corresponding to each of these contrasts. Note that the between-participant functional connectome similarity means were stable across contexts, whereas the within-participant means were more variable, indicating that the (at most small) positive differences in functional connectome similarity can be attributed to individual-dependent factors with small modulations by session and states. Jointly, these results suggest that, on average, the amplitude coupling dynamics of underlying global network activity in the alpha band was largely undifferentiated between individuals across contexts, with only a slight, negligible influence of individual-dependent factors.
+
+The contrast results remained largely consistent between the reduced and maximal mixed beta regression models of functional connectome similarity, but with slightly more uncertainty in the estimates (Figure \@ref(fig:amplitude-similarity-plots-maximal-alpha)). This increased uncertainty resulted in the direction of the between sessions and states contrast to become unresolved; however, the difference in meaning between a precise zero effect [@anderson_AssessingStatisticalResults_2019] for the maximal model and a practically nil positive effect for the reduced model observed here is trivial, and does not detract from the main point that the results of both models suggest that the amplitude coupling dynamics of underlying global network activity in the alpha band was largely undifferentiated between individuals across contexts, with only a slight, negligible influence of individual-dependent factors.
+
+```{r amplitude-similarity-plots-alpha}
+#| fig.cap: "Results of amplitude coupling analyses in the alpha band: (A) connectivity profiles for all functional connectomes, organized by participant and recording; (B) estimates of functional connectome similarity between all pairs of functional connectomes, organized by participant and recording; and (C) group-level contrasts estimating the average difference in functional connectome similarity within and between participants across contexts."
+targets::tar_load(amplitude_similarity_results_figure_alpha)
+knitr::include_graphics(here::here(amplitude_similarity_results_figure_alpha))
 ```
+
+```{r amplitude-similarity-table-alpha}
+#| tab.cap: Estimated marginal means, mean differences, and targeted hypothesis tests of zero difference in alpha band amplitude coupling functional connectome similarity within and between participants across contexts.
+targets::tar_read(amplitude_similarity_contrasts_table_nhst_alpha)
+```
+
+### Delta, Theta, Beta, and Gamma
+
+Although we conducted all analyses for the delta, theta, beta, and gamma bands, we refrain from interpreting the results of these analyses here based on a post-hoc suggestion from a committee member; however, for transparency, the results for these frequency bands can be found in Figure \@ref(fig:amplitude-similarity-delta-theta-beta-gamma) in Appendix A. In short, the rationale behind this decision was that the functional connectome similarity analyses for these frequency bands appeared misleading, due to an unforeseen limitation of our approach to quantifying functional connectome similarity. Specifically---although the distribution of amplitude envelope correlation estimates in each of these frequency bands was in agreement with previous published published work [e.g., @fraschinietal_RobustnessFunctionalConnectivity_2019; @laietal_ComparisonScalpSourcereconstructed_2018; @mehrkanoonetal_IntrinsicCouplingModes_2014]---any qualitatively distinct differences in spatial organization between any pair of functional connectomes was overshadowed by the fact that the relative position of the observations in each connectome were very close together in space, resulting in very high to near-perfect estimates of functional connectome similarity across participants, sessions, and states. While these estimates are a statistically valid reflection of the data, we felt that they were neurophysiologically unrealistic, greatly exaggerating the magnitude of similarity between any pair of functional connectomes and failing to capture the intended nuance across participants, sessions, and states.
+
+## Outcome Variability of Functional Connectome Similarity Contrasts
+
+Figure \@ref(fig:subset-similarity-contrast-barplot) summarizes the results of the individual-level phase coupling and amplitude coupling functional connectome similarity contrasts in each frequency band, respectively, showing the proportion of participants whose 95% compatibility intervals for a given contrast were positive, unresolved, or negative. The effect sizes corresponding to these results are shown in Figures \@ref(fig:phase-similarity-subset-plots-delta) to \@ref(fig:amplitude-similarity-subset-plots-alpha) in Appendix A. Note that across all frequency bands and contrasts there was a mixture of participants whose most compatible effect sizes, given the background model, were unresolved or positive, with a smaller portion of negative effect sizes. Thus, although the group-level contrast results for both phase coupling and amplitude coupling functional connectomes across all frequency bands suggested that, on average, differences in functional connectome similarity may have been influenced to a slight or at most small extent by individual-dependent factors---this relationship was not necessarily true at an individual-level for all participants.[^8] 
+
+```{r subset-similarity-contrast-barplot}
+#| fig.cap: Stacked bar plots showing the proportion of individual participants whose 95% compatibility intervals for the phase coupling (A) and amplitude coupling (B) functional connectome similarity contrasts were positive, unresolved, or negative in each frequency band.
+targets::tar_load(subset_similarity_contrast_barplot_figure)
+knitr::include_graphics(
+  here::here(subset_similarity_contrast_barplot_figure)
+)
+```
+
+Because of this outcome variability, we caution against confusing the positive and precise estimates of average effects for the group-level contrasts with the predictability of individual outcomes, which were more variable in both their direction and magnitude. However, equally, we also caution against confusing the individual-level contrasts whose direction was unresolved with precise zero effects or evidence of no difference in functional connectome similarity. For many of these contrasts, the effect sizes most compatible with our data, given the background model, included a range of effects that---although generally still at most small---were not negligible; thus, even though they leave open the possibility of zero or positive but negligible effects, they also leave open the possibility of small effects that may be worth investigating further.
+
+<!-- These results are informative in that they rule out moderate or large effects for individuals whose direction was unresolved. -->
+
+<!--
+Negative results tended to occur
+
+Delta: all negative results came from P19, plus P09 between sessions, between sessions within states, within states; P07 between sessions within states
+
+Theta: all negative results came from P07 and P20
+
+Alpha: all negative result came from P09, appears to be caused by the eyes closed recording 2-1 being dissimilar from eyes open recordings (i.e., it might just be from a single inconsistent recording)
+
+Beta: all negative results came from P21, plus P20 for the between sessions and within states contrast
+
+Gamma: all negative results came from P21
+
+<!-- because our interval estimate will usually show there are many important non-null effects that are highly compatible with our data. -->
+
+<!-- Footnotes start --------------------------------------------------------->
+
+[^7]: For accessibility, larger versions of the figures in this section are available in the online supplement.
+
+[^8]: Note that this statement would hold true even if we only considered the direction of the point estimates for each individual-level contrasts. This is shown in Figures \@ref(fig:phase-similarity-subset-plots-delta) to \@ref(fig:amplitude-similarity-subset-plots-alpha) in Appendix A, where it can be seen that although the majority of point estimates were positive across all contrasts, a small but not insignificant proportion of point estimates were negative for most contrasts across all frequency bands and coupling modes.
+
+<!-- Footnotes end ----------------------------------------------------------->

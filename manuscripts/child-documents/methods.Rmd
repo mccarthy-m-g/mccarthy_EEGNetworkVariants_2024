@@ -164,7 +164,7 @@ The amplitude envelope correlation takes values between 0 and 1. A value of 0 in
 
 #### Interpreting functional connectivity
 
-We use connectivity profile matrices [@demuruetal_FunctionalEffectiveWhole_2017] to compactly display the phase and amplitude coupling functional connectome from each recording. These plots serve as a supplement to our similarity analyses, providing a broad idea of what aspects of functional connectivity are being summarized by a given similarity estimate. Each row shows the vectorized lower-triangle of the phase or amplitude coupling functional connectome from a given recording (i.e., all unique pairs in the connectome), and each column represents a pair of sensors. The strength of coupling between any pair of sensors corresponds to their phase lag index or amplitude envelope correlation estimate and is represented by the colour of that cell in the matrix, with darker colours representing less coupling and brighter colours representing more coupling. Each functional connectome is presented in matrix form in the online supplement. 
+We use connectivity profile matrices [@demuruetal_FunctionalEffectiveWhole_2017] to compactly display the phase and amplitude coupling functional connectome from each recording. These plots serve as a supplement to our similarity analyses, providing a broad idea of what aspects of functional connectivity are being summarized by a given similarity estimate. Each row shows the vectorized lower-triangle of the phase or amplitude coupling functional connectome from a given recording (i.e., all unique pairs in the connectome), and each column represents a pair of sensors. The strength of coupling between any pair of sensors corresponds to their phase lag index or amplitude envelope correlation estimate and is represented by the colour of that cell in the matrix, with darker colours representing less coupling and brighter colours representing more coupling. 
 
 ### Functional connectome similarity
 
@@ -218,6 +218,6 @@ We use ridge plots to report the individual-level contrasts estimating the diffe
 
 [^5]: Mathematical details and discussion of the relationship between the RV coefficient and the squared Pearson correlation coefficient, as well as its relationship to other multivariate statistical methods, can be found in articles by @josseholmes_MeasuringMultivariateAssociation_2016, and @robertescoufier_UnifyingToolLinear_1976.
 
-[^6]: These values were obtained by back-transforming the Fisher-transformed Pearson correlation coefficients for the group and individual effects reported in Supplemental Figures 2D and 2E in @grattonetal_FunctionalBrainNetworks_2018, then taking their difference.
+[^6]: These values were obtained by back-transforming the Fisher-transformed Pearson correlation coefficients for the group and individual effects reported in Supplemental Figures 2D and 2E in @grattonetal_FunctionalBrainNetworks_2018, then taking their difference. <!-- Note: At the individual-level (Supplemental Figure 2A, middle plot), there is little outcome variability across participants, and differences between the group and individual effects are approximately 0.3 more similar for every participant. -->
 
 <!-- Footnotes end ----------------------------------------------------------->

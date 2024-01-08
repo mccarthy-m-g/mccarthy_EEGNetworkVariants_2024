@@ -31,7 +31,7 @@ targets::tar_load(phase_connectivity_patchwork_figure_beta)
 targets::tar_load(phase_connectivity_patchwork_figure_gamma)
 ```
 
-# Phase coupling Functional Connectomes
+# Phase Coupling Functional Connectomes
 
 Note that unlike the connectivity profiles presented in the results section, the fill scale is independent for each functional connectome presented below with a range spanning from zero to the largest connectivity value in a given connectome. This was done to highlight the connectivity structure in each connectome as clearly as possible, rather than to facilitate visual comparisons between connectomes by using a consistent scale spanning the full range of possible values as was done in the results section of the thesis manuscript.
 

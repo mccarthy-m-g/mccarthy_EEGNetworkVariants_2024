@@ -1163,6 +1163,15 @@ connectivity_estimation_targets <- list(
     ),
     format = "file"
   ),
+  tar_target(
+    subset_similarity_contrast_barplot_figure,
+    save_subset_similarity_contrast_barplot_figure(
+      paste0("figures/similarity-subset-contrast-barplot.png"),
+      phase_subset_similarity_contrast_barplot,
+      amplitude_subset_similarity_contrast_barplot
+    ),
+    format = "file"
+  ),
   # Make tables ----
   tar_target(
     phase_connectivity_summaries,

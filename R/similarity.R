@@ -1704,6 +1704,35 @@ save_results_figure <- function(
 
 }
 
+save_subset_similarity_contrast_barplot_figure <- function(
+  filename,
+  phase,
+  amplitude
+) {
+
+  design <- ("AAAAAAAAAA
+              BB########")
+
+  patch <- phase +
+    amplitude +
+    patchwork::plot_layout(design = design, guides = "collect") +
+    patchwork::plot_annotation(tag_levels = "A")
+
+  ggplot2::ggsave(
+    filename = filename,
+    plot = patch,
+    device = ragg::agg_png,
+    width = 21.59,
+    height = 18,
+    units = "cm",
+    dpi = "retina",
+    scaling = 1
+  )
+
+  filename
+
+}
+
 #' Save amplitude similarity patchwork
 #'
 #' @param delta,theta,beta,gamma Similarity matrix for the respective frequency band.

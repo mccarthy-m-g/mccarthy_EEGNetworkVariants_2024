@@ -50,7 +50,9 @@ n_recordings_split_half_total <-
 
 # Cohen's d for separate sessions ---------------------------------------------
 
-# Means and standard errors were determined from Figure S2D using
+# Note that means are the Fisher-transformed correlations. The inverse of the
+# Fisher-transform, tanh(z), can be used to get the Pearson correlation
+# coefficients. Means and standard errors were determined from Figure S2D using
 # WebPlotDigitizer: https://automeris.io/WebPlotDigitizer/
 mean_within <- 0.6270758122743683
 se_within <- 0.03249097
@@ -88,7 +90,9 @@ d <- mean_difference / sd_pooled
 
 # Cohen's d for split-half sessions -------------------------------------------
 
-# Means and standard errors were determined from Figure S2E using
+# Note that means are the Fisher-transformed correlations. The inverse of the
+# Fisher-transform, tanh(z), can be used to get the Pearson correlation
+# coefficients. Means and standard errors were determined from Figure S2E using
 # WebPlotDigitizer: https://automeris.io/WebPlotDigitizer/
 mean_within_split_half <- 1.083941605839416
 se_within_split_half <- 0.03941606

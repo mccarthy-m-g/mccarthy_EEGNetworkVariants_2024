@@ -1,4 +1,5 @@
 ---
+bibliography: "../references.json"
 output:
   bookdown::word_document2:
     reference_docx: "apa6_man.docx"
@@ -154,3 +155,21 @@ knitr::include_graphics(
   error = FALSE
 )
 ```
+
+## Jet palettes
+
+```{r jet-palettes}
+#| fig.cap: Similarity matrices showing functional connectome similarities within and between participants for phase coupling and amplitude coupling functional connectomes across frequency bands using the Jet colour scale (<https://www.mathworks.com/help/matlab/ref/jet.html>). Note that this colour scale is not perceptually uniform, making differences between different values appear greater than they are, and which have been further exaggerated by scaling colours to the limits of the data rather than the 0-1 range of the RV coefficient. We show our results here using this approach solely to facilitate visual comparisons between our results and those of other studies that have shown their results in this way (e.g., @gordonetal_PrecisionFunctionalMapping_2017; @grattonetal_FunctionalBrainNetworks_2018).
+targets::tar_load(jet_similarity_patchwork_figure)
+knitr::include_graphics(
+  here::here(jet_similarity_patchwork_figure),
+  error = FALSE
+)
+```
+
+\newpage
+
+# References
+
+:::{#refs custom-style="Bibliography"}
+:::

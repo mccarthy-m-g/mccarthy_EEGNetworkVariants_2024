@@ -1087,6 +1087,18 @@ connectivity_estimation_targets <- list(
     format = "file"
   ),
   tar_target(
+    jet_similarity_patchwork_figure,
+    save_jet_similarity_patchwork_figure(
+      phase_similarity_plot_delta,
+      phase_similarity_plot_theta,
+      phase_similarity_plot_alpha,
+      phase_similarity_plot_beta,
+      phase_similarity_plot_gamma,
+      amplitude_similarity_plot_alpha
+    ),
+    format = "file"
+  ),
+  tar_target(
     phase_connectivity_histograms_plot,
     plot_connectivity_histograms(
       phase_connectivity_matrix_delta,

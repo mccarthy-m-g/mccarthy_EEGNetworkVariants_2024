@@ -1846,6 +1846,130 @@ save_amplitude_similarity_patchwork_figure <- function(
 
 }
 
+#' Save similarity matrix patchwork with jet colour scale
+#'
+#' @param all_arguments Similarity matrix plot for the respective frequency
+#'   band.
+#'
+#' @return A character vector of the file path.
+save_jet_similarity_patchwork_figure <- function(
+  phase_delta,
+  phase_theta,
+  phase_alpha,
+  phase_beta,
+  phase_gamma,
+  amplitude_alpha
+) {
+
+  filename <- "figures/jet-similarity-patchwork.png"
+
+  jet <- palettes::as_colour(readRDS(here::here("R/jet-colours.rds")))
+
+  phase_delta <- phase_delta +
+    palettes::scale_fill_palette_c(
+      jet,
+      limits = c(0, NA),
+      # This is a bit of a hacky way to get the limits of the fill-scale to
+      # ignore the 1s on the diagonal of the matrix. They are set to 0 instead
+      # of NA because the latter throws a cryptic error that I couldn't be
+      # bothered with.
+      trans = scales::trans_new(
+        name = "remove_ones",
+        transform = \(.x) ifelse(.x == 1, 0, .x),
+        inverse = \(.x) ifelse(is.na(.x), 1, .x)
+      )
+    ) +
+    ggplot2::ggtitle("Phase, Delta")
+
+  phase_theta <- phase_theta +
+    palettes::scale_fill_palette_c(
+      jet,
+      limits = c(0, NA),
+      trans = scales::trans_new(
+        name = "remove_ones",
+        transform = \(.x) ifelse(.x == 1, 0, .x),
+        inverse = \(.x) ifelse(is.na(.x), 1, .x)
+      )
+    ) +
+    ggplot2::ggtitle("Phase, Theta")
+
+  phase_alpha <- phase_alpha +
+    palettes::scale_fill_palette_c(
+      jet,
+      limits = c(0, NA),
+      trans = scales::trans_new(
+        name = "remove_ones",
+        transform = \(.x) ifelse(.x == 1, 0, .x),
+        inverse = \(.x) ifelse(is.na(.x), 1, .x)
+      )
+    ) +
+    ggplot2::ggtitle("Phase, Alpha")
+
+  phase_beta <- phase_beta +
+    palettes::scale_fill_palette_c(
+      jet,
+      limits = c(0, NA),
+      trans = scales::trans_new(
+        name = "remove_ones",
+        transform = \(.x) ifelse(.x == 1, 0, .x),
+        inverse = \(.x) ifelse(is.na(.x), 1, .x)
+      )
+    ) +
+    ggplot2::ggtitle("Phase, Beta")
+
+  phase_gamma <- phase_gamma +
+    palettes::scale_fill_palette_c(
+      jet,
+      limits = c(0, NA),
+      trans = scales::trans_new(
+        name = "remove_ones",
+        transform = \(.x) ifelse(.x == 1, 0, .x),
+        inverse = \(.x) ifelse(is.na(.x), 1, .x)
+      )
+    ) +
+    ggplot2::ggtitle("Phase, Gamma")
+
+  amplitude_alpha <- amplitude_alpha +
+    palettes::scale_fill_palette_c(
+      jet,
+      limits = c(0, NA),
+      trans = scales::trans_new(
+        name = "remove_ones",
+        transform = \(.x) ifelse(.x == 1, 0, .x),
+        inverse = \(.x) ifelse(is.na(.x), 1, .x)
+      )
+    ) +
+    ggplot2::ggtitle("Amplitude, Alpha")
+
+  design <- "AB
+             CD
+             EF"
+
+  patch <- patchwork::wrap_plots(
+    A = phase_delta,
+    B = phase_theta,
+    C = phase_alpha,
+    D = phase_beta,
+    E = phase_gamma,
+    F = amplitude_alpha,
+    design = design
+  )
+
+  ggplot2::ggsave(
+    filename = filename,
+    plot = patch,
+    device = ragg::agg_png,
+    width = 21.59,
+    height = 26,
+    units = "cm",
+    dpi = "retina",
+    scaling = 0.65
+  )
+
+  filename
+
+}
+
 #' Make contrast results table with significance tests
 #'
 #' @param emmeans_tidy The tidied emmeans data.

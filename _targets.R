@@ -23,6 +23,8 @@ library(flextable)
 library(ftExtra)
 library(gtsummary)
 
+library(officer)
+library(officedown)
 library(papaja)
 library(rbbt)
 
@@ -1310,6 +1312,11 @@ descriptives_targets <- list(
 manuscripts_targets <- list(
   # Child documents for different sections of the manuscript ----
   tar_target(
+    frontmatter,
+    here("manuscripts", "child-documents", "frontmatter.Rmd"),
+    format = "file"
+  ),
+  tar_target(
     introduction,
     here("manuscripts", "child-documents", "introduction.Rmd"),
     format = "file"
@@ -1355,6 +1362,8 @@ manuscripts_targets <- list(
       "tidyverse",
       "rmarkdown",
       "papaja",
+      "officer",
+      "officedown",
       "flextable",
       "ftExtra",
       "gtsummary"

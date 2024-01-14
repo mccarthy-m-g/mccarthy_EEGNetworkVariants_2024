@@ -4,6 +4,13 @@
 Supplementary Results
 :::
 
+```{r}
+knitr::opts_chunk$set(
+  fig.lp = "appendix-a-fig",
+  fig.cap.pre = "Figure A"
+)
+```
+
 The supplementary results are separated into four parts. In the first part, we provide the reduced model results of individual-level contrasts estimating the difference in functional connectome similarity within and between participants at various levels of the session and state predictors. In the second part, we provide the reduced model results of our phase coupling analyses when the phase lag index was estimated using the Hilbert transform method. In the third part, we provide the results of our functional connectome similarity analyses derived from the maximal models of functional connectome similarity. In the final part, we provide the results of our functional connectome similarity estimates for amplitude coupling functional connectomes in the delta, theta, beta, and gamma bands.
 
 Additional supplementary results can be found in the Supplementary Material available online (). These include: (1) phase, amplitude, and phase (Hilbert transform) coupling functional connectomes with independent fill scales for all recordings, presented as adjacency matrices rather than connectivity profiles (see Phase Coupling Functional Connectomes, Amplitude Coupling Functional Connectomes, and Phase Coupling Functional Connectomes [Hilbert transform]); and (2) larger versions of all the similarity matrices presented in this manuscript, as well as alternate versions of these matrices plotted using the Jet colour scale to facilitate visual comparisons between our results and those of @gordonetal_PrecisionFunctionalMapping_2017 and @grattonetal_FunctionalBrainNetworks_2018 (see Similarity Matrices). <!--; (3) model fits and diagnostics for all group-level mixed beta regression models of functional connectome similarity, and standardized mean differences for all group-level functional connectome similarity contrasts; ... -->
@@ -12,11 +19,18 @@ Additional supplementary results can be found in the Supplementary Material avai
 
 ## Individual-level contrast results
 
+```{r}
+knitr::opts_chunk$set(fig.height = 2.722717)
+```
+
 In this section we provide the reduced model results of individual-level contrasts estimating the difference in functional connectome similarity within and between participants at various levels of the session and state predictors. These models were fit to the subset of the similarity matrix belonging to a given participant, but otherwise follow the same parameterizations as the group-level contrasts provided in the main results section. A simple way to conceptualize this is that the group-level contrasts were fit on all observations in the lower triangle of the similarity matrix, whereas the individual-level contrasts were fit on all observations in a given column or row of the similarity matrix belonging to each participant. Thus, we emphasize that the number of observations used in the individual-level contrasts (1,002 observations per model/participant) is considerably smaller than the number of observations used in the group-level contrasts (14,028 observations total), and consequently, the uncertainty of these estimates is considerably larger. Note that although we did conduct individual-level contrasts for amplitude coupling functional connectomes in the delta, theta, beta, and gamma bands, we refrain from displaying them here for the same reasons of interpretability described in the results section of this manuscript.
 
 \newpage
 
 ```{r phase-similarity-subset-plots-delta}
+#| fig.autonum.start_at: 1
+#| fig.lp: "appendix-a-fig"
+#| fig.cap.pre: "Figure A"
 #| fig.cap: 95% compatibility distributions for individual-level contrasts estimating the difference in functional connectome similarity within and between participants at various levels of the session and state predictors for phase coupling functional connectome similarities in the delta band.
 targets::tar_load(phase_similarity_subset_results_figure_delta)
 knitr::include_graphics(here::here(phase_similarity_subset_results_figure_delta))
@@ -53,6 +67,10 @@ knitr::include_graphics(here::here(amplitude_similarity_subset_results_figure_al
 ```
 
 ## Phase coupling (Hilbert transform) results
+
+```{r}
+knitr::opts_chunk$set(fig.height = 7.865627)
+```
 
 In this section we report how functional connectivity and phase-coupling similarities change when the phase lag index is estimated using the Hilbert transform method instead of the multitaper method. Across all five frequency bands we find that (1) functional connectivity is generally lower, but individual patterns of connectivity are similar or the same; (2) functional connectome similarity is generally higher, but patterns of similarity are similar or the same.
 
@@ -106,9 +124,12 @@ knitr::include_graphics(here::here(phase_similarity_results_figure_hilbert_gamma
 
 ## Maximal model results
 
-In this section we provide the results of our functional connectome similarity analyses derived from the maximal models of functional connectome similarity. Note that results are only shown for analyses where the group-level maximal converged and was non-singular (Table \@ref(tab:convergence-check-table)). Likewise, individual-level contrast results are only shown for converged, non-singular models. Additionally, note that the connectivity profiles and similarity matrices in the following sections are identical to those from the main results section---only the contrast plots depict new results.
+In this section we provide the results of our functional connectome similarity analyses derived from the maximal models of functional connectome similarity. Note that results are only shown for analyses where the group-level maximal converged and was non-singular (Table A\@ref(tab:convergence-check-table)). Likewise, individual-level contrast results are only shown for converged, non-singular models. Additionally, note that the connectivity profiles and similarity matrices in the following sections are identical to those from the main results section---only the contrast plots depict new results.
 
 ```{r convergence-check-table}
+#| tab.autonum.start_at: 1
+#| tab.lp: "appendix-a-tab"
+#| tab.cap.pre: "Table A"
 #| tab.cap: Results of convergence and singularity checks for each group-level mixed beta regression model of functional connectome similarity, organized by coupling mode and frequency band. Here the maximal and reduced models correspond to, respectively, models with and without a random intercept for the participant pair term.
 targets::tar_load(similarity_glmmTMB_convergence_table)
 similarity_glmmTMB_convergence_table
@@ -202,9 +223,13 @@ knitr::include_graphics(here::here(phase_similarity_results_figure_hilbert_maxim
 
 ## Amplitude coupling results (delta, theta, beta, gamma)
 
+```{r}
+knitr::opts_chunk$set(fig.height = 5.747959)
+```
+
 <!-- TODO: Finish this -->
 
-In this section we provide the results of our functional connectome similarity estimates for amplitude coupling functional connectomes in the delta, theta, beta, and gamma bands. Figure \@ref(fig:amplitude-similarity-delta-theta-beta-gamma) shows the functional connectome similarity estimates between all pairs of amplitude coupling functional connectomes in each frequency band. Note the very high similarity similarity estimates across participants, sessions, and states---particularly in the beta and gamma bands, where similarity is estimated to be near perfect. 
+In this section we provide the results of our functional connectome similarity estimates for amplitude coupling functional connectomes in the delta, theta, beta, and gamma bands. Figure A\@ref(fig:amplitude-similarity-delta-theta-beta-gamma) shows the functional connectome similarity estimates between all pairs of amplitude coupling functional connectomes in each frequency band. Note the very high similarity estimates across participants, sessions, and states---particularly in the beta and gamma bands, where similarity is estimated to be near perfect. 
 
 ```{r amplitude-similarity-delta-theta-beta-gamma}
 #| fig.cap: Estimates of functional connectome similarity between all pairs of amplitude coupling functional connectomes in the delta, theta, beta, and gamma bands, organized by participant and recording.
@@ -221,23 +246,30 @@ Session Info
 :::
 
 ```{r session-info-environment}
-#| results = 'asis'
+#| tab.autonum.start_at: 1
+#| tab.lp: "appendix-b-tab"
+#| tab.cap.pre: "Table B"
+#| tab.cap: Session info for R environment.
 targets::tar_load(session_information_environment)
 
-papaja::apa_table(
-  session_information_environment,
-  caption = "Session info for R environment."
-)
+session_information_environment |>
+  flextable::flextable() |>
+  flextable::font(fontname = "Times New Roman", part = "all") |>
+  flextable::fontsize(size = 10, part = "all") |>
+  flextable::set_table_properties(layout = "autofit")
 ```
 
 \newpage
 
 ```{r session-info-packages}
-#| results = 'asis'
+#| tab.lp: "appendix-b-tab"
+#| tab.cap.pre: "Table B"
+#| tab.cap: Session info for R packages.
 targets::tar_load(session_information_packages)
 
-papaja::apa_table(
-  session_information_packages,
-  caption = "Session info for R packages."
-)
+session_information_packages |>
+  flextable::flextable() |>
+  flextable::font(fontname = "Times New Roman", part = "all") |>
+  flextable::fontsize(size = 10, part = "all") |>
+  flextable::set_table_properties(layout = "autofit")
 ```

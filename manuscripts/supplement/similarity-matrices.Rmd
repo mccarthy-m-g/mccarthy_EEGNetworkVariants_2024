@@ -1,5 +1,7 @@
 ---
 bibliography: "../references.json"
+csl: "../apa-6th-edition.csl"
+
 output:
   bookdown::word_document2:
     reference_docx: "apa6_man.docx"

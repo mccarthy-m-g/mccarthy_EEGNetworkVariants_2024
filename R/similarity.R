@@ -2415,7 +2415,12 @@ make_model_fit_table <- function(model, maximal_model = FALSE) {
     flextable::fix_border_issues(part = "footer") |>
     # Font
     flextable::font(fontname = "Times New Roman", part = "all") |>
-    flextable::fontsize(size = 10, part = "all")
+    flextable::fontsize(size = 10, part = "all") |>
+    # Dimensions
+    flextable::width(j = 1, width = 1.4, unit = "cm") |>
+    flextable::width(j = 2, width = 8.5, unit = "cm") |>
+    flextable::width(j = 3, width = 1.8, unit = "cm") |>
+    flextable::width(j = 4:6, width = 1.6, unit = "cm")
 
 }
 

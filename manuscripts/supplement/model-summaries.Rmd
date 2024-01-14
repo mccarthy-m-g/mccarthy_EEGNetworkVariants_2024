@@ -1,0 +1,248 @@
+---
+output:
+  bookdown::word_document2:
+    reference_docx: "apa6_man.docx"
+    number_sections: false
+---
+
+```{r setup, include=FALSE}
+library(here)
+library(papaja)
+library(targets)
+
+knitr::opts_chunk$set(
+  echo = FALSE,
+  warning = FALSE,
+  message = FALSE,
+  fig.retina = 0.8, # figures are either vectors or 300 dpi diagrams
+  dpi = 320,
+  fig.width = 6,
+  fig.asp = 0.618, # 1 / phi
+  fig.show = "hold",
+  cache.extra = knitr::rand_seed
+)
+```
+
+```{r tables}
+# Model convergence/singularity checks
+targets::tar_load(similarity_glmmTMB_convergence_table)
+
+# Reduced model fits
+targets::tar_load(phase_similarity_model_fit_table_delta)
+targets::tar_load(phase_similarity_model_fit_table_theta)
+targets::tar_load(phase_similarity_model_fit_table_alpha)
+targets::tar_load(phase_similarity_model_fit_table_beta)
+targets::tar_load(phase_similarity_model_fit_table_gamma)
+
+targets::tar_load(amplitude_similarity_model_fit_table_alpha)
+
+targets::tar_load(phase_similarity_model_fit_table_hilbert_delta)
+targets::tar_load(phase_similarity_model_fit_table_hilbert_theta)
+targets::tar_load(phase_similarity_model_fit_table_hilbert_alpha)
+targets::tar_load(phase_similarity_model_fit_table_hilbert_beta)
+targets::tar_load(phase_similarity_model_fit_table_hilbert_gamma)
+
+# Maximal model fits
+targets::tar_load(phase_similarity_model_fit_table_maximal_delta)
+targets::tar_load(phase_similarity_model_fit_table_maximal_theta)
+targets::tar_load(phase_similarity_model_fit_table_maximal_alpha)
+targets::tar_load(phase_similarity_model_fit_table_maximal_beta)
+targets::tar_load(phase_similarity_model_fit_table_maximal_gamma)
+
+targets::tar_load(amplitude_similarity_model_fit_table_maximal_alpha)
+
+targets::tar_load(phase_similarity_model_fit_table_hilbert_maximal_delta)
+targets::tar_load(phase_similarity_model_fit_table_hilbert_maximal_theta)
+targets::tar_load(phase_similarity_model_fit_table_hilbert_maximal_alpha)
+targets::tar_load(phase_similarity_model_fit_table_hilbert_maximal_beta)
+targets::tar_load(phase_similarity_model_fit_table_hilbert_maximal_gamma)
+```
+
+# Model Summaries
+
+```{r convergence-check-table}
+#| tab.cap: Results of convergence and singularity checks for each mixed beta regression modelling how functional connectome similarity varied between and within individuals, sessions, and states in each frequency band. Here the maximal and reduced models correspond to, respectively, models with and without a random intercept for the participant pair term.
+similarity_glmmTMB_convergence_table
+```
+
+\newpage
+
+## Reduced models
+
+### Phase coupling
+
+<br>
+
+```{r}
+#| tab.cap: Summary of the reduced mixed beta regression model of phase coupling functional connectome similarity in the delta band.
+phase_similarity_model_fit_table_delta
+```
+
+\newpage
+
+```{r}
+#| tab.cap: Summary of the reduced mixed beta regression model of phase coupling functional connectome similarity in the theta band.
+phase_similarity_model_fit_table_theta
+```
+
+\newpage
+
+```{r}
+#| tab.cap: Summary of the reduced mixed beta regression model of phase coupling functional connectome similarity in the alpha band.
+phase_similarity_model_fit_table_alpha
+```
+
+\newpage
+
+```{r}
+#| tab.cap: Summary of the reduced mixed beta regression model of phase coupling functional connectome similarity in the beta band.
+phase_similarity_model_fit_table_beta
+```
+
+\newpage
+
+```{r}
+#| tab.cap: Summary of the reduced mixed beta regression model of phase coupling functional connectome similarity in the gamma band.
+phase_similarity_model_fit_table_gamma
+```
+
+\newpage
+
+### Amplitude coupling
+
+<br>
+
+```{r}
+#| tab.cap: Summary of the reduced mixed beta regression model of amplitude coupling functional connectome similarity in the in the alpha band.
+amplitude_similarity_model_fit_table_alpha
+```
+
+\newpage
+
+### Phase coupling (Hilbert transform)
+
+<br>
+
+```{r}
+#| tab.cap: Summary of the reduced mixed beta regression model of phase coupling (Hilbert transform) functional connectome similarity in the delta band.
+phase_similarity_model_fit_table_hilbert_delta
+```
+
+\newpage
+
+```{r}
+#| tab.cap: Summary of the reduced mixed beta regression model of phase coupling (Hilbert transform) functional connectome similarity in the theta band.
+phase_similarity_model_fit_table_hilbert_theta
+```
+
+\newpage
+
+```{r}
+#| tab.cap: Summary of the reduced mixed beta regression model of phase coupling (Hilbert transform) functional connectome similarity in the alpha band.
+phase_similarity_model_fit_table_hilbert_alpha
+```
+
+\newpage
+
+```{r}
+#| tab.cap: Summary of the reduced mixed beta regression model of phase coupling (Hilbert transform) functional connectome similarity in the beta band.
+phase_similarity_model_fit_table_hilbert_beta
+```
+
+\newpage
+
+```{r}
+#| tab.cap: Summary of the reduced mixed beta regression model of phase coupling (Hilbert transform) functional connectome similarity in the gamma band.
+phase_similarity_model_fit_table_hilbert_gamma
+```
+
+\newpage
+
+## Maximal models
+
+### Phase coupling
+
+<br>
+
+```{r}
+#| tab.cap: Summary of the maximal mixed beta regression model of phase coupling functional connectome similarity in the delta band.
+phase_similarity_model_fit_table_maximal_delta
+```
+
+\newpage
+
+```{r}
+#| tab.cap: Summary of the maximal mixed beta regression model of phase coupling functional connectome similarity in the theta band.
+phase_similarity_model_fit_table_maximal_theta
+```
+
+\newpage
+
+```{r}
+#| tab.cap: Summary of the maximal mixed beta regression model of phase coupling functional connectome similarity in the alpha band.
+phase_similarity_model_fit_table_maximal_alpha
+```
+
+\newpage
+
+```{r}
+#| tab.cap: Summary of the maximal mixed beta regression model of phase coupling functional connectome similarity in the beta band.
+phase_similarity_model_fit_table_maximal_beta
+```
+
+\newpage
+
+```{r}
+#| tab.cap: Summary of the maximal mixed beta regression model of phase coupling functional connectome similarity in the gamma band.
+phase_similarity_model_fit_table_maximal_gamma
+```
+
+\newpage
+
+### Amplitude coupling
+
+<br>
+
+```{r}
+#| tab.cap: Summary of the maximal mixed beta regression model of amplitude coupling functional connectome similarity in the in the alpha band.
+amplitude_similarity_model_fit_table_maximal_alpha
+```
+
+\newpage
+
+### Phase coupling (Hilbert transform)
+
+<br>
+
+```{r}
+#| tab.cap: Summary of the maximal mixed beta regression model of phase coupling (Hilbert transform) functional connectome similarity in the delta band.
+phase_similarity_model_fit_table_hilbert_maximal_delta
+```
+
+\newpage
+
+```{r}
+#| tab.cap: Summary of the maximal mixed beta regression model of phase coupling (Hilbert transform) functional connectome similarity in the theta band.
+phase_similarity_model_fit_table_hilbert_maximal_theta
+```
+
+\newpage
+
+```{r}
+#| tab.cap: Summary of the maximal mixed beta regression model of phase coupling (Hilbert transform) functional connectome similarity in the alpha band.
+phase_similarity_model_fit_table_hilbert_maximal_alpha
+```
+
+\newpage
+
+```{r}
+#| tab.cap: Summary of the maximal mixed beta regression model of phase coupling (Hilbert transform) functional connectome similarity in the beta band.
+phase_similarity_model_fit_table_hilbert_maximal_beta
+```
+
+\newpage
+
+```{r}
+#| tab.cap: Summary of the maximal mixed beta regression model of phase coupling (Hilbert transform) functional connectome similarity in the gamma band.
+phase_similarity_model_fit_table_hilbert_maximal_gamma
+```

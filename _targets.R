@@ -1401,7 +1401,7 @@ manuscripts_targets <- list(
     session_information_packages,
     session_info_packages()
   ),
-  # Thesis (papaja) ----
+  # Thesis (officedown) ----
   ## Note: The following error is thrown at the start of the pipeline because
   ## this target uses params and child documents: `Error in eval(x, envir =
   ## envir) : object 'params' not found`. The source of the error is explained
@@ -1442,9 +1442,9 @@ manuscripts_targets <- list(
     )
   ),
   tar_render(
-    supplement_model_fits_diagnostics,
+    supplement_model_summaries,
     here(
-      "manuscripts", "supplement", "model-fits-diagnostics.Rmd"
+      "manuscripts", "supplement", "model-summaries.Rmd"
     )
   ),
   tar_render(

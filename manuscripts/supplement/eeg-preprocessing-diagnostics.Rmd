@@ -23,7 +23,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-# EEG preprocessing diagnostics
+# EEG Preprocessing Diagnostics
 
 ```{r bad-channels-plots}
 #| fig.cap: Bar plots showing the distribution of bad EEG channels by the total number of EEG channels marked bad per recording (A), and the total number of recordings a given EEG channels was marked bad in (B).

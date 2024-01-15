@@ -23,11 +23,16 @@ session_info_environment <- function() {
 #' @return A tibble.
 session_info_packages <- function() {
 
-  session_info_packages <- sessioninfo::session_info()$packages |>
-    as.data.frame() |>
-    dplyr::filter(attached == TRUE) |>
-    dplyr::select(loadedversion, source) |>
-    tibble::rownames_to_column()
+  project_dependencies <- renv::dependencies(here::here()) |>
+    tibble::as_tibble() |>
+    dplyr::pull(Package) |>
+    unique()
+
+  session_info_packages <- sessioninfo::session_info(project_dependencies) |>
+    purrr::pluck("packages") |>
+    tibble::as_tibble() |>
+    dplyr::filter(package %in% project_dependencies) |>
+    dplyr::select(package, ondiskversion, source)
 
   colnames(session_info_packages) <- c("Package", "Version", "Source")
 

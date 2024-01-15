@@ -18,11 +18,14 @@ library(ggdist)
 library(ggh4x)
 library(ggnewscale)
 library(patchwork)
+library(see)
 
 library(flextable)
 library(ftExtra)
 library(gtsummary)
 
+library(rmarkdown)
+library(knitr)
 library(officer)
 library(officedown)
 library(papaja)
@@ -1399,7 +1402,8 @@ manuscripts_targets <- list(
   ),
   tar_target(
     session_information_packages,
-    session_info_packages()
+    session_info_packages(),
+    cue = tar_cue("always")
   ),
   # Thesis (officedown) ----
   ## Note: The following error is thrown at the start of the pipeline because

@@ -52,6 +52,7 @@ source("R/similarity.R")
 source("R/descriptives.R")
 source("R/references.R")
 source("R/session_info.R")
+source("R/utils.R")
 
 # Pipeline params:
 eeg_recordings_unavailable <- FALSE # TODO: Figure out how to implement this, either with tar_skip() or an ifelse

@@ -10,7 +10,11 @@ session_info_environment <- function() {
   session_info_environment <- session_info_environment |>
     unlist() |>
     as.data.frame() |>
-    tibble::rownames_to_column()
+    tibble::rownames_to_column() |>
+    tibble::add_row(
+      setting = c("zotero", "better bibtex"),
+      value   = c("6.0.30", "6.7.140")
+    )
 
   colnames(session_info_environment) <- c("Setting", "Value")
 

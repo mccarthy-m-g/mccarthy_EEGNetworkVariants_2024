@@ -11,12 +11,11 @@ session_info_environment <- function() {
     unlist() |>
     as.data.frame() |>
     tibble::rownames_to_column() |>
+    dplyr::rename_with(\(.x) c("Setting", "Value")) |>
     tibble::add_row(
-      setting = c("zotero", "better bibtex"),
-      value   = c("6.0.30", "6.7.140")
+      Setting = c("zotero", "better bibtex"),
+      Value   = c("6.0.30", "6.7.140")
     )
-
-  colnames(session_info_environment) <- c("Setting", "Value")
 
   session_info_environment
 

@@ -1,7 +1,7 @@
 ---
 output:
   bookdown::word_document2:
-    reference_docx: "apa6_man.docx"
+    reference_docx: "../apa-template-supplement.docx"
     number_sections: false
 ---
 

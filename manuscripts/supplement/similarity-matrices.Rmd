@@ -1,0 +1,177 @@
+---
+bibliography: "../references.json"
+csl: "../apa-6th-edition.csl"
+
+output:
+  bookdown::word_document2:
+    reference_docx: "../apa-template-supplement.docx"
+    number_sections: false
+---
+
+```{r setup, include=FALSE}
+library(here)
+library(papaja)
+library(targets)
+
+knitr::opts_chunk$set(
+  echo = FALSE,
+  warning = FALSE,
+  message = FALSE,
+  fig.retina = 0.8, # figures are either vectors or 300 dpi diagrams
+  dpi = 320,
+  fig.width = 6,
+  fig.asp = 0.618, # 1 / phi
+  fig.show = "hold",
+  cache.extra = knitr::rand_seed
+)
+```
+
+# Similarity Matrices
+
+```{r}
+targets::tar_load(phase_similarity_matrix_figure_delta)
+targets::tar_load(phase_similarity_matrix_figure_theta)
+targets::tar_load(phase_similarity_matrix_figure_alpha)
+targets::tar_load(phase_similarity_matrix_figure_beta)
+targets::tar_load(phase_similarity_matrix_figure_gamma)
+
+targets::tar_load(amplitude_similarity_matrix_figure_alpha)
+
+targets::tar_load(phase_similarity_matrix_figure_hilbert_delta)
+targets::tar_load(phase_similarity_matrix_figure_hilbert_theta)
+targets::tar_load(phase_similarity_matrix_figure_hilbert_alpha)
+targets::tar_load(phase_similarity_matrix_figure_hilbert_beta)
+targets::tar_load(phase_similarity_matrix_figure_hilbert_gamma)
+```
+
+## Phase coupling
+
+```{r phase-similarity-matrix-delta}
+#| fig.cap: Similarity matrix showing functional connectome similarities within and between participants for phase coupling functional connectomes in the delta band.
+knitr::include_graphics(
+  here::here(phase_similarity_matrix_figure_delta),
+  error = FALSE
+)
+```
+
+\newpage
+
+```{r phase-similarity-matrix-theta}
+#| fig.cap: Similarity matrix showing functional connectome similarities within and between participants for phase coupling functional connectomes in the theta band.
+knitr::include_graphics(
+  here::here(phase_similarity_matrix_figure_theta),
+  error = FALSE
+)
+```
+
+\newpage
+
+```{r phase-similarity-matrix-alpha}
+#| fig.cap: Similarity matrix showing functional connectome similarities within and between participants for phase coupling functional connectomes in the alpha band.
+knitr::include_graphics(
+  here::here(phase_similarity_matrix_figure_alpha),
+  error = FALSE
+)
+```
+
+\newpage
+
+```{r phase-similarity-matrix-beta}
+#| fig.cap: Similarity matrix showing functional connectome similarities within and between participants for phase coupling functional connectomes in the beta band.
+knitr::include_graphics(
+  here::here(phase_similarity_matrix_figure_beta),
+  error = FALSE
+)
+```
+
+\newpage
+
+```{r phase-similarity-matrix-gamma}
+#| fig.cap: Similarity matrix showing functional connectome similarities within and between participants for phase coupling functional connectomes in the gamma band.
+knitr::include_graphics(
+  here::here(phase_similarity_matrix_figure_gamma),
+  error = FALSE
+)
+```
+
+\newpage
+
+## Amplitude coupling
+
+```{r amplitude-similarity-matrix-alpha}
+#| fig.cap: Similarity matrix showing functional connectome similarities within and between participants for amplitude coupling functional connectomes in the alpha band.
+knitr::include_graphics(
+  here::here(amplitude_similarity_matrix_figure_alpha),
+  error = FALSE
+)
+```
+
+\newpage
+
+## Phase coupling (Hilbert transform)
+
+```{r phase-similarity-matrix-hilbert-delta}
+#| fig.cap: Similarity matrix showing functional connectome similarities within and between participants for phase coupling (Hilbert transform) functional connectomes in the delta band.
+knitr::include_graphics(
+  here::here(phase_similarity_matrix_figure_hilbert_delta),
+  error = FALSE
+)
+```
+
+\newpage
+
+```{r phase-similarity-matrix-hilbert-theta}
+#| fig.cap: Similarity matrix showing functional connectome similarities within and between participants for phase coupling (Hilbert transform) functional connectomes in the theta band.
+knitr::include_graphics(
+  here::here(phase_similarity_matrix_figure_hilbert_theta),
+  error = FALSE
+)
+```
+
+\newpage
+
+```{r phase-similarity-matrix-hilbert-alpha}
+#| fig.cap: Similarity matrix showing functional connectome similarities within and between participants for phase coupling (Hilbert transform) functional connectomes in the alpha band.
+knitr::include_graphics(
+  here::here(phase_similarity_matrix_figure_hilbert_alpha),
+  error = FALSE
+)
+```
+
+\newpage
+
+```{r phase-similarity-matrix-hilbert-beta}
+#| fig.cap: Similarity matrix showing functional connectome similarities within and between participants for phase coupling (Hilbert transform) functional connectomes in the beta band.
+knitr::include_graphics(
+  here::here(phase_similarity_matrix_figure_hilbert_beta),
+  error = FALSE
+)
+```
+
+\newpage
+
+```{r phase-similarity-matrix-hilbert-gamma}
+#| fig.cap: Similarity matrix showing functional connectome similarities within and between participants for phase coupling (Hilbert transform) functional connectomes in the gamma band.
+knitr::include_graphics(
+  here::here(phase_similarity_matrix_figure_hilbert_gamma),
+  error = FALSE
+)
+```
+
+## Jet palettes
+
+```{r jet-palettes}
+#| fig.cap: "Similarity matrices showing functional connectome similarities within and between participants for phase coupling and amplitude coupling functional connectomes across frequency bands using the Jet colour scale (<https://www.mathworks.com/help/matlab/ref/jet.html>). Note that this colour scale is not perceptually uniform, making differences between different values appear greater than they are, and which have been further exaggerated by scaling colours to the limits of the data rather than the 0-1 range of the RV coefficient. We show our results here using this approach solely to facilitate visual comparisons between our results and those of other studies that have shown their results in this way [e.g., @gordonetal_PrecisionFunctionalMapping_2017; @grattonetal_FunctionalBrainNetworks_2018]."
+targets::tar_load(jet_similarity_patchwork_figure)
+knitr::include_graphics(
+  here::here(jet_similarity_patchwork_figure),
+  error = FALSE
+)
+```
+
+\newpage
+
+# References
+
+:::{#refs custom-style="Bibliography"}
+:::

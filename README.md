@@ -6,54 +6,29 @@
 [![Synced with](https://img.shields.io/badge/Synced%20with-OSF-blue.svg)](https://osf.io/xztdk/)
 <!-- badges: end -->
 
-<!--
-## TODO:
+This repository contains the materials and source code for my MSc thesis, titled "Studying Network Variants With Electroencephalography". This project uses the [targets](https://books.ropensci.org/targets/) R package to maintain a reproducible, end-to-end workflow for the entire computational pipeline. The configuration and computational steps in this pipeline can be found in `_targets.R`.
 
--   set up renv package and docker
--   consider adding abstract
--->
+## Repository Overview
 
-## About
+- `manuscripts/` contains all source files and rendered documents made by our targets pipeline, including the thesis document and supplementary materials.
 
-This repository contains the materials and source code for my MSc thesis, tentatively titled "Studying network variants with electroencephalography".
+- `figures/` contains all figures made by our targets pipeline.
 
-## Reproducibility
+- `_targets.R` contains the [target script file](https://docs.ropensci.org/targets/reference/tar_script.html) to configure and define our targets pipeline. This is executed using the `run.R` or `run.sh` scripts.
 
-This project comes with a reproducible environment that includes everything needed to run its code. The reproducible environment is built using [Docker](https://www.docker.com), which packages all of the software dependencies of the project (i.e., the operating system, system libraries, R and Python packages, etc.) into an [image](https://docs.docker.com/get-started/overview/#images). When you run this image it will give you access to all of the software dependencies of the project inside a completely self-contained instance called a [container](https://docs.docker.com/get-started/overview/#containers). You can then run, explore, and test the project's code inside the container. When you are done, you can stop the container and remove the image from your computer.
+- `_targets/` contains, locally, the data store of our targets pipeline; in addition to metadata on the status of each target, which is included online.
 
-To set up the reproducible environment on your computer:
+- `data/` contains, locally, the raw and cleaned EEG and functional connectivity data, participant descriptive data; in addition to the data file used to handle EEG preprocessing for each recording, which is included online.
 
-Download this project. Make note of the location you download the project to.
+- `R/` contains the custom user-defined functions used in our targets pipeline.
 
-Download and install [Docker Desktop](https://docs.docker.com/get-docker/).
+- `python/` contains the scripts we used interactively during the initial EEG preprocessing stages of the project, which were later refactored into our targets pipeline using the [reticulate](https://rstudio.github.io/reticulate/) R package.
 
-Download the Docker image for this project by running the following command in the terminal:
-
-```
-docker pull ghcr.io/mccarthy-m-g/mccarthy-20XX:latest
-```
-
-Run the Docker image inside a container:
-
-```
-docker run -it -v ~/mccarthy-20XX:/mccarthy-20XX my-docker-image
-```
-
-Open [RStudio Server]() in your browser.
-
-Open the RStudio project.
-
-You can now run, explore, and test the project's code.
-
-To remove the reproducible environment from your computer:
-
-Stop the container.
-
-Remove the image.
-
-Delete the project.
+- `LICENSE.md` contains a copy of the content and code licenses for this repository.
 
 ## License
+
+### Content License
 
 [![License: CC BY-NC-ND 4.0](https://img.shields.io/badge/License-CC_BY--NC--ND_4.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-nd/4.0/)
 
@@ -70,14 +45,6 @@ Under the following terms:
 **NonCommercial**---You may not use the material for commercial purposes.
 
 **NoDerivatives**---If you remix, transform, or build upon the material, you may not distribute the modified material.
-
-### Data License
-
-[![License: CC0-1.0](https://img.shields.io/badge/License-CC0_1.0-lightgrey.svg)](http://creativecommons.org/publicdomain/zero/1.0/)
-
-All data inside the `data/EEG-sensor-connectivity/` directory is licensed under the [Creative Commons CC0 1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/). Please see `LICENSE.md` for a copy of this license.
-
-You are free to copy, modify, distribute and perform the work, even for commercial purposes, all without asking permission.
 
 ### Code License
 

@@ -621,6 +621,18 @@ tidy_emmeans_similarity <- function(object) {
     "within_sessions_states"
   )
 
+  effect_labels_nice <- c(
+    "Main effect",
+    "Between sessions",
+    "Within sessions",
+    "Between states",
+    "Within states",
+    "Between sessions and states",
+    "Between sessions and within states",
+    "Within sessions and between states",
+    "Within sessions and states"
+  )
+
   object |>
     purrr::map_dfr(broom::tidy, .id = "effect") |>
     dplyr::mutate(
@@ -629,7 +641,8 @@ tidy_emmeans_similarity <- function(object) {
         within_participant == TRUE  ~ "within_participants",
         within_participant == FALSE ~ "between_participants"
       ),
-      effect_label = paste0(within_participant, "_", effect_label)
+      effect_label = paste0(within_participant, "_", effect_label),
+      effect_label_nice = rep(effect_labels_nice, each = 2)
     )
 
 }
@@ -672,6 +685,9 @@ tidy_contrast_similarity <- function(object) {
     purrr::map_dfr(broom::tidy, .id = "effect", conf.int = TRUE) |>
     dplyr::mutate(
       effect_label = factor(effect_labels, levels = effect_labels),
+      effect_label = forcats::fct_relevel(
+        effect_label, "Between sessions and states", after = 7
+      ),
       dist = distributional::dist_student_t(
         df = df, mu = estimate, sigma = std.error
       )
@@ -688,6 +704,70 @@ tidy_contrast_similarity <- function(object) {
         effect_direction,
         levels = c("Positive", "Unresolved", "Negative")
       )
+    )
+
+  contrasts
+
+}
+
+#' Estimate standardized mean differences for contrasts
+#'
+#' @param model A glmmTMB model object.
+#' @param contrasts An emmeans contrasts object.
+#'
+#' @return An emmeans object.
+contrast_similarity_cohens_d <- function(model, contrasts) {
+
+  purrr::map(
+    contrasts,
+    \(.x) {
+      emmeans::eff_size(
+        .x,
+        # Add variances then take the square root to get total SD of the
+        # variance components.
+        sigma = sqrt(sum(insight::get_variance_intercept(model))),
+        edf = df.residual(model),
+        method = "identity"
+      )
+    }
+  )
+
+}
+
+#' Tidy emmeans standardized mean differences
+#'
+#' @param object An emmeans model object.
+#'
+#' @return A tidy tibble.
+tidy_contrast_similarity_cohens_d <- function(object) {
+
+  effect_labels <- c(
+    "Main effect",
+    "Between sessions",
+    "Within sessions",
+    "Between states",
+    "Within states",
+    "Between sessions and states",
+    "Between sessions and within states",
+    "Within sessions and between states",
+    "Within sessions and states"
+  )
+
+  contrasts <- object |>
+    purrr::map_dfr(tibble::as_tibble, .id = "effect") |>
+    dplyr::mutate(
+      effect_label = factor(effect_labels, levels = effect_labels),
+      effect_label = forcats::fct_relevel(
+        effect_label, "Between sessions and states", after = 7
+      )
+    ) |>
+    dplyr::select(
+      effect_label,
+      effect,
+      smd = effect.size,
+      smd_std.error = SE,
+      smd_conf.low = lower.CL,
+      smd_conf.high = upper.CL
     )
 
   contrasts
@@ -871,10 +951,13 @@ subset_contrast_similarity <- function(objects) {
 
 #' Tidy emmeans subset contrasts
 #'
-#' @param object A list of emmeans model objects.
+#' @param objects A list of emmeans model objects.
+#' @param objects A list of glmmTMB model objects. Used for convergence checks.
 #'
 #' @return A list of tidy tibbles.
-tidy_subset_contrast_similarity <- function(objects) {
+tidy_subset_contrast_similarity <- function(
+  objects, models = NULL, check_convergence = TRUE
+) {
 
   effect_labels <- c(
     "Main effect",
@@ -888,14 +971,26 @@ tidy_subset_contrast_similarity <- function(objects) {
     "Within sessions and states"
   )
 
-  purrr::map_dfr(
-    objects,
+  purrr::map2_dfr(
+    objects, models,
     ~{
       contrasts <- .x |>
-      purrr::map_dfr(broom::tidy, .id = "effect") |>
-      dplyr::mutate(
-        effect_label = factor(effect_labels, levels = effect_labels)
-      )
+        purrr::map_dfr(broom::tidy, .id = "effect") |>
+        dplyr::mutate(
+          effect_label = factor(effect_labels, levels = effect_labels),
+          effect_label = forcats::fct_relevel(
+            effect_label, "Between sessions and states", after = 7
+          )
+
+        )
+
+      if (check_convergence) {
+        contrasts <- dplyr::mutate(
+          contrasts,
+          converged = performance::check_convergence(.y)
+        )
+      }
+
       contrasts
     },
     .id = "participant"
@@ -923,11 +1018,14 @@ tidy_subset_contrast_similarity <- function(objects) {
 
 #' Plot subset similarity contrasts
 #'
-#' @param group_object A tibble of similarity results
-#' @param subset_objects A list of subset similarity results
+#' @param group_object A tibble of similarity results.
+#' @param subset_objects A list of subset similarity results.
+#' @param subset_models A list of subset similarity glmmTMB models.
 #'
 #' @return A grob.
-plot_subset_similarity_contrasts <- function(group_object, subset_objects) {
+plot_subset_similarity_contrasts <- function(
+  group_object, subset_objects, subset_models
+) {
 
   # Note: The gradient fill in the ridges is currently commented out, as it's a
   # bit busy when also filling the ridges by effect direction, with the colour
@@ -935,7 +1033,7 @@ plot_subset_similarity_contrasts <- function(group_object, subset_objects) {
 
   # Tidy data to prepare for plotting
   contrasts <- tidy_contrast_similarity(group_object)
-  subset_contrasts <- tidy_subset_contrast_similarity(subset_objects)
+  subset_contrasts <- tidy_subset_contrast_similarity(subset_objects, subset_models)
 
   subset_contrasts <- contrasts |>
     dplyr::select(effect_label, group_estimate = estimate) |>
@@ -945,8 +1043,11 @@ plot_subset_similarity_contrasts <- function(group_object, subset_objects) {
     # later remove, to work around this.
     dplyr::mutate(
       effect_label = forcats::fct_expand(effect_label, " "),
-      effect_label = forcats::fct_relevel(effect_label, "Main effect", " ")
-    )
+      effect_label = forcats::fct_relevel(effect_label, "Main effect", " "),
+      participant  = factor(participant)
+    ) |>
+    # Only show results for converged models.
+    dplyr::filter(converged)
 
   # Plotting
   my_scale <- ggplot2::scale_x_continuous(
@@ -1044,7 +1145,10 @@ plot_subset_similarity_contrasts <- function(group_object, subset_objects) {
       breaks = my_breaks,
       labels = function(x) ifelse(x == 0, 0, x)
     ) +
-    ggplot2::scale_y_discrete(expand = ggplot2::expansion(add = c(1.1, 0))) +
+    ggplot2::scale_y_discrete(
+      expand = ggplot2::expansion(add = c(1.1, 0)),
+      drop = FALSE
+    ) +
     ## These legends already appear in the group-level interval plot, so they
     ## don't need to be repeated here.
     ggplot2::guides(
@@ -1092,6 +1196,299 @@ plot_subset_similarity_contrasts <- function(group_object, subset_objects) {
 
 }
 
+#' Plot subset similarity contrasts
+#'
+#' This is the same as the function above, but includes the legend. Yes, the
+#' function above should just give an argument to do this (DRY principles and
+#' all that), but I need to make targets with and without the legend anyways
+#' since the returned object can't be modified after the fact, and this was
+#' easier.
+#'
+#' @param group_object A tibble of similarity results
+#' @param subset_objects A list of subset similarity results
+#' @param subset_models A list of subset similarity glmmTMB models.
+#'
+#' @return A grob.
+plot_subset_similarity_contrasts_2 <- function(
+  group_object, subset_objects, subset_models
+) {
+
+  # Tidy data to prepare for plotting
+  contrasts <- tidy_contrast_similarity(group_object)
+  subset_contrasts <- tidy_subset_contrast_similarity(subset_objects, subset_models)
+
+  subset_contrasts <- contrasts |>
+    dplyr::select(effect_label, group_estimate = estimate) |>
+    dplyr::left_join(subset_contrasts) |>
+    # Since we have 9 contrasts, there's an odd number which makes lining up
+    # facets awkward. We'll create a blank factor level, whose facet we will
+    # later remove, to work around this.
+    dplyr::mutate(
+      effect_label = forcats::fct_expand(effect_label, " "),
+      effect_label = forcats::fct_relevel(effect_label, "Main effect", " "),
+      participant  = factor(participant)
+    ) |>
+    # Only show results for converged models.
+    dplyr::filter(converged)
+
+  # Plotting
+  my_scale <- ggplot2::scale_x_continuous(
+    breaks = scales::extended_breaks(n = 3)
+  )
+  my_scale$train(
+    c(min(subset_contrasts$.lower_0.95), max(subset_contrasts$.upper_0.95))
+  )
+  my_breaks <- my_scale$get_breaks()
+
+  p <- ggplot2::ggplot(subset_contrasts) +
+    ggplot2::geom_vline(ggplot2::aes(xintercept = 0), linetype = 5, alpha = 0.2) +
+    # Plot group-level intervals so there's a reference point to compare the
+    # sub-models to.
+    ggdist::stat_interval(
+      ggplot2::aes(
+        y = "Group",
+        xdist = distributional::dist_student_t(
+          df = df, mu = estimate, sigma = std.error
+        ),
+        colour = effect_direction,
+        colour_ramp = stat(level)
+      ),
+      .width = c(0.66, 0.95),
+      data = contrasts
+    ) +
+    ggplot2::scale_colour_discrete(
+      drop = FALSE,
+      type = c(
+        "#3aaf85", # Green
+        "#1b6ca8", # Blue
+        "#cd201f"  # Red
+      )
+    ) +
+    ggdist::scale_colour_ramp_discrete(
+      from = "#fafdce",
+      range = c(0.33, 1)
+    ) +
+    ggdist::geom_interval(
+      ggplot2::aes(
+        y = "Group", ymin = "Group", ymax = "Group",
+        # When the estimate is very small the width of the point estimate
+        # interval should be smaller so it doesn't overplot the CIs.
+        xmin = ifelse(.upper_0.95 - .lower_0.95 < 0.01, estimate - 0.00025, estimate - 0.00075),
+        xmax = ifelse(.upper_0.95 - .lower_0.95 < 0.01, estimate + 0.00025, estimate + 0.00075)
+      ),
+      orientation = "horizontal",
+      data = contrasts
+    ) +
+    # Confidence distributions for participant sub-models
+    ggdist::stat_slab(
+      ggplot2::aes(
+        x = estimate,
+        y = participant,
+        # This throws a warning that the aesthetic is being ignored, but it's
+        # needed for the code in `fill_ramp` to work.
+        group_estimate = group_estimate,
+        xdist = distributional::dist_student_t(df = df, mu = estimate, sigma = std.error),
+        fill = effect_direction
+      ),
+      color = "black",
+      size = 0.25,
+      height = 2,
+      expand = TRUE, # I can't disable this for whatever reason
+      trim = FALSE, # I can't disable this for whatever reason
+    ) +
+    ggplot2::scale_fill_discrete(
+      type = c(
+        "#3aaf85", # Green
+        "#1b6ca8", # Blue
+        "#cd201f"  # Red
+      )
+    ) +
+
+    # General plot settings
+    ggplot2::scale_x_continuous(
+      breaks = my_breaks,
+      labels = function(x) ifelse(x == 0, 0, x)
+    ) +
+    ggplot2::scale_y_discrete(
+      expand = ggplot2::expansion(add = c(1.1, 0)),
+      drop = FALSE
+    ) +
+    ## These legends don't need to appear.
+    ggplot2::guides(
+      fill = "none",
+      colour_ramp = "none"
+    ) +
+    # Keep the empty " " facet to enforce facet alignment. It will be removed
+    # manually after building the plot. Make the direction vertical so that
+    # the "Main effect" facet is above the " " facet.
+    ggplot2::facet_wrap(~ effect_label, ncol = 5, drop = FALSE, dir = "v") +
+    ggplot2::labs(
+      x = paste0(
+        "Difference in functional connectome similarity",
+        "\n",
+        "(Within participant y \U2212 Between participant)"
+      ),
+      y = "Participant",
+      colour = "Effect Direction"
+    ) +
+    ggplot2::theme_classic()
+
+  # Remove the blank facet. Solution for removing facet modified from:
+  # https://stackoverflow.com/a/30372692/16844576
+  g <- ggplot2::ggplotGrob(p)
+
+  # Get the grobs that must be removed
+  rm_grobs <- g$layout$name %in% c("strip-t-1-2")
+  # Remove grobs
+  g$grobs[rm_grobs] <- NULL
+  g$layout <- g$layout[!rm_grobs, ]
+  # Move x-axis from " " facet to "Main effect" facet
+  g$layout[g$layout$name == "axis-b-1-2", c("t", "b")] <- c(9, 9)
+  # Move y-axis from " " facet to "Within sessions" facet
+  g$layout[g$layout$name == "axis-l-2-1", c("l", "r")] <- c(8, 8)
+
+  # Transform back to class ggplot and print
+  ggpubr::as_ggplot(g)
+
+}
+
+#' Plot subset similarity contrast bar charts
+#'
+#' @param delta,theta,alpha,beta,gamma A list of subset similarity results for a
+#'   given frequency band.
+#'
+#' @return A ggplot2 object.
+plot_subset_similarity_contrast_bars <- function(
+  delta = NULL, theta = NULL, alpha = NULL, beta = NULL, gamma = NULL
+) {
+
+  subset_contrasts <- purrr::map_dfr(
+    list(
+      Delta = delta, Theta = theta, Alpha = alpha, Beta = beta, Gamma = gamma
+    ),
+    function(.x) {
+
+      if (is.null(.x)) {
+        .x
+      } else {
+        .x |>
+          tidy_subset_contrast_similarity(
+            models = NA, check_convergence = FALSE
+          ) |>
+          dplyr::select(effect_label, effect_direction) |>
+          dplyr::group_by(effect_label) |>
+          dplyr::count(effect_direction)
+      }
+
+    },
+    .id = "frequency_band"
+  )
+
+  subset_contrasts |>
+    dplyr::mutate(
+      frequency_band = factor(
+        frequency_band,
+        levels = c("Delta", "Theta", "Alpha", "Beta", "Gamma")
+      )
+    ) |>
+    ggplot2::ggplot(ggplot2::aes(x = effect_label, y = n, fill = effect_direction)) +
+    ggplot2::geom_col() +
+    ggplot2::coord_flip() +
+    ggplot2::scale_y_continuous(breaks = c(0, 7, 14)) +
+    ggplot2::scale_fill_discrete(
+      drop = FALSE,
+      type = c(
+        "#3aaf85", # Green
+        "#1b6ca8", # Blue
+        "#cd201f"  # Red
+      )
+    ) +
+    ggplot2::facet_wrap(ggplot2::vars(frequency_band), nrow = 1) +
+    ggplot2::labs(
+      x = "Contrast",
+      y = "Count",
+      fill = "Effect Direction"
+    ) +
+    ggplot2::theme_classic()
+}
+
+#' Save similarity matrix figure
+#'
+#' @param filename A character string of the file path.
+#' @param plots A similarity matrix ggplot2 object.
+#'
+#' @return A character string of the file path.
+save_similarity_matrix_figure <- function(filename, similarity_plot) {
+
+  # Add legends for session and state.
+  axis_tick_colours <- colorspace::diverging_hcl(
+    12, h = c(299, 135), c = 60, l = c(20, 80), power = c(0.7, 1.3)
+  )
+
+  case_colours <- rep(
+    c(rev(axis_tick_colours[7:12]), axis_tick_colours[1:6]),
+    times = 14 # length(participant_levels)
+  )
+
+  state_legend <- tibble::tibble(
+    State = factor(c("Eyes closed", "Eyes open"))
+  )
+
+  session_legend_colours <- colorspace::diverging_hcl(
+    12, h = c(299, 135), c = 0, l = c(20, 80), power = c(0.7, 1.3)
+  )
+
+  session_levels <- c("1-1", "1-2", "2-1", "2-2", "3-1", "3-2")
+
+  session_legend <- tibble::tibble(
+    Session = factor(session_levels, levels = session_levels)
+  )
+
+  similarity_plot <- similarity_plot +
+    # The axis ticks need to be a tiny bit wider to prevent gaps when scaling
+    # the plot up in size.
+    ggplot2::theme(
+      axis.ticks.x.top = ggplot2::element_line(size = 1.2),
+      axis.ticks.y.left = ggplot2::element_line(size = 1.1)
+    ) +
+    # These rasters/rectangles are purely here to make the new legends show up;
+    # they aren't actually visible in the plot.
+    ggnewscale::new_scale_fill() +
+    ggplot2::geom_rect(
+      ggplot2::aes(xmin = -Inf, xmax = -Inf, ymin = -Inf, ymax = -Inf, fill = Session),
+      data = session_legend, inherit.aes = FALSE
+    ) +
+    ggplot2::scale_fill_manual(
+      values = session_legend_colours[6:1],
+      guide = ggplot2::guide_legend(
+        title = "Session-Recording", order = 4
+      )
+    ) +
+    ggnewscale::new_scale_fill() +
+    ggplot2::geom_rect(
+      ggplot2::aes(xmin = -Inf, xmax = -Inf, ymin = -Inf, ymax = -Inf, fill = State),
+      data = state_legend, inherit.aes = FALSE
+    ) +
+    ggplot2::scale_fill_manual(
+      values = c(case_colours[9], case_colours[3]),
+      guide = ggplot2::guide_legend(order = 3)
+    )
+
+  ggplot2::ggsave(
+    filename = filename,
+    plot = similarity_plot,
+    device = ragg::agg_png,
+    width = 21.59,
+    height = 16,
+    units = "cm",
+    dpi = "retina",
+    scaling = 1
+  )
+
+  filename
+
+}
+
 #' Save similarity archetypes figure
 #'
 #' @param filename A character string of the file path.
@@ -1105,10 +1502,10 @@ save_similarity_archetypes_figure <- function(filename, plots) {
     ggplot2::ggtitle("Group effect") +
     ggplot2::theme(legend.position = "none")
   session_effect <- plots$session_effect +
-    ggplot2::ggtitle("Session effect") +
+    ggplot2::ggtitle("Group-session effect") +
     ggplot2::theme(legend.position = "none")
   state_effect <- plots$state_effect +
-    ggplot2::ggtitle("State effect") +
+    ggplot2::ggtitle("Group-state effect") +
     ggplot2::theme(legend.position = "none")
   individual_session_effect <- plots$individual_session_effect +
     ggplot2::ggtitle("Individual-session effect") +
@@ -1154,8 +1551,21 @@ save_similarity_archetypes_figure <- function(filename, plots) {
         title = "Functional\nConnectome\nSimilarity", reverse = TRUE, order = 1
       )
     ) +
-    # These rectangles are purely here to make the legend show up; they aren't
-    # actually visible in the plot.
+    # These rasters/rectangles are purely here to make the new legends show up;
+    # they aren't actually visible in the plot.
+    ggnewscale::new_scale_fill() +
+    ggplot2::geom_raster(
+      ggplot2::aes(x = NA, y = NA, fill = 1),
+      inherit.aes = FALSE
+    ) +
+    ggplot2::scale_fill_continuous(
+      limits = c(0, 1),
+      breaks = seq(0, 1, by = .1),
+      type = "viridis",
+      guide = ggplot2::guide_legend(
+        title = "Similarity Values", reverse = TRUE, order = 2
+      )
+    ) +
     ggnewscale::new_scale_fill() +
     ggplot2::geom_rect(
       ggplot2::aes(xmin = -Inf, xmax = -Inf, ymin = -Inf, ymax = -Inf, fill = Session),
@@ -1164,7 +1574,7 @@ save_similarity_archetypes_figure <- function(filename, plots) {
     ggplot2::scale_fill_manual(
       values = session_legend_colours[6:1],
       guide = ggplot2::guide_legend(
-        title = "Session-Recording", order = 3
+        title = "Session-Recording", order = 4
       )
     ) +
     ggnewscale::new_scale_fill() +
@@ -1174,7 +1584,7 @@ save_similarity_archetypes_figure <- function(filename, plots) {
     ) +
     ggplot2::scale_fill_manual(
       values = c(case_colours[9], case_colours[3]),
-      guide = ggplot2::guide_legend(order = 2)
+      guide = ggplot2::guide_legend(order = 3)
     )
 
   plots_legend <- individual_effect |>
@@ -1237,12 +1647,8 @@ save_results_figure <- function(
   connectivity_profile,
   similarity_matrix,
   group_contrasts,
-  subset_contrasts
+  subset_contrasts = NULL
   ) {
-
-  design <- "AA
-             BC
-             DD"
 
   # FIXME: Using wrap_elements() may be unnecessary now that I'm no longer using
   # ggh4x::facet_grid2() for the similarity matrix.
@@ -1251,8 +1657,303 @@ save_results_figure <- function(
   p3 <- patchwork::wrap_elements(group_contrasts)
   p4 <- patchwork::wrap_elements(subset_contrasts)
 
-  patch <- patchwork::wrap_plots(A = p1, B = p2, C = p3, D = p4, design = design) +
+  # Include individual-level sub-models
+  if (!is.null(subset_contrasts)) {
+
+    design <- "AA
+               BC
+               DD"
+
+    patch <- patchwork::wrap_plots(A = p1, B = p2, C = p3, D = p4, design = design) +
+      patchwork::plot_annotation(tag_levels = "A")
+
+    ggplot2::ggsave(
+      filename = filename,
+      plot = patch,
+      device = ragg::agg_png,
+      width = 21.59,
+      height = 26,
+      units = "cm",
+      dpi = "retina",
+      scaling = 0.65
+    )
+
+  # Do not include individual-level sub-models
+  } else {
+
+    design <- "AA
+               BC"
+
+    patch <- patchwork::wrap_plots(A = p1, B = p2, C = p3, design = design) +
+      patchwork::plot_annotation(tag_levels = "A")
+
+    ggplot2::ggsave(
+      filename = filename,
+      plot = patch,
+      device = ragg::agg_png,
+      width = 21.59,
+      height = 18,
+      units = "cm",
+      dpi = "retina",
+      scaling = 0.65
+    )
+
+  }
+
+  filename
+
+}
+
+save_subset_similarity_contrast_barplot_figure <- function(
+  filename,
+  phase,
+  amplitude
+) {
+
+  design <- ("AAAAAAAAAA
+              BB########")
+
+  patch <- phase +
+    amplitude +
+    patchwork::plot_layout(design = design, guides = "collect") +
     patchwork::plot_annotation(tag_levels = "A")
+
+  ggplot2::ggsave(
+    filename = filename,
+    plot = patch,
+    device = ragg::agg_png,
+    width = 21.59,
+    height = 18,
+    units = "cm",
+    dpi = "retina",
+    scaling = 1
+  )
+
+  filename
+
+}
+
+#' Save amplitude similarity patchwork
+#'
+#' @param delta,theta,beta,gamma Similarity matrix for the respective frequency band.
+#'
+#' @return A character vector of the file path.
+save_amplitude_similarity_patchwork_figure <- function(
+  delta, theta, beta, gamma
+) {
+
+  filename <- "figures/amplitude-similarity-patchwork.png"
+
+  delta <- delta +
+    ggplot2::ggtitle("Delta") +
+    ggplot2::theme(legend.position = "none")
+  theta <- theta +
+    ggplot2::ggtitle("Theta") +
+    ggplot2::theme(legend.position = "none")
+  beta <- beta +
+    ggplot2::ggtitle("Beta") +
+    ggplot2::theme(legend.position = "none")
+
+  # Modify the legend so that it's discrete instead of continuous. This legend
+  # will be extracted to represent the entire patchwork, since collecting
+  # legends does not work with these plots. Also add legends for session and
+  # state.
+  axis_tick_colours <- colorspace::diverging_hcl(
+    12, h = c(299, 135), c = 60, l = c(20, 80), power = c(0.7, 1.3)
+  )
+
+  case_colours <- rep(
+    c(rev(axis_tick_colours[7:12]), axis_tick_colours[1:6]),
+    times = 14 # length(participant_levels)
+  )
+
+  state_legend <- tibble::tibble(
+    State = factor(c("Eyes closed", "Eyes open"))
+  )
+
+  session_legend_colours <- colorspace::diverging_hcl(
+    12, h = c(299, 135), c = 0, l = c(20, 80), power = c(0.7, 1.3)
+  )
+
+  session_levels <- c("1-1", "1-2", "2-1", "2-2", "3-1", "3-2")
+
+  session_legend <- tibble::tibble(
+    Session = factor(session_levels, levels = session_levels)
+  )
+
+  gamma <- gamma +
+    # These rasters/rectangles are purely here to make the new legends show up;
+    # they aren't actually visible in the plot.
+    ggnewscale::new_scale_fill() +
+    ggplot2::geom_rect(
+      ggplot2::aes(xmin = -Inf, xmax = -Inf, ymin = -Inf, ymax = -Inf, fill = Session),
+      data = session_legend, inherit.aes = FALSE
+    ) +
+    ggplot2::scale_fill_manual(
+      values = session_legend_colours[6:1],
+      guide = ggplot2::guide_legend(
+        title = "Session-Recording", order = 4
+      )
+    ) +
+    ggnewscale::new_scale_fill() +
+    ggplot2::geom_rect(
+      ggplot2::aes(xmin = -Inf, xmax = -Inf, ymin = -Inf, ymax = -Inf, fill = State),
+      data = state_legend, inherit.aes = FALSE
+    ) +
+    ggplot2::scale_fill_manual(
+      values = c(case_colours[9], case_colours[3]),
+      guide = ggplot2::guide_legend(order = 3)
+    )
+
+  plots_legend <- gamma |>
+    ggpubr::get_legend() |>
+    ggpubr::as_ggplot()
+
+  gamma <- gamma +
+    ggplot2::ggtitle("Gamma") +
+    ggplot2::theme(legend.position = "none")
+
+  design <- "ABEFG
+             CDEFG"
+
+  p1 <- patchwork::wrap_elements(delta)
+  p2 <- patchwork::wrap_elements(theta)
+  p3 <- patchwork::wrap_elements(beta)
+  p4 <- patchwork::wrap_elements(gamma)
+
+  p7 <- plots_legend
+
+  patch <- patchwork::wrap_plots(
+    A = p1, B = p2, C = p3, D = p4,
+    E = patchwork::plot_spacer(), F = p7, G = patchwork::plot_spacer(),
+    design = design,
+    guides = "collect",
+    widths = c(1, 1, 0.025, 0.2, 0.025)
+  )
+
+  ggplot2::ggsave(
+    filename = filename,
+    plot = patch,
+    device = ragg::agg_png,
+    width = 21.59,
+    height = 19,
+    units = "cm",
+    dpi = "retina",
+    scaling = 0.65
+  )
+
+  filename
+
+}
+
+#' Save similarity matrix patchwork with jet colour scale
+#'
+#' @param all_arguments Similarity matrix plot for the respective frequency
+#'   band.
+#'
+#' @return A character vector of the file path.
+save_jet_similarity_patchwork_figure <- function(
+  phase_delta,
+  phase_theta,
+  phase_alpha,
+  phase_beta,
+  phase_gamma,
+  amplitude_alpha
+) {
+
+  filename <- "figures/jet-similarity-patchwork.png"
+
+  jet <- palettes::as_colour(readRDS(here::here("R/jet-colours.rds")))
+
+  phase_delta <- phase_delta +
+    palettes::scale_fill_palette_c(
+      jet,
+      limits = c(0, NA),
+      # This is a bit of a hacky way to get the limits of the fill-scale to
+      # ignore the 1s on the diagonal of the matrix. They are set to 0 instead
+      # of NA because the latter throws a cryptic error that I couldn't be
+      # bothered with.
+      trans = scales::trans_new(
+        name = "remove_ones",
+        transform = \(.x) ifelse(.x == 1, 0, .x),
+        inverse = \(.x) ifelse(is.na(.x), 1, .x)
+      )
+    ) +
+    ggplot2::ggtitle("Phase, Delta")
+
+  phase_theta <- phase_theta +
+    palettes::scale_fill_palette_c(
+      jet,
+      limits = c(0, NA),
+      trans = scales::trans_new(
+        name = "remove_ones",
+        transform = \(.x) ifelse(.x == 1, 0, .x),
+        inverse = \(.x) ifelse(is.na(.x), 1, .x)
+      )
+    ) +
+    ggplot2::ggtitle("Phase, Theta")
+
+  phase_alpha <- phase_alpha +
+    palettes::scale_fill_palette_c(
+      jet,
+      limits = c(0, NA),
+      trans = scales::trans_new(
+        name = "remove_ones",
+        transform = \(.x) ifelse(.x == 1, 0, .x),
+        inverse = \(.x) ifelse(is.na(.x), 1, .x)
+      )
+    ) +
+    ggplot2::ggtitle("Phase, Alpha")
+
+  phase_beta <- phase_beta +
+    palettes::scale_fill_palette_c(
+      jet,
+      limits = c(0, NA),
+      trans = scales::trans_new(
+        name = "remove_ones",
+        transform = \(.x) ifelse(.x == 1, 0, .x),
+        inverse = \(.x) ifelse(is.na(.x), 1, .x)
+      )
+    ) +
+    ggplot2::ggtitle("Phase, Beta")
+
+  phase_gamma <- phase_gamma +
+    palettes::scale_fill_palette_c(
+      jet,
+      limits = c(0, NA),
+      trans = scales::trans_new(
+        name = "remove_ones",
+        transform = \(.x) ifelse(.x == 1, 0, .x),
+        inverse = \(.x) ifelse(is.na(.x), 1, .x)
+      )
+    ) +
+    ggplot2::ggtitle("Phase, Gamma")
+
+  amplitude_alpha <- amplitude_alpha +
+    palettes::scale_fill_palette_c(
+      jet,
+      limits = c(0, NA),
+      trans = scales::trans_new(
+        name = "remove_ones",
+        transform = \(.x) ifelse(.x == 1, 0, .x),
+        inverse = \(.x) ifelse(is.na(.x), 1, .x)
+      )
+    ) +
+    ggplot2::ggtitle("Amplitude, Alpha")
+
+  design <- "AB
+             CD
+             EF"
+
+  patch <- patchwork::wrap_plots(
+    A = phase_delta,
+    B = phase_theta,
+    C = phase_alpha,
+    D = phase_beta,
+    E = phase_gamma,
+    F = amplitude_alpha,
+    design = design
+  )
 
   ggplot2::ggsave(
     filename = filename,
@@ -1263,6 +1964,595 @@ save_results_figure <- function(
     units = "cm",
     dpi = "retina",
     scaling = 0.65
+  )
+
+  filename
+
+}
+
+#' Make contrast results table with significance tests
+#'
+#' @param emmeans_tidy The tidied emmeans data.
+#' @param contrasts_tidy The tidied contrasts data.
+#'
+#' @return A flextable object.
+make_contrast_results_table_nhst <- function(emmeans_tidy, contrasts_tidy) {
+
+  # Prepare data for display
+  tidy_data <- emmeans_tidy |>
+    dplyr::select(
+      effect_label = effect_label_nice, within_participant, response, std.error
+    ) |>
+    tidyr::pivot_wider(
+      names_from = within_participant,
+      values_from = c(response, std.error)
+    ) |>
+    dplyr::relocate(
+      effect_label,
+      response_within_participants,
+      std.error_within_participants,
+      response_between_participants,
+      std.error_between_participants
+    ) |>
+    dplyr::left_join(
+      dplyr::select(contrasts_tidy, effect_label, estimate:p.value)
+    ) |>
+    dplyr::relocate(df, .after = statistic) |>
+    dplyr::mutate(
+      dplyr::across(
+        c(where(is.numeric), -df, -p.value),
+        function(x) papaja::apa_num(x, digits = 3)
+      ),
+      dplyr::across(
+        dplyr::starts_with("std.error"),
+        function(x) paste0("(", x, ")")
+      ),
+      df = papaja::print_df(df),
+      p.value = papaja::print_p(p.value)
+    ) |>
+    tidyr::unite(
+      "mean_se_within_participant",
+      dplyr::ends_with("within_participants"),
+      sep = " "
+    ) |>
+    tidyr::unite(
+      "mean_se_between_participant",
+      dplyr::ends_with("between_participants"),
+      sep = " "
+    ) |>
+    tidyr::unite(
+      "mean_difference",
+      c(estimate, std.error),
+      sep = " "
+    ) |>
+    tidyr::unite(
+      "ci",
+      c(conf.low, conf.high),
+      sep = ", "
+    ) %>%
+    dplyr::rename(
+      contrast = effect_label,
+      "*t*({unique(.$df)})" := statistic,
+      "*p*" = p.value
+    ) |>
+    dplyr::select(-df) |>
+    dplyr::mutate(
+      contrast = factor(
+        contrast,
+        levels = c(
+          "Main effect",
+          "Between sessions",
+          "Within sessions",
+          "Between states",
+          "Within states",
+          "Between sessions and within states",
+          "Within sessions and between states",
+          "Between sessions and states",
+          "Within sessions and states"
+        )
+      )
+    ) |>
+    dplyr::arrange(contrast)
+
+  # Make results table
+  tidy_data |>
+    flextable::flextable() |>
+    # Header
+    flextable::set_header_labels(
+      contrast = "",
+      mean_se_within_participant = "Mean (SE)",
+      mean_se_between_participant = "Mean (SE)",
+      mean_difference = "ΔRV (SE)",
+      ci = "95% CI"
+    ) |>
+    flextable::add_header_row(
+      values = c(
+        "Contrast",
+        "Within Participant",
+        "Between Participant",
+        "Mean Difference",
+        ""
+      ),
+      colwidths = c(1, 1, 1, 2, 2)
+    ) |>
+    ftExtra::colformat_md(part = "header") |>
+    # Footer
+    flextable::footnote(
+      i = 1, j = 1,
+      value = flextable::as_paragraph(
+        "Results are averaged over the levels of session and state."
+      ),
+      ref_symbols = "1",
+      part = "body",
+    ) |>
+    flextable::footnote(
+      i = 2:3, j = 1,
+      value = flextable::as_paragraph("Results are averaged over the levels of state."),
+      ref_symbols = "2",
+      part = "body",
+    ) |>
+    flextable::footnote(
+      i = 4:5, j = 1,
+      value = flextable::as_paragraph(
+        "Results are averaged over the levels of session."
+      ),
+      ref_symbols = "3",
+      part = "body",
+    ) |>
+    # Cell alignment
+    flextable::align(part = "header", j = 1, align = "left") |>
+    flextable::align(part = "body", j = 1, align = "left") |>
+    flextable::align(part = "header", j = 2:7, align = "center") |>
+    flextable::align(part = "body", j = 2:7, align = "right") |>
+    # Borders
+    flextable::hline(
+      i = 1, j = c(1, 6, 7),
+      border = flextable::fp_border_default(width = 0),
+      part = "header"
+    ) |>
+    flextable::hline_bottom(
+      border = flextable::fp_border_default(width = 1.5),
+      part = "footer"
+    ) |>
+    flextable::fix_border_issues(part = "footer") |>
+    # Font
+    flextable::font(fontname = "Times New Roman", part = "all") |>
+    flextable::fontsize(size = 10, part = "all") |>
+    # Dimensions
+    flextable::width(j = 1, width = 3.59, unit = "cm")
+
+}
+
+#' Make contrast results table with standardized mean differences
+#'
+#' @param model A glmmTMB object.
+#' @param emmeans_tidy The tidied emmeans data.
+#' @param contrasts_tidy The tidied contrasts data.
+#' @param contrasts_cohens_d_tidy The tidied Cohen's d contrasts data.
+#'
+#' @return A flextable object.
+make_contrast_results_table_smd <- function(
+  model, emmeans_tidy, contrasts_tidy, contrasts_cohens_d_tidy
+) {
+
+  # Prepare data for display
+  tidy_data <- emmeans_tidy |>
+    dplyr::select(
+      effect_label = effect_label_nice, within_participant, response, std.error
+    ) |>
+    tidyr::pivot_wider(
+      names_from = within_participant,
+      values_from = c(response, std.error)
+    ) |>
+    dplyr::relocate(
+      effect_label,
+      response_within_participants,
+      std.error_within_participants,
+      response_between_participants,
+      std.error_between_participants
+    ) |>
+    dplyr::left_join(
+      dplyr::select(contrasts_tidy, effect_label, estimate:conf.high)
+    ) |>
+    dplyr::left_join(
+      dplyr::select(contrasts_cohens_d_tidy, effect_label, smd:smd_conf.high)
+    ) |>
+    dplyr::mutate(
+      dplyr::across(
+        c(where(is.numeric), -df),
+        function(x) papaja::apa_num(x, digits = 3)
+      ),
+      dplyr::across(
+        dplyr::contains("std.error"),
+        function(x) paste0("(", x, ")")
+      ),
+      df = papaja::print_df(df)
+    ) |>
+    tidyr::unite(
+      "mean_se_within_participant",
+      dplyr::ends_with("within_participants"),
+      sep = " "
+    ) |>
+    tidyr::unite(
+      "mean_se_between_participant",
+      dplyr::ends_with("between_participants"),
+      sep = " "
+    ) |>
+    tidyr::unite(
+      "mean_difference",
+      c(estimate, std.error),
+      sep = " "
+    ) |>
+    tidyr::unite(
+      "ci",
+      c(conf.low, conf.high),
+      sep = ", "
+    ) |>
+    tidyr::unite(
+      "standardized_mean_difference",
+      c(smd, smd_std.error),
+      sep = " "
+    ) |>
+    tidyr::unite(
+      "smd_ci",
+      c(smd_conf.low, smd_conf.high),
+      sep = ", "
+    ) |>
+    dplyr::rename(
+      contrast = effect_label
+    ) |>
+    dplyr::select(-df) |>
+    dplyr::mutate(
+      contrast = factor(
+        contrast,
+        levels = c(
+          "Main effect",
+          "Between sessions",
+          "Within sessions",
+          "Between states",
+          "Within states",
+          "Between sessions and within states",
+          "Within sessions and between states",
+          "Between sessions and states",
+          "Within sessions and states"
+        )
+      )
+    ) |>
+    dplyr::arrange(contrast)
+
+  # Make results table
+  tidy_data |>
+    flextable::flextable() |>
+    # Header
+    flextable::set_header_labels(
+      contrast = "",
+      mean_se_within_participant = "Mean (SE)",
+      mean_se_between_participant = "Mean (SE)",
+      mean_difference = "ΔRV (SE)",
+      ci = "95% CI",
+      standardized_mean_difference = "d",
+      smd_ci = "95% CI"
+    ) |>
+    flextable::compose(
+      part = "header", i = 1, j = 6,
+      flextable::as_paragraph(
+        flextable::as_i("d"),
+        flextable::as_sub(flextable::as_i("T")),
+        " (SE)"
+      )
+    ) |>
+    flextable::add_header_row(
+      values = c(
+        "Contrast",
+        "Within Participant",
+        "Between Participant",
+        "Mean Difference",
+        "Standardized Mean Difference"
+      ),
+      colwidths = c(1, 1, 1, 2, 2)
+    ) |>
+    #ftExtra::colformat_md(part = "header") |>
+    # Footer
+    flextable::footnote(
+      i = 1, j = 1,
+      value = flextable::as_paragraph(
+        "Results are averaged over the levels of session and state."
+      ),
+      ref_symbols = "1",
+      part = "body",
+    ) |>
+    flextable::footnote(
+      i = 2:3, j = 1,
+      value = flextable::as_paragraph("Results are averaged over the levels of state."),
+      ref_symbols = "2",
+      part = "body",
+    ) |>
+    flextable::footnote(
+      i = 4:5, j = 1,
+      value = flextable::as_paragraph(
+        "Results are averaged over the levels of session."
+      ),
+      ref_symbols = "3",
+      part = "body",
+    ) |>
+    flextable::footnote(
+      i = 2, j = 6,
+      value = flextable::as_paragraph(
+        "Mean differences were standardized using the summed standard ",
+        "deviation of the variance components from the fitted model (",
+        flextable::as_equation("\\sigma_T"),
+        " = ",
+        papaja::apa_num(
+          sqrt(sum(insight::get_variance_intercept(model))), digits = 3
+        ),
+        ")."
+      ),
+      ref_symbols = "4",
+      part = "header",
+    ) |>
+    # Cell alignment
+    flextable::align(part = "header", j = 1, align = "left") |>
+    flextable::align(part = "body", j = 1, align = "left") |>
+    flextable::align(part = "header", j = 2:7, align = "center") |>
+    flextable::align(part = "body", j = 2:7, align = "right") |>
+    # Borders
+    flextable::hline(
+      i = 1, j = 1,
+      border = flextable::fp_border_default(width = 0),
+      part = "header"
+    ) |>
+    flextable::hline_bottom(
+      border = flextable::fp_border_default(width = 1.5),
+      part = "footer"
+    ) |>
+    flextable::fix_border_issues(part = "footer") |>
+    # Font
+    flextable::font(fontname = "Times New Roman", part = "all") |>
+    flextable::fontsize(size = 10, part = "all") |>
+    # Dimensions
+    flextable::width(j = 1, width = 3.59, unit = "cm")
+
+}
+
+#' Make model fit table
+#'
+#' @param model A glmmTMB object.
+#'
+#' @return A flextable object.
+make_model_fit_table <- function(model, maximal_model = FALSE) {
+
+  model |>
+    gtsummary::tbl_regression(
+      label = if (maximal_model) {
+        list(
+          within_participant ~ "Within Participant",
+          within_session ~ "Within Session",
+          within_state ~ "Within State",
+          "pair_participant.sd__(Intercept)" ~ "Participant Pair",
+          "x_label.sd__(Intercept)" ~ "X Connectome",
+          "y_label.sd__(Intercept)" ~ "Y Connectome"
+        )
+      } else {
+        list(
+          within_participant ~ "Within Participant",
+          within_session ~ "Within Session",
+          within_state ~ "Within State",
+          "x_label.sd__(Intercept)" ~ "X Connectome",
+          "y_label.sd__(Intercept)" ~ "Y Connectome"
+        )
+      },
+      show_single_row = c(
+        within_participant, within_state, within_session,
+        "within_participant:within_session",
+        "within_participant:within_state",
+        "within_session:within_state",
+        "within_participant:within_session:within_state"
+      ),
+      intercept = TRUE,
+      estimate_fun = ~ papaja::print_num(.x, digits = 3, na_string = ""),
+      pvalue_fun = papaja::print_p,
+      tidy_fun = broom.mixed::tidy
+    ) |>
+    gtsummary::modify_footnote(update = everything() ~ NA, abbreviation = TRUE) |>
+    gtsummary::modify_table_body(
+      ~ .x |>
+        dplyr::mutate(
+          Type = c(
+            rep("Fixed Effects", times = 8),
+            rep("Random Effects", times = ifelse(maximal_model, 3, 2))
+          ),
+          .before = label
+        ) |>
+        flextable::as_grouped_data(groups = "Type") |>
+        tibble::as_tibble()
+    ) |>
+    gtsummary::modify_column_unhide(c(Type, std.error)) |>
+    gtsummary::add_glance_source_note(
+      label = list(
+        sigma ~ "Phi coefficient"
+      ),
+      glance_fun = broom.mixed::glance
+    ) |>
+    gtsummary::as_flex_table() |>
+    # Header and grouped rows
+    flextable::set_header_labels(
+      label = "Term",
+      estimate = "Estimate",
+      p.value = "*p*"
+    ) |>
+    ftExtra::colformat_md(part = "header") |>
+    flextable::merge_at(i = 1, part = "body") |>
+    flextable::align(i = 1, align = "left") |>
+    flextable::merge_at(i = 10, part = "body") |>
+    flextable::align(i = 10, align = "left") |>
+    # Footnotes
+    flextable::footnote(
+      j = 3,
+      value = flextable::as_paragraph(
+        "Estimates for fixed effects and random effects are, respectively, ",
+        "coefficients for the mean model (with logit link) and standard ",
+        "deviations for the grouping variables (random intercepts)."
+      ),
+      ref_symbols = "1",
+      part = "header",
+    ) |>
+    # Cell alignment
+    flextable::align(part = "header", i = 1, align = "center") |>
+    flextable::align(part = "body", j = 3:6, align = "right") |>
+    # Borders
+    flextable::hline_bottom(
+      border = flextable::fp_border_default(width = 1.5),
+      part = "footer"
+    ) |>
+    flextable::fix_border_issues(part = "footer") |>
+    # Font
+    flextable::font(fontname = "Times New Roman", part = "all") |>
+    flextable::fontsize(size = 10, part = "all") |>
+    # Dimensions
+    flextable::width(j = 1, width = 1.4, unit = "cm") |>
+    flextable::width(j = 2, width = 8.5, unit = "cm") |>
+    flextable::width(j = 3, width = 1.8, unit = "cm") |>
+    flextable::width(j = 4:6, width = 1.6, unit = "cm")
+
+}
+
+#' Make conervgence/singularity table
+#'
+#' @param all_arguments A glmmTMB object corresponding to the respective
+#'   coupling mode, frequency band, and random effects specification.
+#'
+#' @return A flextable object.
+make_convergence_table <- function(
+  phase_delta_reduced,
+  phase_delta_maximal,
+  phase_theta_reduced,
+  phase_theta_maximal,
+  phase_alpha_reduced,
+  phase_alpha_maximal,
+  phase_beta_reduced,
+  phase_beta_maximal,
+  phase_gamma_reduced,
+  phase_gamma_maximal,
+  amplitude_alpha_reduced,
+  amplitude_alpha_maximal,
+  phase_delta_hilbert_reduced,
+  phase_delta_hilbert_maximal,
+  phase_theta_hilbert_reduced,
+  phase_theta_hilbert_maximal,
+  phase_alpha_hilbert_reduced,
+  phase_alpha_hilbert_maximal,
+  phase_beta_hilbert_reduced,
+  phase_beta_hilbert_maximal,
+  phase_gamma_hilbert_reduced,
+  phase_gamma_hilbert_maximal
+) {
+
+  models <- tibble::tribble(
+    ~model,                            ~coupling_mode,              ~freq_band, ~re,
+    list(phase_delta_reduced),         "Phase",                     "Delta", "Reduced",
+    list(phase_delta_maximal),         "Phase",                     "Delta", "Maximal",
+    list(phase_theta_reduced),         "Phase",                     "Theta", "Reduced",
+    list(phase_theta_maximal),         "Phase",                     "Theta", "Maximal",
+    list(phase_alpha_reduced),         "Phase",                     "Alpha", "Reduced",
+    list(phase_alpha_maximal),         "Phase",                     "Alpha", "Maximal",
+    list(phase_beta_reduced),          "Phase",                     "Beta",  "Reduced",
+    list(phase_beta_maximal),          "Phase",                     "Beta",  "Maximal",
+    list(phase_gamma_reduced),         "Phase",                     "Gamma", "Reduced",
+    list(phase_gamma_maximal),         "Phase",                     "Gamma", "Maximal",
+    list(amplitude_alpha_reduced),     "Amplitude",                 "Alpha", "Reduced",
+    list(amplitude_alpha_maximal),     "Amplitude",                 "Alpha", "Maximal",
+    list(phase_delta_hilbert_reduced), "Phase (Hilbert transform)", "Delta", "Reduced",
+    list(phase_delta_hilbert_maximal), "Phase (Hilbert transform)", "Delta", "Maximal",
+    list(phase_theta_hilbert_reduced), "Phase (Hilbert transform)", "Theta", "Reduced",
+    list(phase_theta_hilbert_maximal), "Phase (Hilbert transform)", "Theta", "Maximal",
+    list(phase_alpha_hilbert_reduced), "Phase (Hilbert transform)", "Alpha", "Reduced",
+    list(phase_alpha_hilbert_maximal), "Phase (Hilbert transform)", "Alpha", "Maximal",
+    list(phase_beta_hilbert_reduced),  "Phase (Hilbert transform)", "Beta",  "Reduced",
+    list(phase_beta_hilbert_maximal),  "Phase (Hilbert transform)", "Beta",  "Maximal",
+    list(phase_gamma_hilbert_reduced), "Phase (Hilbert transform)", "Gamma", "Reduced",
+    list(phase_gamma_hilbert_maximal), "Phase (Hilbert transform)", "Gamma", "Maximal"
+  )
+
+  # Check models
+  models |>
+    dplyr::rowwise() |>
+    dplyr::mutate(
+      converged = performance::check_convergence(model[[1]]),
+      singular  = performance::check_singularity(model[[1]])
+    ) |>
+    dplyr::ungroup() |>
+    dplyr::select(-model) |>
+    # Make table
+    tidyr::pivot_wider(
+      names_from = re, values_from = c(converged, singular)
+    ) |>
+    dplyr::relocate(singular_Reduced, .after = converged_Reduced) |>
+    flextable::as_grouped_data(groups = "coupling_mode") |>
+    flextable::flextable() |>
+    # Header and grouped rows
+    flextable::set_header_labels(
+      coupling_mode = "",
+      freq_band = "",
+      converged_Reduced = "Converged",
+      singular_Reduced = "Singular",
+      converged_Maximal = "Converged",
+      singular_Maximal = "Singular"
+    ) |>
+    flextable::add_header_row(
+      values = c(
+        "Coupling Mode",
+        "Frequency Band",
+        "Reduced Model",
+        "Maximal Model"
+      ),
+      colwidths = c(1, 1, 2, 2)
+    ) |>
+    flextable::merge_at(i = 1, part = "body") |>
+    flextable::align(i = 1, align = "left") |>
+    flextable::merge_at(i = 7, part = "body") |>
+    flextable::align(i = 7, align = "left") |>
+    flextable::merge_at(i = 9, part = "body") |>
+    flextable::align(i = 9, align = "left") |>
+    # Cell alignment
+    flextable::align(part = "header", i = c(1, 2), align = "center") |>
+    flextable::align(part = "body", j = 3:6, align = "center") |>
+    # Borders
+    flextable::hline(
+      i = 1, j = c(1, 2),
+      border = flextable::fp_border_default(width = 0),
+      part = "header"
+    ) |>
+    # Font
+    flextable::font(fontname = "Times New Roman", part = "all") |>
+    flextable::fontsize(size = 10, part = "all")
+
+}
+
+#' Save a figure
+#'
+#' @param filename A character vector of the file path.
+#' @param plot A ggplot2 object.
+#' @param width,height Numeric. Dimensions in cm.
+#' @param scaling Numeric. Plot scaling.
+#'
+#' @return A character vector of the file path.
+save_figure <- function(
+  filename,
+  plot,
+  width = 21.59,
+  height,
+  scaling = 0.65
+) {
+
+  ggplot2::ggsave(
+    filename = filename,
+    plot = plot,
+    device = ragg::agg_png,
+    width = width,
+    height = height,
+    units = "cm",
+    dpi = "retina",
+    scaling = scaling
   )
 
   filename

@@ -18,7 +18,16 @@ library(ggdist)
 library(ggh4x)
 library(ggnewscale)
 library(patchwork)
+library(see)
 
+library(flextable)
+library(ftExtra)
+library(gtsummary)
+
+library(rmarkdown)
+library(knitr)
+library(officer)
+library(officedown)
 library(papaja)
 library(rbbt)
 
@@ -36,13 +45,13 @@ tar_option_set(
 )
 
 # Load the R scripts with your custom functions:
-#for (file in list.files("R", full.names = TRUE)) source(file) # TODO: Uncomment this once all done
 source("R/preprocessing.R")
 source("R/connectivity.R")
 source("R/similarity.R")
 source("R/descriptives.R")
 source("R/references.R")
 source("R/session_info.R")
+source("R/utils.R")
 
 # Pipeline params:
 eeg_recordings_unavailable <- FALSE # TODO: Figure out how to implement this, either with tar_skip() or an ifelse
@@ -168,7 +177,6 @@ preprocessing_targets <- list(
   )
 )
 
-# TODO: Calculate amplitude connectivity.
 # Might be able to use tar_map() and metaprogramming to do both phase and amplitude in a single target
 # TODO: See if this can be split up into separate tar_map functions
 connectivity_estimation_targets <- list(
@@ -217,6 +225,14 @@ connectivity_estimation_targets <- list(
     tar_target(
       phase_connectivity_profile_plot,
       plot_connectivity_profiles(phase_connectivity_matrix, "PLI")
+    ),
+    tar_target(
+      phase_connectivity_histogram_plot,
+      plot_connectivity_histogram(phase_connectivity_matrix, "PLI")
+    ),
+    tar_target(
+      phase_connectivity_patchwork_plot,
+      plot_connectivity_patchwork(phase_connectivity_matrix, "PLI")
     ),
     # Estimate phase connectivity similarity ----
     tar_target(
@@ -267,8 +283,41 @@ connectivity_estimation_targets <- list(
       tidy_contrast_similarity(phase_similarity_contrasts)
     ),
     tar_target(
+      phase_similarity_contrasts_cohens_d,
+      contrast_similarity_cohens_d(
+        phase_similarity_glmmTMB,
+        phase_similarity_contrasts
+      )
+    ),
+    tar_target(
+      phase_similarity_contrasts_cohens_d_tidy,
+      tidy_contrast_similarity_cohens_d(
+        phase_similarity_contrasts_cohens_d
+      )
+    ),
+    tar_target(
       phase_similarity_contrasts_plot,
       plot_similarity_contrasts(phase_similarity_contrasts)
+    ),
+    tar_target(
+      phase_similarity_contrasts_table_nhst,
+      make_contrast_results_table_nhst(
+        phase_similarity_emmeans_tidy,
+        phase_similarity_contrasts_tidy
+      )
+    ),
+    tar_target(
+      phase_similarity_contrasts_table_smd,
+      make_contrast_results_table_smd(
+        phase_similarity_glmmTMB,
+        phase_similarity_emmeans_tidy,
+        phase_similarity_contrasts_tidy,
+        phase_similarity_contrasts_cohens_d_tidy
+      )
+    ),
+    tar_target(
+      phase_similarity_model_fit_table,
+      make_model_fit_table(phase_similarity_glmmTMB)
     ),
     ## Model diagnostics
     tar_target(
@@ -314,7 +363,16 @@ connectivity_estimation_targets <- list(
       phase_similarity_subset_contrasts_plot,
       plot_subset_similarity_contrasts(
         phase_similarity_contrasts,
-        phase_similarity_subset_contrasts
+        phase_similarity_subset_contrasts,
+        phase_similarity_subset_glmmTMB
+      )
+    ),
+    tar_target(
+      phase_similarity_subset_contrasts_plot_2,
+      plot_subset_similarity_contrasts_2(
+        phase_similarity_contrasts,
+        phase_similarity_subset_contrasts,
+        phase_similarity_subset_glmmTMB
       )
     ),
     # Estimate amplitude coupling ----
@@ -346,6 +404,14 @@ connectivity_estimation_targets <- list(
     tar_target(
       amplitude_connectivity_profile_plot,
       plot_connectivity_profiles(amplitude_connectivity_matrix, "AEC")
+    ),
+    tar_target(
+      amplitude_connectivity_histogram_plot,
+      plot_connectivity_histogram(amplitude_connectivity_matrix, "AEC")
+    ),
+    tar_target(
+      amplitude_connectivity_patchwork_plot,
+      plot_connectivity_patchwork(amplitude_connectivity_matrix, "AEC")
     ),
     # Estimate amplitude coupling similarity ----
     tar_target(
@@ -396,10 +462,44 @@ connectivity_estimation_targets <- list(
       tidy_contrast_similarity(amplitude_similarity_contrasts)
     ),
     tar_target(
+      amplitude_similarity_contrasts_cohens_d,
+      contrast_similarity_cohens_d(
+        amplitude_similarity_glmmTMB,
+        amplitude_similarity_contrasts
+      )
+    ),
+    tar_target(
+      amplitude_similarity_contrasts_cohens_d_tidy,
+      tidy_contrast_similarity_cohens_d(
+        amplitude_similarity_contrasts_cohens_d
+      )
+    ),
+    tar_target(
       amplitude_similarity_contrasts_plot,
       plot_similarity_contrasts(amplitude_similarity_contrasts)
     ),
-    ## Model diagnostics
+    tar_target(
+      amplitude_similarity_contrasts_table_nhst,
+      make_contrast_results_table_nhst(
+        amplitude_similarity_emmeans_tidy,
+        amplitude_similarity_contrasts_tidy
+      )
+    ),
+    tar_target(
+      amplitude_similarity_contrasts_table_smd,
+      make_contrast_results_table_smd(
+        amplitude_similarity_glmmTMB,
+        amplitude_similarity_emmeans_tidy,
+        amplitude_similarity_contrasts_tidy,
+        amplitude_similarity_contrasts_cohens_d_tidy
+      )
+    ),
+    tar_target(
+      amplitude_similarity_model_fit_table,
+      make_model_fit_table(amplitude_similarity_glmmTMB)
+    ),
+    ## TODO: Model diagnostics
+
 
     # Fit amplitude connectivity similarity submodels ----
     tar_target(
@@ -427,10 +527,19 @@ connectivity_estimation_targets <- list(
       amplitude_similarity_subset_contrasts_plot,
       plot_subset_similarity_contrasts(
         amplitude_similarity_contrasts,
-        amplitude_similarity_subset_contrasts
+        amplitude_similarity_subset_contrasts,
+        amplitude_similarity_subset_glmmTMB
       )
     ),
-    # Estimate phase coupling and similarity (Hilbert transform) ----
+    tar_target(
+      amplitude_similarity_subset_contrasts_plot_2,
+      plot_subset_similarity_contrasts_2(
+        amplitude_similarity_contrasts,
+        amplitude_similarity_subset_contrasts,
+        amplitude_similarity_subset_glmmTMB
+      )
+    ),
+    # Estimate phase coupling (Hilbert transform) ----
     tar_target(
       phase_coupling_hilbert,
       estimate_phase_coupling_hilbert(
@@ -450,7 +559,11 @@ connectivity_estimation_targets <- list(
       phase_connectivity_profile_plot_hilbert,
       plot_connectivity_profiles(phase_connectivity_matrix_hilbert, "PLI (Hilbert)")
     ),
-    # Model phase connectivity similarity
+    tar_target(
+      phase_connectivity_patchwork_plot_hilbert,
+      plot_connectivity_patchwork(phase_connectivity_matrix_hilbert, "PLI")
+    ),
+    # Estimate phase connectivity similarity (Hilbert transform) ----
     tar_target(
       phase_similarity_hilbert,
       estimate_similarity(phase_connectivity_matrix_hilbert)
@@ -459,6 +572,7 @@ connectivity_estimation_targets <- list(
       phase_similarity_plot_hilbert,
       plot_similarity(phase_similarity_hilbert, rv)
     ),
+    # Model phase connectivity similarity (Hilbert transform) ----
     tar_target(
       phase_similarity_glmmTMB_hilbert,
       glmmTMB_similarity(
@@ -485,10 +599,43 @@ connectivity_estimation_targets <- list(
       tidy_contrast_similarity(phase_similarity_contrasts_hilbert)
     ),
     tar_target(
+      phase_similarity_contrasts_cohens_d_hilbert,
+      contrast_similarity_cohens_d(
+        phase_similarity_glmmTMB_hilbert,
+        phase_similarity_contrasts_hilbert
+      )
+    ),
+    tar_target(
+      phase_similarity_contrasts_cohens_d_tidy_hilbert,
+      tidy_contrast_similarity_cohens_d(
+        phase_similarity_contrasts_cohens_d_hilbert
+      )
+    ),
+    tar_target(
       phase_similarity_contrasts_plot_hilbert,
       plot_similarity_contrasts(phase_similarity_contrasts_hilbert)
     ),
-    # Fit phase connectivity similarity submodels
+    tar_target(
+      phase_similarity_contrasts_table_nhst_hilbert,
+      make_contrast_results_table_nhst(
+        phase_similarity_emmeans_tidy_hilbert,
+        phase_similarity_contrasts_tidy_hilbert
+      )
+    ),
+    tar_target(
+      phase_similarity_contrasts_table_smd_hilbert,
+      make_contrast_results_table_smd(
+        phase_similarity_glmmTMB_hilbert,
+        phase_similarity_emmeans_tidy_hilbert,
+        phase_similarity_contrasts_tidy_hilbert,
+        phase_similarity_contrasts_cohens_d_tidy_hilbert
+      )
+    ),
+    tar_target(
+      phase_similarity_model_fit_table_hilbert,
+      make_model_fit_table(phase_similarity_glmmTMB_hilbert)
+    ),
+    # Fit phase connectivity similarity submodels (Hilbert transform) ----
     tar_target(
       phase_similarity_subset_hilbert,
       subset_similarity_results(phase_similarity_hilbert, participants_final)
@@ -514,18 +661,327 @@ connectivity_estimation_targets <- list(
       phase_similarity_subset_contrasts_plot_hilbert,
       plot_subset_similarity_contrasts(
         phase_similarity_contrasts_hilbert,
-        phase_similarity_subset_contrasts_hilbert
+        phase_similarity_subset_contrasts_hilbert,
+        phase_similarity_subset_glmmTMB_hilbert
+      )
+    ),
+    # Model phase connectivity similarity (maximal model) ----
+    tar_target(
+      phase_similarity_glmmTMB_maximal,
+      glmmTMB_similarity(
+        rv ~
+          within_participant * within_session * within_state + # Fixed effects
+          (1 | pair_participant) + (1 | x_label) + (1 | y_label), # Random effects
+        data = phase_similarity
+      )
+    ),
+    tar_target(
+      phase_similarity_emmeans_maximal,
+      emmeans_similarity(phase_similarity_glmmTMB_maximal)
+    ),
+    tar_target(
+      phase_similarity_emmeans_tidy_maximal,
+      tidy_emmeans_similarity(phase_similarity_emmeans_maximal)
+    ),
+    tar_target(
+      phase_similarity_contrasts_maximal,
+      contrast_similarity(phase_similarity_emmeans_maximal)
+    ),
+    tar_target(
+      phase_similarity_contrasts_tidy_maximal,
+      tidy_contrast_similarity(phase_similarity_contrasts_maximal)
+    ),
+    tar_target(
+      phase_similarity_contrasts_cohens_d_maximal,
+      contrast_similarity_cohens_d(
+        phase_similarity_glmmTMB_maximal,
+        phase_similarity_contrasts_maximal
+      )
+    ),
+    tar_target(
+      phase_similarity_contrasts_cohens_d_tidy_maximal,
+      tidy_contrast_similarity_cohens_d(
+        phase_similarity_contrasts_cohens_d_maximal
+      )
+    ),
+    tar_target(
+      phase_similarity_contrasts_plot_maximal,
+      plot_similarity_contrasts(phase_similarity_contrasts_maximal)
+    ),
+    tar_target(
+      phase_similarity_contrasts_table_nhst_maximal,
+      make_contrast_results_table_nhst(
+        phase_similarity_emmeans_tidy_maximal,
+        phase_similarity_contrasts_tidy_maximal
+      )
+    ),
+    tar_target(
+      phase_similarity_contrasts_table_smd_maximal,
+      make_contrast_results_table_smd(
+        phase_similarity_glmmTMB_maximal,
+        phase_similarity_emmeans_tidy_maximal,
+        phase_similarity_contrasts_tidy_maximal,
+        phase_similarity_contrasts_cohens_d_tidy_maximal
+      )
+    ),
+    tar_target(
+      phase_similarity_model_fit_table_maximal,
+      make_model_fit_table(
+        phase_similarity_glmmTMB_maximal, maximal_model = TRUE
+      )
+    ),
+    # Fit phase connectivity similarity submodels (maximal models) ----
+    tar_target(
+      phase_similarity_subset_glmmTMB_maximal,
+      subset_glmmTMB_similarity(
+        rv ~
+          within_participant * within_session * within_state + # Fixed effects
+          (1 | pair_participant) + (1 | x_label) + (1 | y_label), # Random effects
+        data = phase_similarity_subset
+      )
+    ),
+    tar_target(
+      phase_similarity_subset_emmeans_maximal,
+      subset_emmeans_similarity(phase_similarity_subset_glmmTMB_maximal)
+    ),
+    tar_target(
+      phase_similarity_subset_contrasts_maximal,
+      subset_contrast_similarity(phase_similarity_subset_emmeans_maximal)
+    ),
+    tar_target(
+      phase_similarity_subset_contrasts_plot_maximal,
+      plot_subset_similarity_contrasts(
+        phase_similarity_contrasts_maximal,
+        phase_similarity_subset_contrasts_maximal,
+        phase_similarity_subset_glmmTMB_maximal
+      )
+    ),
+    # Model amplitude connectivity similarity (maximal model) ----
+    tar_target(
+      amplitude_similarity_glmmTMB_maximal,
+      glmmTMB_similarity(
+        rv ~
+          within_participant * within_session * within_state + # Fixed effects
+          (1 | pair_participant) + (1 | x_label) + (1 | y_label), # Random effects
+        data = amplitude_similarity
+      )
+    ),
+    tar_target(
+      amplitude_similarity_emmeans_maximal,
+      emmeans_similarity(amplitude_similarity_glmmTMB_maximal)
+    ),
+    tar_target(
+      amplitude_similarity_emmeans_tidy_maximal,
+      tidy_emmeans_similarity(amplitude_similarity_emmeans_maximal)
+    ),
+    tar_target(
+      amplitude_similarity_contrasts_maximal,
+      contrast_similarity(amplitude_similarity_emmeans_maximal)
+    ),
+    tar_target(
+      amplitude_similarity_contrasts_tidy_maximal,
+      tidy_contrast_similarity(amplitude_similarity_contrasts_maximal)
+    ),
+    tar_target(
+      amplitude_similarity_contrasts_cohens_d_maximal,
+      contrast_similarity_cohens_d(
+        amplitude_similarity_glmmTMB_maximal,
+        amplitude_similarity_contrasts_maximal
+      )
+    ),
+    tar_target(
+      amplitude_similarity_contrasts_cohens_d_tidy_maximal,
+      tidy_contrast_similarity_cohens_d(
+        amplitude_similarity_contrasts_cohens_d_maximal
+      )
+    ),
+    tar_target(
+      amplitude_similarity_contrasts_plot_maximal,
+      plot_similarity_contrasts(amplitude_similarity_contrasts_maximal)
+    ),
+    tar_target(
+      amplitude_similarity_contrasts_table_nhst_maximal,
+      make_contrast_results_table_nhst(
+        amplitude_similarity_emmeans_tidy_maximal,
+        amplitude_similarity_contrasts_tidy_maximal
+      )
+    ),
+    tar_target(
+      amplitude_similarity_contrasts_table_smd_maximal,
+      make_contrast_results_table_smd(
+        amplitude_similarity_glmmTMB_maximal,
+        amplitude_similarity_emmeans_tidy_maximal,
+        amplitude_similarity_contrasts_tidy_maximal,
+        amplitude_similarity_contrasts_cohens_d_tidy_maximal
+      )
+    ),
+    tar_target(
+      amplitude_similarity_model_fit_table_maximal,
+      make_model_fit_table(
+        amplitude_similarity_glmmTMB_maximal, maximal_model = TRUE
+      )
+    ),
+    # Fit amplitude connectivity similarity submodels (maximal models) ----
+    tar_target(
+      amplitude_similarity_subset_glmmTMB_maximal,
+      subset_glmmTMB_similarity(
+        rv ~
+          within_participant * within_session * within_state + # Fixed effects
+          (1 | pair_participant) + (1 | x_label) + (1 | y_label), # Random effects
+        data = amplitude_similarity_subset
+      )
+    ),
+    tar_target(
+      amplitude_similarity_subset_emmeans_maximal,
+      subset_emmeans_similarity(amplitude_similarity_subset_glmmTMB_maximal)
+    ),
+    tar_target(
+      amplitude_similarity_subset_contrasts_maximal,
+      subset_contrast_similarity(amplitude_similarity_subset_emmeans_maximal)
+    ),
+    tar_target(
+      amplitude_similarity_subset_contrasts_plot_maximal,
+      plot_subset_similarity_contrasts(
+        amplitude_similarity_contrasts_maximal,
+        amplitude_similarity_subset_contrasts_maximal,
+        amplitude_similarity_subset_glmmTMB_maximal
+      )
+    ),
+    # Model phase connectivity similarity (Hilbert transform, maximal model) ----
+    tar_target(
+      phase_similarity_glmmTMB_hilbert_maximal,
+      glmmTMB_similarity(
+        rv ~
+          within_participant * within_session * within_state + # Fixed effects
+          (1 | pair_participant) + (1 | x_label) + (1 | y_label), # Random effects
+        data = phase_similarity_hilbert
+      )
+    ),
+    tar_target(
+      phase_similarity_emmeans_hilbert_maximal,
+      emmeans_similarity(phase_similarity_glmmTMB_hilbert_maximal)
+    ),
+    tar_target(
+      phase_similarity_emmeans_tidy_hilbert_maximal,
+      tidy_emmeans_similarity(phase_similarity_emmeans_hilbert_maximal)
+    ),
+    tar_target(
+      phase_similarity_contrasts_hilbert_maximal,
+      contrast_similarity(phase_similarity_emmeans_hilbert_maximal)
+    ),
+    tar_target(
+      phase_similarity_contrasts_tidy_hilbert_maximal,
+      tidy_contrast_similarity(phase_similarity_contrasts_hilbert_maximal)
+    ),
+    tar_target(
+      phase_similarity_contrasts_cohens_d_hilbert_maximal,
+      contrast_similarity_cohens_d(
+        phase_similarity_glmmTMB_hilbert_maximal,
+        phase_similarity_contrasts_hilbert_maximal
+      )
+    ),
+    tar_target(
+      phase_similarity_contrasts_cohens_d_tidy_hilbert_maximal,
+      tidy_contrast_similarity_cohens_d(
+        phase_similarity_contrasts_cohens_d_hilbert_maximal
+      )
+    ),
+    tar_target(
+      phase_similarity_contrasts_plot_hilbert_maximal,
+      plot_similarity_contrasts(phase_similarity_contrasts_hilbert_maximal)
+    ),
+    tar_target(
+      phase_similarity_contrasts_table_nhst_hilbert_maximal,
+      make_contrast_results_table_nhst(
+        phase_similarity_emmeans_tidy_hilbert_maximal,
+        phase_similarity_contrasts_tidy_hilbert_maximal
+      )
+    ),
+    tar_target(
+      phase_similarity_contrasts_table_smd_hilbert_maximal,
+      make_contrast_results_table_smd(
+        phase_similarity_glmmTMB_hilbert_maximal,
+        phase_similarity_emmeans_tidy_hilbert_maximal,
+        phase_similarity_contrasts_tidy_hilbert_maximal,
+        phase_similarity_contrasts_cohens_d_tidy_hilbert_maximal
+      )
+    ),
+    tar_target(
+      phase_similarity_model_fit_table_hilbert_maximal,
+      make_model_fit_table(
+        phase_similarity_glmmTMB_hilbert_maximal, maximal_model = TRUE
+      )
+    ),
+    # Fit phase connectivity similarity submodels (Hilbert transform, maximal models) ----
+    tar_target(
+      phase_similarity_subset_glmmTMB_hilbert_maximal,
+      subset_glmmTMB_similarity(
+        rv ~
+          within_participant * within_session * within_state + # Fixed effects
+          (1 | pair_participant) + (1 | x_label) + (1 | y_label), # Random effects
+        data = phase_similarity_subset_hilbert
+      )
+    ),
+    tar_target(
+      phase_similarity_subset_emmeans_hilbert_maximal,
+      subset_emmeans_similarity(phase_similarity_subset_glmmTMB_hilbert_maximal)
+    ),
+    tar_target(
+      phase_similarity_subset_contrasts_hilbert_maximal,
+      subset_contrast_similarity(phase_similarity_subset_emmeans_hilbert_maximal)
+    ),
+    tar_target(
+      phase_similarity_subset_contrasts_plot_hilbert_maximal,
+      plot_subset_similarity_contrasts(
+        phase_similarity_contrasts_hilbert_maximal,
+        phase_similarity_subset_contrasts_hilbert_maximal,
+        phase_similarity_subset_glmmTMB_hilbert_maximal
       )
     ),
     # Save manuscript figures ----
+    tar_target(
+      phase_similarity_matrix_figure,
+      save_similarity_matrix_figure(
+        paste0("figures/", filter_freq_band, "/phase-similarity-matrix.png"),
+        phase_similarity_plot
+      ),
+      format = "file"
+    ),
     tar_target(
       phase_similarity_results_figure,
       save_results_figure(
         paste0("figures/", filter_freq_band, "/phase_similarity_results.png"),
         phase_connectivity_profile_plot,
         phase_similarity_plot,
-        phase_similarity_contrasts_plot,
-        phase_similarity_subset_contrasts_plot
+        phase_similarity_contrasts_plot
+      ),
+      format = "file"
+    ),
+    tar_target(
+      phase_similarity_subset_results_figure,
+      save_figure(
+        paste0("figures/", filter_freq_band, "/phase_similarity_subset_results.png"),
+        phase_similarity_subset_contrasts_plot_2,
+        height = 9
+      ),
+      format = "file"
+    ),
+    tar_target(
+      phase_similarity_results_figure_maximal,
+      save_results_figure(
+        paste0("figures/", filter_freq_band, "/phase_similarity_results_maximal.png"),
+        phase_connectivity_profile_plot,
+        phase_similarity_plot,
+        phase_similarity_contrasts_plot_maximal,
+        phase_similarity_subset_contrasts_plot_maximal
+      ),
+      format = "file"
+    ),
+    tar_target(
+      amplitude_similarity_matrix_figure,
+      save_similarity_matrix_figure(
+        paste0("figures/", filter_freq_band, "/amplitude-similarity-matrix.png"),
+        amplitude_similarity_plot
       ),
       format = "file"
     ),
@@ -535,8 +991,35 @@ connectivity_estimation_targets <- list(
         paste0("figures/", filter_freq_band, "/amplitude_similarity_results.png"),
         amplitude_connectivity_profile_plot,
         amplitude_similarity_plot,
-        amplitude_similarity_contrasts_plot,
-        amplitude_similarity_subset_contrasts_plot
+        amplitude_similarity_contrasts_plot
+      ),
+      format = "file"
+    ),
+    tar_target(
+      amplitude_similarity_subset_results_figure,
+      save_figure(
+        paste0("figures/", filter_freq_band, "/amplitude_similarity_subset_results.png"),
+        amplitude_similarity_subset_contrasts_plot_2,
+        height = 9
+      ),
+      format = "file"
+    ),
+    tar_target(
+      amplitude_similarity_results_figure_maximal,
+      save_results_figure(
+        paste0("figures/", filter_freq_band, "/amplitude_similarity_results_maximal.png"),
+        amplitude_connectivity_profile_plot,
+        amplitude_similarity_plot,
+        amplitude_similarity_contrasts_plot_maximal,
+        amplitude_similarity_subset_contrasts_plot_maximal
+      ),
+      format = "file"
+    ),
+    tar_target(
+      phase_similarity_matrix_figure_hilbert,
+      save_similarity_matrix_figure(
+        paste0("figures/", filter_freq_band, "/phase-similarity-matrix-hilbert.png"),
+        phase_similarity_plot_hilbert
       ),
       format = "file"
     ),
@@ -548,6 +1031,39 @@ connectivity_estimation_targets <- list(
         phase_similarity_plot_hilbert,
         phase_similarity_contrasts_plot_hilbert,
         phase_similarity_subset_contrasts_plot_hilbert
+      ),
+      format = "file"
+    ),
+    tar_target(
+      phase_similarity_results_figure_hilbert_maximal,
+      save_results_figure(
+        paste0("figures/", filter_freq_band, "/phase_similarity_results_hilbert_maximal.png"),
+        phase_connectivity_profile_plot_hilbert,
+        phase_similarity_plot_hilbert,
+        phase_similarity_contrasts_plot_hilbert_maximal,
+        phase_similarity_subset_contrasts_plot_hilbert_maximal
+      ),
+      format = "file"
+    ),
+    tar_target(
+      phase_connectivity_patchwork_figure,
+      save_connectivity_patchwork(
+        phase_connectivity_patchwork_plot, filter_freq_band, "phase"
+      ),
+      format = "file"
+    ),
+    tar_target(
+      amplitude_connectivity_patchwork_figure,
+      save_connectivity_patchwork(
+        amplitude_connectivity_patchwork_plot, filter_freq_band, "amplitude"
+      ),
+      format = "file"
+    )
+    ,
+    tar_target(
+      phase_connectivity_patchwork_figure_hilbert,
+      save_connectivity_patchwork(
+        phase_connectivity_patchwork_plot_hilbert, filter_freq_band, "phase-hilbert"
       ),
       format = "file"
     )
@@ -563,6 +1079,171 @@ connectivity_estimation_targets <- list(
       similarity_archetype_plot
     ),
     format = "file"
+  ),
+  tar_target(
+    amplitude_similarity_patchwork_figure,
+    save_amplitude_similarity_patchwork_figure(
+      amplitude_similarity_plot_delta,
+      amplitude_similarity_plot_theta,
+      amplitude_similarity_plot_beta,
+      amplitude_similarity_plot_gamma
+    ),
+    format = "file"
+  ),
+  tar_target(
+    jet_similarity_patchwork_figure,
+    save_jet_similarity_patchwork_figure(
+      phase_similarity_plot_delta,
+      phase_similarity_plot_theta,
+      phase_similarity_plot_alpha,
+      phase_similarity_plot_beta,
+      phase_similarity_plot_gamma,
+      amplitude_similarity_plot_alpha
+    ),
+    format = "file"
+  ),
+  tar_target(
+    phase_connectivity_histograms_plot,
+    plot_connectivity_histograms(
+      phase_connectivity_matrix_delta,
+      phase_connectivity_matrix_theta,
+      phase_connectivity_matrix_alpha,
+      phase_connectivity_matrix_beta,
+      phase_connectivity_matrix_gamma,
+      "PLI"
+    )
+  ),
+  tar_target(
+    amplitude_connectivity_histograms_plot,
+    plot_connectivity_histograms(
+      amplitude_connectivity_matrix_delta,
+      amplitude_connectivity_matrix_theta,
+      amplitude_connectivity_matrix_alpha,
+      amplitude_connectivity_matrix_beta,
+      amplitude_connectivity_matrix_gamma,
+      "AEC"
+    )
+  ),
+  tar_target(
+    connectivity_histogram_patchwork_figure,
+    save_connectivity_histogram_patchwork(
+      phase_connectivity_histograms_plot,
+      amplitude_connectivity_histograms_plot
+    ),
+    format = "file"
+  ),
+  tar_target(
+    illustrative_connectomes_figure,
+    save_illustrative_connectomes_figure(
+      phase_connectivity_matrix_delta,
+      amplitude_connectivity_matrix_delta,
+      participant = "P16",
+      recording = "fu_ro2"
+    ),
+    format = "file"
+  ),
+  tar_target(
+    phase_subset_similarity_contrast_barplot,
+    plot_subset_similarity_contrast_bars(
+      phase_similarity_subset_contrasts_delta,
+      phase_similarity_subset_contrasts_theta,
+      phase_similarity_subset_contrasts_alpha,
+      phase_similarity_subset_contrasts_beta,
+      phase_similarity_subset_contrasts_gamma
+    )
+  ),
+  tar_target(
+    phase_subset_similarity_contrast_barplot_figure,
+    save_figure(
+      paste0("figures/phase-similarity-subset-contrast-barplot.png"),
+      phase_subset_similarity_contrast_barplot,
+      height = 9,
+      scaling = 1
+    ),
+    format = "file"
+  ),
+  tar_target(
+    amplitude_subset_similarity_contrast_barplot,
+    plot_subset_similarity_contrast_bars(
+      alpha = amplitude_similarity_subset_contrasts_alpha,
+    )
+  ),
+  tar_target(
+    amplitude_subset_similarity_contrast_barplot_figure,
+    save_figure(
+      paste0("figures/amplitude-similarity-subset-contrast-barplot.png"),
+      amplitude_subset_similarity_contrast_barplot,
+      width = 21.59/2,
+      height = 9,
+      scaling = 1
+    ),
+    format = "file"
+  ),
+  tar_target(
+    subset_similarity_contrast_barplot_figure,
+    save_subset_similarity_contrast_barplot_figure(
+      paste0("figures/similarity-subset-contrast-barplot.png"),
+      phase_subset_similarity_contrast_barplot,
+      amplitude_subset_similarity_contrast_barplot
+    ),
+    format = "file"
+  ),
+  # Make tables ----
+  tar_target(
+    phase_connectivity_summaries,
+    summarize_connectivity_distributions(
+      phase_connectivity_matrix_delta,
+      phase_connectivity_matrix_theta,
+      phase_connectivity_matrix_alpha,
+      phase_connectivity_matrix_beta,
+      phase_connectivity_matrix_gamma,
+      "Phase"
+    )
+  ),
+  tar_target(
+    amplitude_connectivity_summaries,
+    summarize_connectivity_distributions(
+      amplitude_connectivity_matrix_delta,
+      amplitude_connectivity_matrix_theta,
+      amplitude_connectivity_matrix_alpha,
+      amplitude_connectivity_matrix_beta,
+      amplitude_connectivity_matrix_gamma,
+      "Amplitude"
+    )
+  ),
+  tar_target(
+    connectivity_summary_table,
+    make_connectivity_summary_table(
+      phase_connectivity_summaries,
+      amplitude_connectivity_summaries
+    )
+  ),
+  tar_target(
+    similarity_glmmTMB_convergence_table,
+    make_convergence_table(
+      phase_similarity_glmmTMB_delta,
+      phase_similarity_glmmTMB_maximal_delta,
+      phase_similarity_glmmTMB_theta,
+      phase_similarity_glmmTMB_maximal_theta,
+      phase_similarity_glmmTMB_alpha,
+      phase_similarity_glmmTMB_maximal_alpha,
+      phase_similarity_glmmTMB_beta,
+      phase_similarity_glmmTMB_maximal_beta,
+      phase_similarity_glmmTMB_gamma,
+      phase_similarity_glmmTMB_maximal_gamma,
+      amplitude_similarity_glmmTMB_alpha,
+      amplitude_similarity_glmmTMB_maximal_alpha,
+      phase_similarity_glmmTMB_hilbert_delta,
+      phase_similarity_glmmTMB_hilbert_maximal_delta,
+      phase_similarity_glmmTMB_hilbert_theta,
+      phase_similarity_glmmTMB_hilbert_maximal_theta,
+      phase_similarity_glmmTMB_hilbert_alpha,
+      phase_similarity_glmmTMB_hilbert_maximal_alpha,
+      phase_similarity_glmmTMB_hilbert_beta,
+      phase_similarity_glmmTMB_hilbert_maximal_beta,
+      phase_similarity_glmmTMB_hilbert_gamma,
+      phase_similarity_glmmTMB_hilbert_maximal_gamma
+    )
   )
 )
 
@@ -600,18 +1281,43 @@ descriptives_targets <- list(
     plot_bad_channel_counts(bad_channels_descriptives_final)
   ),
   tar_target(
+    bad_channels_figure,
+    save_figure(
+      "figures/eeg-diagnostics/bad-eeg-channels.png",
+      bad_channels_plots_final,
+      height = 9,
+      scaling = 1
+    ),
+    format = "file"
+  ),
+  tar_target(
     bad_segments_descriptives_final,
     summarize_bad_segments(file_handler_final)
   ),
   tar_target(
     bad_segments_plots_final,
     plot_bad_segment_descriptives(bad_segments_descriptives_final)
+  ),
+  tar_target(
+    bad_segments_figure,
+    save_figure(
+      "figures/eeg-diagnostics/bad-eeg-segments.png",
+      bad_segments_plots_final,
+      height = 18,
+      scaling = 1
+    ),
+    format = "file"
   )
   # TODO: Add targets for bad ICA indices
 )
 
 manuscripts_targets <- list(
   # Child documents for different sections of the manuscript ----
+  tar_target(
+    frontmatter,
+    here("manuscripts", "child-documents", "frontmatter.Rmd"),
+    format = "file"
+  ),
   tar_target(
     introduction,
     here("manuscripts", "child-documents", "introduction.Rmd"),
@@ -657,7 +1363,12 @@ manuscripts_targets <- list(
       "patchwork",
       "tidyverse",
       "rmarkdown",
-      "papaja"
+      "papaja",
+      "officer",
+      "officedown",
+      "flextable",
+      "ftExtra",
+      "gtsummary"
     )
   ),
   tar_target(
@@ -690,9 +1401,10 @@ manuscripts_targets <- list(
   ),
   tar_target(
     session_information_packages,
-    session_info_packages()
+    session_info_packages(),
+    cue = tar_cue("always")
   ),
-  # Thesis (papaja) ----
+  # Thesis (officedown) ----
   ## Note: The following error is thrown at the start of the pipeline because
   ## this target uses params and child documents: `Error in eval(x, envir =
   ## envir) : object 'params' not found`. The source of the error is explained
@@ -705,6 +1417,43 @@ manuscripts_targets <- list(
     params = list(
       references_path = references,
       packages_path   = package_references
+    )
+  ),
+  # Supplement ----
+  tar_render(
+    supplement_phase_coupling_functional_connectomes,
+    here(
+      "manuscripts", "supplement", "phase-coupling-functional-connectomes.Rmd"
+    )
+  ),
+  tar_render(
+    supplement_amplitude_coupling_functional_connectomes,
+    here(
+      "manuscripts", "supplement", "amplitude-coupling-functional-connectomes.Rmd"
+    )
+  ),
+  tar_render(
+    supplement_phase_coupling_functional_connectomes_hilbert,
+    here(
+      "manuscripts", "supplement", "phase-coupling-functional-connectomes-hilbert.Rmd"
+    )
+  ),
+  tar_render(
+    supplement_similarity_matrices,
+    here(
+      "manuscripts", "supplement", "similarity-matrices.Rmd"
+    )
+  ),
+  tar_render(
+    supplement_model_summaries,
+    here(
+      "manuscripts", "supplement", "model-summaries.Rmd"
+    )
+  ),
+  tar_render(
+    supplement_eeg_preprocessing_diagnostics,
+    here(
+      "manuscripts", "supplement", "eeg-preprocessing-diagnostics.Rmd"
     )
   )
 )

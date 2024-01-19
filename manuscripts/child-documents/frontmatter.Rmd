@@ -1,0 +1,78 @@
+:::{custom-style="Subtitle (No Spacing)"}
+UNIVERSITY OF CALGARY
+:::
+:::{custom-style="Subtitle"}
+
+<br>
+
+:::
+:::{custom-style="Title"}
+Studying Network Variants With Electroencephalography
+:::
+:::{custom-style="Subtitle"}
+by
+:::
+:::{custom-style="Author"}
+Michael McCarthy
+:::
+:::{custom-style="Subtitle"}
+
+<br>
+
+:::
+:::{custom-style="Subtitle (No Spacing)"}
+A THESIS  
+SUBMITTED TO THE FACULTY OF GRADUATE STUDIES  
+IN PARTIAL FULFILMENT OF THE REQUIREMENTS FOR THE  
+DEGREE OF MASTER OF SCIENCE
+
+<br>
+
+GRADUATE PROGRAM IN PSYCHOLOGY
+
+<br>
+
+CALGARY, ALBERTA
+
+<br>
+
+OCTOBER, 2022
+
+<br>
+
+&copy; Michael McCarthy 2022
+:::
+
+```{r}
+officer::block_section(officer::prop_section(type = "nextPage"))
+```
+
+:::{custom-style="h1-pagebreak"}
+Abstract
+:::
+
+Functional MRI (fMRI) studies have shown that the human functional connectome exhibits reliable and substantial variability in organization across individuals, so-called network variants. However, it is unclear whether neuroimaging modalities that measure different aspects of brain function show similar evidence of such individual differences. Here we explored the feasibility of using electroencephalography (EEG) to study network variants using repeated measures eyes-closed and eyes-open resting state data from 14 participants taken across three sessions over the course of three months---estimating how much and in which ways band-limited phase coupling and amplitude coupling functional connectomes differed in similarity within and between individuals across contexts. For each coupling mode and frequency band, we hypothesized that if functional connectome organization was influenced by stable individual-dependent factors in our sample, then functional connectomes would be more similar within than between individuals across all contexts, on average, with smaller variations in similarity related to session or state. Overall, our results were inconclusive. Although we generally found consistently positive differences in functional connectome similarity across coupling modes, frequency bands, and contexts---these differences ranged from practically nil to at most small, on average, and were inconsistent across participants. We discuss several factors that may explain the differences between our results and the larger, more consistent effects reported in fMRI network variant studies, such as the spatial and temporal resolution of EEG and fMRI, and the methods used to estimate functional connectivity. We then offer suggestions for future EEG research that might address some shortcomings of our study.
+
+*Keywords:* Electroencephalography, Functional Connectivity, Network Variants, Individual Differences
+
+:::{custom-style="h1-pagebreak"}
+Preface
+:::
+
+This thesis is original, unpublished, independent work by the author, M. McCarthy.
+
+:::{custom-style="h1-pagebreak"}
+Acknowledgements
+:::
+
+I thank my supervisor, Dr. Andrea Protzner, for her guidance, mentorship, and support throughout my degree and thesis; my committee members, Dr. Penny Pexman, Dr. Signe Bray, and Dr. Bradley Goodyear for their feedback on my thesis; Dr. Ford Burles for training me to work with EEG data; and Dr. Joshua Bourdage for his support towards completing my thesis. I also thank my father, Gord, my brother, Branden, and my grandparents, Joan and Walter, for their love and support---I could not have achieved all that I have without you.
+
+This research was partially supported by funding received through the Natural Sciences and Engineering Research Council (NSERC) Canada Graduate Scholarship; University of Calgary Faculty of Graduate Studies Master’s Research Scholarship and Graduate Studies Scholarship; and Alberta Graduate Excellence Scholarships (AGES) Master’s Research Scholarship.
+
+:::{custom-style="TOC Heading"}
+Table of Contents
+:::
+
+```{r toc}
+officer::block_toc(level = 2)
+```

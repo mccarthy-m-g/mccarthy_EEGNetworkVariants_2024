@@ -2062,12 +2062,8 @@ make_contrast_results_table_nhst <- function(emmeans_tidy, contrasts_tidy) {
       contrast = "",
       mean_se_within_participant = "Mean (SE)",
       mean_se_between_participant = "Mean (SE)",
-      mean_difference = "RV (SE)",
+      mean_difference = "ΔRV (SE)",
       ci = "95% CI"
-    ) |>
-    flextable::prepend_chunks(
-      part = "header", i = 1, j = 4,
-      flextable::as_equation("\\Delta")
     ) |>
     flextable::add_header_row(
       values = c(
@@ -2232,14 +2228,10 @@ make_contrast_results_table_smd <- function(
       contrast = "",
       mean_se_within_participant = "Mean (SE)",
       mean_se_between_participant = "Mean (SE)",
-      mean_difference = "RV (SE)",
+      mean_difference = "ΔRV (SE)",
       ci = "95% CI",
       standardized_mean_difference = "d",
       smd_ci = "95% CI"
-    ) |>
-    flextable::prepend_chunks(
-      part = "header", i = 1, j = 4,
-      flextable::as_equation("\\Delta")
     ) |>
     flextable::compose(
       part = "header", i = 1, j = 6,

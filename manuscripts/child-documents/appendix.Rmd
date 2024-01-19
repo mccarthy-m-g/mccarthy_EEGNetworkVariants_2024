@@ -130,9 +130,15 @@ In this section we provide the results of our functional connectome similarity a
 #| tab.autonum.start_at: 1
 #| tab.lp: "appendix-a-tab"
 #| tab.cap.pre: "Table A"
-#| tab.cap: Results of convergence and singularity checks for each group-level mixed beta regression model of functional connectome similarity, organized by coupling mode and frequency band. Here the maximal and reduced models correspond to, respectively, models with and without a random intercept for the participant pair term.
 targets::tar_load(similarity_glmmTMB_convergence_table)
-similarity_glmmTMB_convergence_table
+similarity_glmmTMB_convergence_table |>
+  set_table_caption_apa(paste0(
+    "Results of convergence and singularity checks for each group-level ",
+    "mixed beta regression model of functional connectome similarity, ",
+    "organized by coupling mode and frequency band. Here the maximal and ",
+    "reduced models correspond to, respectively, models with and without a ",
+    "random intercept for the participant pair term."
+  ))
 ```
 
 <!-- ### Phase coupling -->
@@ -227,9 +233,7 @@ knitr::include_graphics(here::here(phase_similarity_results_figure_hilbert_maxim
 knitr::opts_chunk$set(fig.height = 5.747959)
 ```
 
-<!-- TODO: Finish this -->
-
-In this section we provide the results of our functional connectome similarity estimates for amplitude coupling functional connectomes in the delta, theta, beta, and gamma bands. Figure A\@ref(fig:amplitude-similarity-delta-theta-beta-gamma) shows the functional connectome similarity estimates between all pairs of amplitude coupling functional connectomes in each frequency band. Note the very high similarity estimates across participants, sessions, and states---particularly in the beta and gamma bands, where similarity is estimated to be near perfect. 
+In this section we provide the results of our functional connectome similarity estimates for amplitude coupling functional connectomes in the delta, theta, beta, and gamma bands. Figure A\@ref(fig:amplitude-similarity-delta-theta-beta-gamma) shows the functional connectome similarity estimates between all pairs of amplitude coupling functional connectomes in each frequency band. Note the very high similarity estimates across participants, sessions, and states---particularly in the beta and gamma bands, where similarity is estimated to be near perfect. As we discussed in the results section, while these estimates are a statistically valid reflection of the data due to the relative position of the observations in each connectome being very close together in space, we felt that they were neurophysiologically unrealistic, greatly exaggerating the magnitude of similarity between any pair of functional connectomes and failing to capture the intended nuance across participants, sessions, and states. Thus, we refrain from showing the functional connectome similarity contrast results for these frequency bands here, but note that for each of these frequency bands the effect sizes most compatible with our data, given the background model, were positive but practically nil for all contrasts.
 
 ```{r amplitude-similarity-delta-theta-beta-gamma}
 #| fig.cap: Estimates of functional connectome similarity between all pairs of amplitude coupling functional connectomes in the delta, theta, beta, and gamma bands, organized by participant and recording.
@@ -249,14 +253,14 @@ Session Info
 #| tab.autonum.start_at: 1
 #| tab.lp: "appendix-b-tab"
 #| tab.cap.pre: "Table B"
-#| tab.cap: Session info for R environment.
 targets::tar_load(session_information_environment)
 
 session_information_environment |>
   flextable::flextable() |>
   flextable::font(fontname = "Times New Roman", part = "all") |>
   flextable::fontsize(size = 10, part = "all") |>
-  flextable::set_table_properties(layout = "autofit")
+  flextable::set_table_properties(layout = "autofit") |>
+  set_table_caption_apa("Session info for R environment.")
 ```
 
 \newpage
@@ -264,12 +268,12 @@ session_information_environment |>
 ```{r session-info-packages}
 #| tab.lp: "appendix-b-tab"
 #| tab.cap.pre: "Table B"
-#| tab.cap: Session info for R packages.
 targets::tar_load(session_information_packages)
 
 session_information_packages |>
   flextable::flextable() |>
   flextable::font(fontname = "Times New Roman", part = "all") |>
   flextable::fontsize(size = 10, part = "all") |>
-  flextable::set_table_properties(layout = "autofit")
+  flextable::set_table_properties(layout = "autofit") |>
+  set_table_caption_apa("Session info for R packages.")
 ```

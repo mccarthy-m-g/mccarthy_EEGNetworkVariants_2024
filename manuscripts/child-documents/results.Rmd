@@ -25,11 +25,17 @@ knitr::include_graphics(here::here(connectivity_histogram_patchwork_figure))
 \newpage
 
 ```{r connectivity-summary-table}
-#| tab.cap: Summary statistics describing the distribution of phase lag index and amplitude envelope correlation estimates across all functional connectomes and EEG channel pairs in each frequency band.
 targets::tar_load(connectivity_summary_table)
-connectivity_summary_table
+connectivity_summary_table |>
+  set_table_caption_apa(paste0(
+    "Summary statistics describing the distribution of phase lag index ",
+    "and amplitude envelope correlation estimates across all functional ",
+    "connectomes and EEG channel pairs in each frequency band."
+  ))
 ```
 
+<br>
+ 
 Finally, note that although amplitude envelope correlation estimates were generally smaller than phase lag index estimates in a given frequency band, we caution against a neurophysiological interpretation of these differences in terms of the relative degree of phase to amplitude coupling. Although both metrics provide an indication of coupling consistency and share the same possible range of 0 to 1, they are mathematically and conceptually distinct from one another. Because of this, quantitative comparisons between the two metrics in terms of coupling magnitudes are nebulous at best, and there is no reason to believe these metrics would give similar estimates when the relative degree of phase to amplitude coupling was equal. Instead, we reiterate that both metrics performed as expected based on what has been reported in previous work; thus, we proceeded with our full analysis plan for both coupling modes across all frequency bands, under the assumption that our estimates provided a sound representation of underlying (non-zero lag) global network activity for each participant.
 
 <!-- Indeed, we would expect the amplitude envelope correlation to be smaller than the phase lag index under such circumstances, given that the former  -->
@@ -52,15 +58,23 @@ Figure \@ref(fig:phase-similarity-plots-delta)B shows the functional connectome 
 
 These results remained largely consistent when the phase lag index was estimated using the Hilbert transform method instead of the the multitaper method (Figure A\@ref(fig:phase-similarity-plots-hilbert-delta)), with some minor differences: (1) phase coupling was generally weaker, but individual patterns of coupling were similar or the same; (2) functional connectome similarity was generally higher, but patterns of similarity were similar or the same; and (3) differences in functional connectome similarity were generally smaller, but were still positive with a similar pattern of variation across contexts. Likewise, the contrast results remained consistent between the reduced and maximal models of functional connectome similarity when the phase lag index was estimated using the Hilbert transform method (Figure A\@ref(fig:phase-similarity-plots-hilbert-maximal-delta)), but with slightly more uncertainty in the estimates. The maximal model of functional connectome similarity did not converge when the phase lag index was estimated using the multitaper method (Table A\@ref(tab:convergence-check-table)). 
 
+\newpage
+
 ```{r phase-similarity-plots-delta}
 #| fig.cap: "Results of phase coupling analyses in the delta band: (A) connectivity profiles for all functional connectomes, organized by participant and recording; (B) estimates of functional connectome similarity between all pairs of functional connectomes, organized by participant and recording; and (C) group-level contrasts estimating the average difference in functional connectome similarity within and between participants across contexts."
 targets::tar_load(phase_similarity_results_figure_delta)
 knitr::include_graphics(here::here(phase_similarity_results_figure_delta))
 ```
 
+\newpage
+
 ```{r phase-similarity-table-delta}
-#| tab.cap: Estimated marginal means, mean differences, and targeted hypothesis tests of zero difference in delta band phase coupling functional connectome similarity within and between participants across contexts.
-targets::tar_read(phase_similarity_contrasts_table_nhst_delta)
+targets::tar_read(phase_similarity_contrasts_table_nhst_delta) |>
+  set_table_caption_apa(paste0(
+    "Estimated marginal means, mean differences, and targeted hypothesis tests ",
+    "of zero difference in delta band phase coupling functional connectome ",
+    "similarity within and between participants across contexts."
+  ))
 ```
 
 \newpage
@@ -73,15 +87,23 @@ Figure \@ref(fig:phase-similarity-plots-theta)B shows the functional connectome 
 
 These results remained largely consistent when the phase lag index was estimated using the Hilbert transform method instead of the the multitaper method (Figure A\@ref(fig:phase-similarity-plots-hilbert-theta)), with some minor differences: (1) phase coupling was generally weaker, but individual patterns of coupling were similar or the same; (2) functional connectome similarity was generally higher, but patterns of similarity were similar or the same; and (3) differences in functional connectome similarity were generally of similar magnitudes, with the exception of the within sessions and between states contrast which was visibly smaller. Likewise, the contrast results remained consistent between the reduced and maximal mixed beta regression models of functional connectome similarity when the phase lag index was estimated using both the multitaper method (Figure A\@ref(fig:phase-similarity-plots-maximal-theta)) and the Hilbert transform method (Figure A\@ref(fig:phase-similarity-plots-hilbert-maximal-theta)), but with slightly more uncertainty in the estimates.
 
+\newpage
+
 ```{r phase-similarity-plots-theta}
 #| fig.cap: "Results of phase coupling analyses in the theta band: (A) connectivity profiles for all functional connectomes, organized by participant and recording; (B) estimates of functional connectome similarity between all pairs of functional connectomes, organized by participant and recording; and (C) group-level contrasts estimating the average difference in functional connectome similarity within and between participants across contexts."
 targets::tar_load(phase_similarity_results_figure_theta)
 knitr::include_graphics(here::here(phase_similarity_results_figure_theta))
 ```
 
+\newpage
+
 ```{r phase-similarity-table-theta}
-#| tab.cap: Estimated marginal means, mean differences, and targeted hypothesis tests of zero difference in theta band phase coupling functional connectome similarity within and between participants across contexts.
-targets::tar_read(phase_similarity_contrasts_table_nhst_theta)
+targets::tar_read(phase_similarity_contrasts_table_nhst_theta) |>
+  set_table_caption_apa(paste0(
+    "Estimated marginal means, mean differences, and targeted hypothesis tests ",
+    "of zero difference in theta band phase coupling functional connectome ",
+    "similarity within and between participants across contexts."
+  ))
 ```
 
 \newpage
@@ -96,15 +118,23 @@ However, despite the presence of more visually apparent individual effects, ther
 
 These results remained largely consistent when the phase lag index was estimated using the Hilbert transform method instead of the the multitaper method (Figure A\@ref(fig:phase-similarity-plots-hilbert-alpha)), with some minor differences: (1) phase coupling was generally weaker, but individual patterns of coupling were similar or the same; and (2) functional connectome similarity was generally higher, but patterns of similarity were similar or the same; however, differences in functional connectome similarity were generally of similar magnitudes. Likewise, the contrast results remained consistent between the reduced and maximal mixed beta regression models of functional connectome similarity when the phase lag index was estimated using both the multitaper method (Figure A\@ref(fig:phase-similarity-plots-maximal-alpha)) and the Hilbert transform method (Figure A\@ref(fig:phase-similarity-plots-hilbert-maximal-alpha)), but with slightly more uncertainty in the estimates.
 
+\newpage
+
 ```{r phase-similarity-plots-alpha}
 #| fig.cap: "Results of phase coupling analyses in the alpha band: (A) connectivity profiles for all functional connectomes, organized by participant and recording; (B) estimates of functional connectome similarity between all pairs of functional connectomes, organized by participant and recording; and (C) group-level contrasts estimating the average difference in functional connectome similarity within and between participants across contexts."
 targets::tar_load(phase_similarity_results_figure_alpha)
 knitr::include_graphics(here::here(phase_similarity_results_figure_alpha))
 ```
 
+\newpage
+
 ```{r phase-similarity-table-alpha}
-#| tab.cap: Estimated marginal means, mean differences, and targeted hypothesis tests of zero difference in alpha band phase coupling functional connectome similarity within and between participants across contexts.
-targets::tar_read(phase_similarity_contrasts_table_nhst_alpha)
+targets::tar_read(phase_similarity_contrasts_table_nhst_alpha) |>
+  set_table_caption_apa(paste0(
+    "Estimated marginal means, mean differences, and targeted hypothesis tests ",
+    "of zero difference in alpha band phase coupling functional connectome ",
+    "similarity within and between participants across contexts."
+  ))
 ```
 
 \newpage
@@ -117,15 +147,23 @@ Figure \@ref(fig:phase-similarity-plots-beta)B shows the functional connectome s
 
 These results remained largely consistent when the phase lag index was estimated using the Hilbert transform method instead of the the multitaper method (Figure A\@ref(fig:phase-similarity-plots-hilbert-beta)), with some minor differences: (1) phase coupling was generally weaker, but individual patterns of coupling were similar or the same; (2) functional connectome similarity was generally higher, but patterns of similarity were similar or the same; and (3) differences in functional connectome similarity were generally smaller, but were still positive with a similar pattern of variation across contexts. Likewise, the contrast results remained consistent between the reduced and maximal mixed beta regression models of functional connectome similarity when the phase lag index was estimated using both the multitaper method (Figure A\@ref(fig:phase-similarity-plots-maximal-beta)) and the Hilbert transform method (Figure A\@ref(fig:phase-similarity-plots-hilbert-maximal-beta)), but with slightly more uncertainty in the estimates.
 
+\newpage
+
 ```{r phase-similarity-plots-beta}
 #| fig.cap: "Results of phase coupling analyses in the beta band: (A) connectivity profiles for all functional connectomes, organized by participant and recording; (B) estimates of functional connectome similarity between all pairs of functional connectomes, organized by participant and recording; and (C) group-level contrasts estimating the average difference in functional connectome similarity within and between participants across contexts."
 targets::tar_load(phase_similarity_results_figure_beta)
 knitr::include_graphics(here::here(phase_similarity_results_figure_beta))
 ```
 
+\newpage
+
 ```{r phase-similarity-table-beta}
-#| tab.cap: Estimated marginal means, mean differences, and targeted hypothesis tests of zero difference in beta band phase coupling functional connectome similarity within and between participants across contexts.
-targets::tar_read(phase_similarity_contrasts_table_nhst_beta)
+targets::tar_read(phase_similarity_contrasts_table_nhst_beta) |>
+  set_table_caption_apa(paste0(
+    "Estimated marginal means, mean differences, and targeted hypothesis tests ",
+    "of zero difference in beta band phase coupling functional connectome ",
+    "similarity within and between participants across contexts."
+  ))
 ```
 
 \newpage
@@ -138,15 +176,23 @@ Figure \@ref(fig:phase-similarity-plots-gamma)B shows the functional connectome 
 
 These results remained largely consistent when the phase lag index was estimated using the Hilbert transform method instead of the the multitaper method (Figure A\@ref(fig:phase-similarity-plots-hilbert-gamma)), with some minor differences: (1) phase coupling was generally weaker, but individual patterns of coupling were similar or the same; (2) functional connectome similarity was generally higher, but patterns of similarity were similar or the same; and (3) differences in functional connectome similarity were generally smaller, but were still positive with a similar pattern of variation across contexts. Likewise, the contrast results remained largely consistent between the reduced and maximal mixed beta regression models of functional connectome similarity when the phase lag index was estimated using both the multitaper method (Figure A\@ref(fig:phase-similarity-plots-maximal-gamma)) and the Hilbert transform method (Figures A\@ref(fig:phase-similarity-plots-hilbert-maximal-gamma)), but with slightly more uncertainty in the estimates. This increased uncertainty resulted in the direction of the between sessions, between sessions and within states, and between sessions and states contrasts to become unresolved. However, the difference in interpretation between the maximal model and reduced model results here was minor: The maximal model simply requires the qualification that the differences in functional connectome similarity within and between participants most compatible with our data for these contrasts, given the background model, also included the possibility of (essentially) zero difference.
 
+\newpage
+
 ```{r phase-similarity-plots-gamma}
 #| fig.cap: "Results of phase coupling analyses in the gamma band: (A) connectivity profiles for all functional connectomes, organized by participant and recording; (B) estimates of functional connectome similarity between all pairs of functional connectomes, organized by participant and recording; and (C) group-level contrasts estimating the average difference in functional connectome similarity within and between participants across contexts."
 targets::tar_load(phase_similarity_results_figure_gamma)
 knitr::include_graphics(here::here(phase_similarity_results_figure_gamma))
 ```
 
+\newpage
+
 ```{r phase-similarity-table-gamma}
-#| tab.cap: Estimated marginal means, mean differences, and targeted hypothesis tests of zero difference in gamma band phase coupling functional connectome similarity within and between participants across contexts.
-targets::tar_read(phase_similarity_contrasts_table_nhst_gamma)
+targets::tar_read(phase_similarity_contrasts_table_nhst_gamma) |>
+  set_table_caption_apa(paste0(
+    "Estimated marginal means, mean differences, and targeted hypothesis tests ",
+    "of zero difference in gamma band phase coupling functional connectome ",
+    "similarity within and between participants across contexts."
+  ))
 ```
 
 \newpage
@@ -163,20 +209,30 @@ This was supported by the group-level contrast results in Figure \@ref(fig:ampli
 
 The contrast results remained largely consistent between the reduced and maximal mixed beta regression models of functional connectome similarity, but with slightly more uncertainty in the estimates (Figure A\@ref(fig:amplitude-similarity-plots-maximal-alpha)). This increased uncertainty resulted in the direction of the between sessions and states contrast to become unresolved. However, the difference in interpretation between the maximal model and reduced model results here was minor: The maximal model simply requires the qualification that the differences in functional connectome similarity within and between participants most compatible with our data for this contrast, given the background model, also included the possibility of (essentially) zero difference.
 
+\newpage
+
 ```{r amplitude-similarity-plots-alpha}
 #| fig.cap: "Results of amplitude coupling analyses in the alpha band: (A) connectivity profiles for all functional connectomes, organized by participant and recording; (B) estimates of functional connectome similarity between all pairs of functional connectomes, organized by participant and recording; and (C) group-level contrasts estimating the average difference in functional connectome similarity within and between participants across contexts."
 targets::tar_load(amplitude_similarity_results_figure_alpha)
 knitr::include_graphics(here::here(amplitude_similarity_results_figure_alpha))
 ```
 
+\newpage
+
 ```{r amplitude-similarity-table-alpha}
-#| tab.cap: Estimated marginal means, mean differences, and targeted hypothesis tests of zero difference in alpha band amplitude coupling functional connectome similarity within and between participants across contexts.
-targets::tar_read(amplitude_similarity_contrasts_table_nhst_alpha)
+targets::tar_read(amplitude_similarity_contrasts_table_nhst_alpha) |>
+  set_table_caption_apa(paste0(
+    "Estimated marginal means, mean differences, and targeted hypothesis tests ",
+    "of zero difference in alpha band amplitude coupling functional connectome ",
+    "similarity within and between participants across contexts."
+  ))
 ```
 
+\newpage
+ 
 ### Delta, Theta, Beta, and Gamma
 
-Although we conducted all analyses for the delta, theta, beta, and gamma bands, we refrain from interpreting the results of these analyses here based on a post-hoc suggestion from a committee member; however, for transparency, the results for these frequency bands are shown in Figure A\@ref(fig:amplitude-similarity-delta-theta-beta-gamma) in Appendix A. In short, the rationale behind this decision was that the functional connectome similarity analyses for these frequency bands appeared misleading, due to an unforeseen limitation of our approach to quantifying functional connectome similarity. Specifically---although the distribution of amplitude envelope correlation estimates in each of these frequency bands was in agreement with previous published published work [e.g., @fraschinietal_RobustnessFunctionalConnectivity_2019; @laietal_ComparisonScalpSourcereconstructed_2018; @mehrkanoonetal_IntrinsicCouplingModes_2014]---any qualitatively distinct differences in spatial organization between any pair of functional connectomes was overshadowed by the fact that the relative position of the observations in each connectome were very close together in space, resulting in very high to near-perfect estimates of functional connectome similarity across participants, sessions, and states. While these estimates are a statistically valid reflection of the data, we felt that they were neurophysiologically unrealistic, greatly exaggerating the magnitude of similarity between any pair of functional connectomes and failing to capture the intended nuance across participants, sessions, and states.
+Although we conducted all analyses for the delta, theta, beta, and gamma bands, we refrain from interpreting the results of these analyses here based on a post-hoc suggestion from a committee member; however, for transparency, the functional connectome similarity results for these frequency bands are shown in Figure A\@ref(fig:amplitude-similarity-delta-theta-beta-gamma) in Appendix A. In short, the rationale behind this decision was that the functional connectome similarity analyses for these frequency bands appeared misleading, due to an unforeseen limitation of our approach to quantifying functional connectome similarity. Specifically---although the distribution of amplitude envelope correlation estimates in each of these frequency bands was in agreement with previous published published work [e.g., @fraschinietal_RobustnessFunctionalConnectivity_2019; @laietal_ComparisonScalpSourcereconstructed_2018; @mehrkanoonetal_IntrinsicCouplingModes_2014]---any qualitatively distinct differences in spatial organization between any pair of functional connectomes was overshadowed by the fact that the relative position of the observations in each connectome were very close together in space, resulting in very high to near-perfect estimates of functional connectome similarity across participants, sessions, and states. While these estimates are a statistically valid reflection of the data, we felt that they were neurophysiologically unrealistic, greatly exaggerating the magnitude of similarity between any pair of functional connectomes and failing to capture the intended nuance across participants, sessions, and states.
 
 ## Outcome variability of functional connectome similarity contrasts
 

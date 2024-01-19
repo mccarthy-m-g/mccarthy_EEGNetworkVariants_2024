@@ -28,6 +28,10 @@ knitr::opts_chunk$set(
   fig.width = 6.531496, # inches
   #fig.asp = 1, # 1 / phi
   fig.show = "hold",
+  fig.cap.fp_text = officer::fp_text_lite(italic = TRUE, bold = FALSE),
+  fig.cap.sep = ". ",
+  tab.cap.fp_text = officer::fp_text_lite(italic = FALSE, bold = FALSE),
+  tab.cap.sep = "",
   cache.extra = knitr::rand_seed
 )
 
@@ -47,6 +51,8 @@ tar_load(appendix)
 ```{r}
 officer::block_section(officer::prop_section(type = "nextPage"))
 ```
+
+\newpage
 
 ```{r introduction}
 #| child = here::here("manuscripts/child-documents/introduction.Rmd")

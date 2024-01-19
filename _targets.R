@@ -1451,12 +1451,6 @@ manuscripts_targets <- list(
     )
   ),
   tar_render(
-    supplement_maximal_model_results,
-    here(
-      "manuscripts", "supplement", "maximal-model-results.Rmd"
-    )
-  ),
-  tar_render(
     supplement_eeg_preprocessing_diagnostics,
     here(
       "manuscripts", "supplement", "eeg-preprocessing-diagnostics.Rmd"

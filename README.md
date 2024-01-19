@@ -56,4 +56,4 @@ You are free to use, copy, modify, merge, publish, distribute, sublicense, and/o
 
 Under the following terms:
 
-**Attribution**---You must include the following copyright notice "Copyright (c) 2022 Michael McCarthy" and provide a link to the license in all copies or substantial portions of the Software.
+**Attribution**---You must include the following copyright notice "Copyright (c) 2024 Michael McCarthy" and provide a link to the license in all copies or substantial portions of the Software.

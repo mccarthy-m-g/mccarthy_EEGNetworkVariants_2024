@@ -38,12 +38,6 @@ connectivity_summary_table |>
  
 Finally, note that although amplitude envelope correlation estimates were generally smaller than phase lag index estimates in a given frequency band, we caution against a neurophysiological interpretation of these differences in terms of the relative degree of phase to amplitude coupling. Although both metrics provide an indication of coupling consistency and share the same possible range of 0 to 1, they are mathematically and conceptually distinct from one another. Because of this, quantitative comparisons between the two metrics in terms of coupling magnitudes are nebulous at best, and there is no reason to believe these metrics would give similar estimates when the relative degree of phase to amplitude coupling was equal. Instead, we reiterate that both metrics performed as expected based on what has been reported in previous work; thus, we proceeded with our full analysis plan for both coupling modes across all frequency bands, under the assumption that our estimates provided a sound representation of underlying (non-zero lag) global network activity for each participant.
 
-<!-- Indeed, we would expect the amplitude envelope correlation to be smaller than the phase lag index under such circumstances, given that the former  -->
-
-<!-- Additionally, the distribution of coupling magnitudes in each frequency band was generally right-skewed for both the phase lag index (Figure \@ref(fig:connectivity-histograms-figure)A) and the amplitude envelope correlation (Figure \@ref(fig:connectivity-histograms-figure)B) at a group and individual level. This distribution of coupling magnitudes is commonly observed for both the phase lag index and amplitude envelope correlation [e.g., @laietal_ComparisonScalpSourcereconstructed_2018; @mehrkanoonetal_IntrinsicCouplingModes_2014] and can be explained in part by the underestimation of true connectivity inherent to each of these metrics, due to their discounting of zero lag interactions [@cohen_EffectsTimeLag_2015; @fraschinietal_RobustnessFunctionalConnectivity_2019; @hippetal_LargescaleCorticalCorrelation_2012; @stametal_PhaseLagIndex_2007]. -->
-
-<!-- Note also that, within each frequency band, the strength of coupling for the phase lag index was generally stronger than the amplitude envelope correlation. Although each of these functional connectivity metrics share the same possible range of 0 to 1, which may invite quantitative comparisons between the two metrics, we emphasize that  -->
-
 ## Phase coupling functional connectome similarity analyses
 
 ```{r}
@@ -247,27 +241,10 @@ knitr::include_graphics(
 )
 ```
 
-<!-- These results are informative in that they rule out moderate or large effects for individuals whose direction was unresolved. -->
-
-<!--
-Negative results tended to occur
-
-Delta: all negative results came from P19, plus P09 between sessions, between sessions within states, within states; P07 between sessions within states
-
-Theta: all negative results came from P07 and P20
-
-Alpha: all negative result came from P09, appears to be caused by the eyes closed recording 2-1 being dissimilar from eyes open recordings (i.e., it might just be from a single inconsistent recording)
-
-Beta: all negative results came from P21, plus P20 for the between sessions and within states contrast
-
-Gamma: all negative results came from P21
-
-<!-- because our interval estimate will usually show there are many important non-null effects that are highly compatible with our data. -->
-
 <!-- Footnotes start --------------------------------------------------------->
 
 [^7]: For accessibility, larger versions of the figures in this section are available in the online supplement (see Similarity Matrices in the Supplementary Material available online).
 
-[^8]: Note that this statement would hold true even if we only considered the direction of the point estimates for each individual-level contrasts. This is shown in Figures \@ref(fig:phase-similarity-subset-plots-delta) to \@ref(fig:amplitude-similarity-subset-plots-alpha) in Appendix A, where it can be seen that although the majority of point estimates were positive across all contrasts, a small but not insignificant proportion of point estimates were negative for most contrasts across all frequency bands and coupling modes.
+[^8]: Note that this statement would hold true even if we only considered the direction of the point estimates for each individual-level contrast. This is shown in Figures \@ref(fig:phase-similarity-subset-plots-delta) to \@ref(fig:amplitude-similarity-subset-plots-alpha) in Appendix A, where it can be seen that although the majority of point estimates were positive across all contrasts, a small but not insignificant proportion of participants had negative point estimates for most contrasts across all frequency bands and coupling modes.
 
 <!-- Footnotes end ----------------------------------------------------------->

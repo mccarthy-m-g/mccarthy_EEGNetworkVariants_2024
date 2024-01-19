@@ -6,9 +6,25 @@
 [![Synced with](https://img.shields.io/badge/Synced%20with-OSF-blue.svg)](https://osf.io/xztdk/)
 <!-- badges: end -->
 
-## About
+This repository contains the materials and source code for my MSc thesis, titled "Studying Network Variants With Electroencephalography". This project uses the [targets](https://books.ropensci.org/targets/) R package to maintain a reproducible, end-to-end workflow for the entire computational pipeline. The configuration and computational steps in this pipeline can be found in `_targets.R`.
 
-This repository contains the materials and source code for my MSc thesis, tentatively titled "Studying network variants with electroencephalography".
+## Repository Overview
+
+- `manuscripts/` contains all source files and rendered documents made by our targets pipeline, including the thesis document and supplementary materials.
+
+- `figures/` contains all figures made by our targets pipeline.
+
+- `_targets.R` contains the [target script file](https://docs.ropensci.org/targets/reference/tar_script.html) to configure and define our targets pipeline. This is executed using the `run.R` or `run.sh` scripts.
+
+- `_targets/` contains, locally, the data store of our targets pipeline; in addition to metadata on the status of each target, which is included online.
+
+- `data/` contains, locally, the raw and cleaned EEG and functional connectivity data, participant descriptive data; in addition to the data file used to handle EEG preprocessing for each recording, which is included online.
+
+- `R/` contains the custom user-defined functions used in our targets pipeline.
+
+- `python/` contains the scripts we used interactively during the initial preprocessing stages of the project, which were later refactored into our targets pipeline using the [reticulate](https://rstudio.github.io/reticulate/) R package.
+
+- `LICENSE.md` contains a copy of the licenses content and code licenses for this repository.
 
 ## License
 

@@ -7,12 +7,14 @@
 data/EEG-recordings/
 data/EEG-sensor-connectivity/
 data/participant-descriptives.csv
+data/participant-descriptives-synthetic.csv
 
 R/scratch/
 python/scratch.py
 python/__pycache__/
 Rplots.pdf
 
+manuscripts/thesis/index.docx
 manuscripts/thesis/feedback/
 manuscripts/child-documents/scratch/
 manuscripts/supplement/scratch/

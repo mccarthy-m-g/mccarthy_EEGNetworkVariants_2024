@@ -45,7 +45,6 @@ tar_option_set(
 )
 
 # Load the R scripts with your custom functions:
-#for (file in list.files("R", full.names = TRUE)) source(file) # TODO: Uncomment this once all done
 source("R/preprocessing.R")
 source("R/connectivity.R")
 source("R/similarity.R")
@@ -178,7 +177,6 @@ preprocessing_targets <- list(
   )
 )
 
-# TODO: Calculate amplitude connectivity.
 # Might be able to use tar_map() and metaprogramming to do both phase and amplitude in a single target
 # TODO: See if this can be split up into separate tar_map functions
 connectivity_estimation_targets <- list(

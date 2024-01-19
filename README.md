@@ -22,9 +22,9 @@ This repository contains the materials and source code for my MSc thesis, titled
 
 - `R/` contains the custom user-defined functions used in our targets pipeline.
 
-- `python/` contains the scripts we used interactively during the initial preprocessing stages of the project, which were later refactored into our targets pipeline using the [reticulate](https://rstudio.github.io/reticulate/) R package.
+- `python/` contains the scripts we used interactively during the initial EEG preprocessing stages of the project, which were later refactored into our targets pipeline using the [reticulate](https://rstudio.github.io/reticulate/) R package.
 
-- `LICENSE.md` contains a copy of the licenses content and code licenses for this repository.
+- `LICENSE.md` contains a copy of the content and code licenses for this repository.
 
 ## License
 

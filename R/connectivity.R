@@ -942,9 +942,16 @@ make_connectivity_summary_table <- function(
     flextable::align(i = 1, align = "left") |>
     flextable::merge_at(i = 7, part = "body") |>
     flextable::align(i = 7, align = "left") |>
+    # Footnotes
+    flextable::add_footer_lines("SD = Standard Deviation") |>
     # Cell alignment
     flextable::align(part = "header", i = 1, align = "center") |>
     flextable::align(part = "body", j = 3:8, align = "right") |>
+    # Borders
+    flextable::hline_bottom(
+      border = flextable::fp_border_default(width = 2),
+      part = "footer"
+    ) |>
     # Font
     flextable::font(fontname = "Times New Roman", part = "all") |>
     flextable::fontsize(size = 10, part = "all")

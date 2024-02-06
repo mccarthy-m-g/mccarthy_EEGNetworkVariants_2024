@@ -40,7 +40,7 @@ FEBRUARY, 2024
 
 <br>
 
-&copy; Michael McCarthy 2022
+&copy; Michael McCarthy 2024
 :::
 
 ```{r}

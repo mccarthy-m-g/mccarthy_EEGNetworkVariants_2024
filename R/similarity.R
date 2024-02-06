@@ -2077,6 +2077,9 @@ make_contrast_results_table_nhst <- function(emmeans_tidy, contrasts_tidy) {
     ) |>
     ftExtra::colformat_md(part = "header") |>
     # Footer
+    flextable::add_footer_lines(
+      "SE = Standard Error, CI = Compatibility Interval"
+    ) |>
     flextable::footnote(
       i = 1, j = 1,
       value = flextable::as_paragraph(
@@ -2111,7 +2114,7 @@ make_contrast_results_table_nhst <- function(emmeans_tidy, contrasts_tidy) {
       part = "header"
     ) |>
     flextable::hline_bottom(
-      border = flextable::fp_border_default(width = 1.5),
+      border = flextable::fp_border_default(width = 2),
       part = "footer"
     ) |>
     flextable::fix_border_issues(part = "footer") |>
@@ -2253,6 +2256,9 @@ make_contrast_results_table_smd <- function(
     ) |>
     #ftExtra::colformat_md(part = "header") |>
     # Footer
+    flextable::add_footer_lines(
+      "SE = Standard Error, CI = Compatibility Interval"
+    ) |>
     flextable::footnote(
       i = 1, j = 1,
       value = flextable::as_paragraph(
@@ -2302,7 +2308,7 @@ make_contrast_results_table_smd <- function(
       part = "header"
     ) |>
     flextable::hline_bottom(
-      border = flextable::fp_border_default(width = 1.5),
+      border = flextable::fp_border_default(width = 2),
       part = "footer"
     ) |>
     flextable::fix_border_issues(part = "footer") |>
@@ -2401,7 +2407,7 @@ make_model_fit_table <- function(model, maximal_model = FALSE) {
     flextable::align(part = "body", j = 3:6, align = "right") |>
     # Borders
     flextable::hline_bottom(
-      border = flextable::fp_border_default(width = 1.5),
+      border = flextable::fp_border_default(width = 1),
       part = "footer"
     ) |>
     flextable::fix_border_issues(part = "footer") |>

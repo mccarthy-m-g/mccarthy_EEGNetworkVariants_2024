@@ -1,4 +1,4 @@
-# McCarthy MSc Thesis
+# Studying network variants with electroencephalography
 
 <!-- badges: start -->
 [![DOI](https://zenodo.org/badge/495956659.svg)](https://zenodo.org/badge/latestdoi/495956659)
@@ -6,7 +6,11 @@
 [![Synced with](https://img.shields.io/badge/Synced%20with-OSF-blue.svg)](https://osf.io/xztdk/)
 <!-- badges: end -->
 
-This repository contains the materials and source code for my MSc thesis, titled "Studying Network Variants With Electroencephalography". This project uses the [targets](https://books.ropensci.org/targets/) R package to maintain a reproducible, end-to-end workflow for the entire computational pipeline. The configuration and computational steps in this pipeline can be found in `_targets.R`.
+This repository contains the materials and source code for my Master's thesis:
+
+McCarthy, M. (2024). *Studying network variants with electroencephalography* [Master's thesis, University of Calgary]. PRISM Open Theses and Dissertations. <https://hdl.handle.net/1880/118186>
+
+This project uses the [targets](https://books.ropensci.org/targets/) R package to maintain a reproducible, end-to-end workflow for the entire computational pipeline. The configuration and computational steps in this pipeline can be found in `_targets.R`.
 
 ## Repository Overview
 
